@@ -2,5 +2,24 @@
   "type": "module",
   "dependencies": {
     "dotenv": "^16.0.3"
-  }
+  },
+  "name": "trsh_bot",
+  "version": "1.0.0",
+  "main": "trshbot.js",
+  "devDependencies": {},
+  "scripts": {
+    "start": "node trshbot.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TrshPuppy/trsh_bot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TrshPuppy/trsh_bot/issues"
+  },
+  "homepage": "https://github.com/TrshPuppy/trsh_bot#readme",
+  "description": ""
 }
