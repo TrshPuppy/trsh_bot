@@ -1,12 +1,12 @@
 {
   "type": "module",
   "dependencies": {
-    "dotenv": "^16.0.3"
+    "dotenv": "^16.0.3",
+    "tmi.js": "^1.8.5"
   },
   "name": "trsh_bot",
   "version": "1.0.0",
   "main": "trshbot.js",
-  "devDependencies": {},
   "scripts": {
     "start": "node trshbot.js",
     "test": "echo \"Error: no test specified\" && exit 1"

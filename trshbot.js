@@ -1,4 +1,7 @@
+// Imports:
 import * as dotenv from "dotenv";
+import tmi from "tmi.js";
+
 dotenv.config();
 
 console.log("Tiddies!");
