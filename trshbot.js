@@ -1,6 +1,7 @@
 // Imports:
 import * as dotenv from "dotenv";
 import tmi from "tmi.js";
+import parseMessage from "./messages.js";
 
 dotenv.config();
 
@@ -19,23 +20,28 @@ const client = new tmi.Client({
 client.connect();
 
 // Event Handlers:
-client.on("message", async (channel, context, message) => {
-  const IS_BOT = context.username.toLowerCase() === process.env.BOT_USERNAME;
+client.on("message", async (channel, context, message) =>
+  parseMessage([channel, context, message])
+);
 
-  if (!IS_BOT) {
-    client.say(
-      channel,
-      `Responding to ${context.username} message: ${message}`
-    );
-  }
+// client.on("message", async (channel, context, message) => {
+// //   const IS_BOT = context.username.toLowerCase() === process.env.BOT_USERNAME;
 
-  console.log("channel", {
-    channel,
-    user: context.username,
-    message,
-  });
-});
+// //   if (!IS_BOT) {
+// //     client.say(
+// //       channel,
+// //       `Responding to ${context.username} message: ${message}`
+// //     );
+// //   }
 
+// //   console.log("channel", {
+// //     channel,
+// //     user: context.username,
+// //     message,
+// //   });
+// });
+
+// console.log(client);
 /*
 NEED:
 TMI.js
