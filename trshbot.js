@@ -4,25 +4,39 @@ import tmi from "tmi.js";
 
 dotenv.config();
 
-// Setting up TMI to listen to channel chat
-// const client = new tmi.Client({
-//   connection: {
-//     reconnect: true,
-//   },
-//   channels: ["trshpuppy"],
-// });
+//Setting up TMI to listen to channel chat
+const client = new tmi.Client({
+  connection: {
+    reconnect: true,
+  },
+  channels: [process.env.CHANNEL],
+  identity: {
+    username: process.env.BOT_USERNAME,
+    password: process.env.OA_TOKEN,
+  },
+});
 
-// client.connect();
+client.connect();
 
-// client.on("message", async (channel, context, message) => {
-//   console.log("channel", {
-//     channel,
-//     user: context.username,
-//     message,
-//   });
-// });
+// Event Handlers:
+client.on("message", async (channel, context, message) => {
+  const IS_BOT = context.username.toLowerCase() === process.env.BOT_USERNAME;
 
-/*]
+  if (!IS_BOT) {
+    client.say(
+      channel,
+      `Responding to ${context.username} message: ${message}`
+    );
+  }
+
+  console.log("channel", {
+    channel,
+    user: context.username,
+    message,
+  });
+});
+
+/*
 NEED:
 TMI.js
     twitch.tmi (library)
