@@ -1,12 +1,12 @@
 // Imports:
 import * as dotenv from "dotenv";
 import tmi from "tmi.js";
-import parseMessage from "./messages.js";
+import delegateMessage from "./messages.js";
 
 dotenv.config();
 
 //Setting up TMI to listen to channel chat
-const client = new tmi.Client({
+export const client = new tmi.Client({
   connection: {
     reconnect: true,
   },
@@ -21,7 +21,7 @@ client.connect();
 
 // Event Handlers:
 client.on("message", async (channel, context, message) =>
-  parseMessage([channel, context, message])
+  delegateMessage(channel, context, message, client)
 );
 
 // client.on("message", async (channel, context, message) => {
