@@ -1,38 +1,78 @@
 // This module is meant to envelope functions r/t parsing through chat messages in order to delegate functions.
 
-import { client } from "tmi.js";
-
 // Imports:
+import { server } from "./trshbot.js";
 
 // Module globals:
 let lastTiddyTime = new Date(0);
 let tiddieLessMessages = 0;
 
-export default function delegateMessage(channel, context, message, client) {
-  if (context.username === "trsh_bot") {
+export default function delegateMessage(channel, context, message) {
+  if (context.username === server.username) {
     return;
   }
+
   tiddieLessMessages += 1;
-  // tiddies q30 messages:
-  // counter: for every message that is not from the bot
-  // change a word in the message to "tiddies" and post
 
   let secondsFromLastTiddy = (new Date() - lastTiddyTime) / 1000;
+  if (secondsFromLastTiddy >= 10 && tiddieLessMessages >= 1) {
+    if (tiddiesQ300(channel, context, message)) {
+      lastTiddyTime = new Date();
+      tiddieLessMessages = 0;
+    }
+  }
+}
 
-  if (secondsFromLastTiddy >= 10 && tiddieLessMessages >= 20) {
-    tiddiesQ300(channel, context, message, client);
-    lastTiddyTime = new Date();
-    tiddieLessMessages = 0;
+function tiddiesQ300(channel, context, message) {
+  let tiddiesMessage;
+
+  let messageSplitOfRandomShit = message.split(" ");
+
+  let validIndex = findValidIndex(messageSplitOfRandomShit);
+
+  if (validIndex === null) {
+    return false;
   }
 
-  // client.say(channel, message);
+  messageSplitOfRandomShit[validIndex] = "tiddies";
+
+  server.say(channel, messageSplitOfRandomShit.join(" "));
+  return true;
 }
 
-function tiddiesQ300(channel, context, message, client) {
-  console.log("tiddies");
-  client.say(channel, "tiddies");
-  // let tiddiesMessage =
+function isValidString(string) {
+  // does it contain emojis?
+  // is it more than one letteer?
+  // is it made up of alphabetical characters?
+  // if yes return true
+
+  ///^[a-z]+$/i (^ is beginning, $ is end)
+  if (/[a-z]+/i.test(string)) {
+    return true;
+  }
+  return false;
 }
+
+function findValidIndex(messageArray) {
+  const validIndices = Array.from({ length: messageArray.length }, (_, i) => i);
+
+  while (validIndices) {
+    const randomIndx = Math.floor(Math.random() * validIndices.length);
+    if (isValidString(messageArray[validIndices[randomIndx]])) {
+      return validIndices[randomIndx];
+    } else {
+      validIndices.splice(randomIndx, 1);
+    }
+  }
+  return null;
+}
+//tokeen timeline
+// (auto refresh)
+// tiddies is iconic
+
+// I was going to say, "FUCK SAVING LIVES, tiddies is living"
+
+// tiddies BIG MOOD
 
 /*
 [
