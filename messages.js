@@ -2,6 +2,7 @@
 
 // Imports:
 import { server } from "./trshbot.js";
+import { handleBotSummons } from "./commands.js";
 
 // Module globals:
 let lastTiddyTime = new Date(0);
@@ -11,11 +12,22 @@ export default function delegateMessage(channel, context, message) {
   if (context.username === server.username) {
     return;
   }
+  if (/(@\btrsh_bot\b)/i.test(message)) {
+    handleBotSummons(channel, context, message);
+    return;
+  }
+  if (message[0] === "!") {
+    return;
+  }
 
+  handleTiddyMessages(channel, context, message);
+}
+
+function handleTiddyMessages(channel, context, message) {
   tiddieLessMessages += 1;
 
   let secondsFromLastTiddy = (new Date() - lastTiddyTime) / 1000;
-  if (secondsFromLastTiddy >= 10 && tiddieLessMessages >= 1) {
+  if (secondsFromLastTiddy >= 300 && tiddieLessMessages >= 20) {
     if (tiddiesQ300(channel, context, message)) {
       lastTiddyTime = new Date();
       tiddieLessMessages = 0;
@@ -26,26 +38,24 @@ export default function delegateMessage(channel, context, message) {
 function tiddiesQ300(channel, context, message) {
   let tiddiesMessage;
 
-  let messageSplitOfRandomShit = message.split(" ");
+  let messageWords = message.split(" ");
+  if (messageWords.length === 1 || messageWords.length >= 15) {
+    return false;
+  }
 
-  let validIndex = findValidIndex(messageSplitOfRandomShit);
+  let validIndex = findValidIndex(messageWords);
 
   if (validIndex === null) {
     return false;
   }
 
-  messageSplitOfRandomShit[validIndex] = "tiddies";
+  messageWords[validIndex] = "tiddies";
 
-  server.say(channel, messageSplitOfRandomShit.join(" "));
+  server.say(channel, messageWords.join(" "));
   return true;
 }
 
 function isValidString(string) {
-  // does it contain emojis?
-  // is it more than one letteer?
-  // is it made up of alphabetical characters?
-  // if yes return true
-
   ///^[a-z]+$/i (^ is beginning, $ is end)
   if (/[a-z]+/i.test(string)) {
     return true;
@@ -66,13 +76,34 @@ function findValidIndex(messageArray) {
   }
   return null;
 }
-//tokeen timeline
-// (auto refresh)
-// tiddies is iconic
 
-// I was going to say, "FUCK SAVING LIVES, tiddies is living"
+/*
+bot commands:
+  @trsh_bot:
+              yes
+              no
+              count
+              ty
+              ricky
 
-// tiddies BIG MOOD
+              botCommands = [yes, no, count, ty]
+
+              @trsh_bot quote @arthvadrr
+
+                  command = [
+                    command: "quote",
+                    args: {author: @whoever,
+                          quoteArray:["i like to imagine jesus as a littlee baby", "I'm on fire"]},
+                          {author: @arthvadrr, 
+                            quoteArray" ["CAPS ON SLAPS ON"]}
+                          ]
+
+                          if( "3h")
+          
+*/
+
+// @trsh_bot:
+// yes/ no   commands(count, etc.)
 
 /*
 [
