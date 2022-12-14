@@ -9,6 +9,11 @@ let lastTiddyTime = new Date(0);
 let tiddieLessMessages = 0;
 
 export default function delegateMessage(channel, context, message) {
+  message = message.trim();
+
+  if (message[0] === "/" || message[0] === ".") {
+    return;
+  }
   if (context.username === server.username) {
     return;
   }
@@ -36,8 +41,6 @@ function handleTiddyMessages(channel, context, message) {
 }
 
 function tiddiesQ300(channel, context, message) {
-  let tiddiesMessage;
-
   let messageWords = message.split(" ");
   if (messageWords.length === 1 || messageWords.length >= 15) {
     return false;

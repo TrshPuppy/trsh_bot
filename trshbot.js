@@ -20,9 +20,7 @@ export const server = new tmi.Client({
 server.connect();
 
 // Event Handlers:
-server.on("message", async (channel, context, message) =>
-  delegateMessage(channel, context, message)
-);
+server.on("message", delegateMessage);
 
 // client.on("message", async (channel, context, message) => {
 // //   const IS_BOT = context.username.toLowerCase() === process.env.BOT_USERNAME;

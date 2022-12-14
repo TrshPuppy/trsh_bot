@@ -14,40 +14,77 @@ class Command {
     this.args.push(arg);
   }
 
-  addCallBack(cb) {
-    this.thatShitFunctionToExecute = cb;
+  tryHandleMessage(channel, context, [arg0, arg1, arg2, ...rest]) {
+    if (this.name === arg1) {
+      this.thatShitFunctionToExecute();
+      return true;
+    }
+    return false;
+  }
+}
+class QuoteCommand extends Command {
+  tryHandleMessage(channel, context, [arg0, arg1, arg2, ...rest]) {
+    if (this.name === arg1) {
+      const foundName = quotesDB.find((x) => x.author == arg2);
+      console.log(foundName);
+      if (foundName === undefined) {
+        return false;
+      }
+
+      this.thatShitFunctionToExecute(channel, context, [
+        arg0,
+        arg1,
+        arg2,
+        ...rest,
+      ]);
+      return true;
+    }
+    return false;
   }
 }
 
-const BOT_COMMANDS = [];
-const CHANNEL_COMMANDS = [];
+const botCommands = [];
+const channelCommands = [];
+const quotesDB = [
+  { author: "rulerlefi", quotes: ["stop flexing your python"] },
+];
 
-let yes = new Command("yes", [], () => server.say(process.env.CHANNEL, ":)"));
+const yesCommand = new Command("yes", [], () =>
+  server.say(process.env.CHANNEL, ":)")
+);
+const noCommand = new Command("no", [], () =>
+  server.say(process.env.CHANNEL, ":(")
+);
+const quoteCommand = new QuoteCommand("quote", [], handleQuoteCommand);
 
-yes.addArg("yes");
+// ("quote", [], handleQuoteCommand);
 
-BOT_COMMANDS.push(yes);
+// quoteCommand.addArg("rulerlefi");
+yesCommand.addArg("yes");
+noCommand.addArg("no");
 
-// BOT_COMMANDS.push(
-//   new Command("yes", [], () => server.say(process.env.CHANNEL, ":)")).addArg(
-//     "yes"
-//   )
-//   // .addCallBack(() => server.say(process.env.CHANNEL, ":)"))
-// );
+botCommands.push(yesCommand, noCommand, quoteCommand);
 
-console.log(BOT_COMMANDS);
-
-// const BOT_COMMANDS = [{ command: "yes", args: undefined, whatDo: undefined }];
+console.log(botCommands);
 
 export function handleBotSummons(channel, context, message) {
-  // <@trsh_bot><commands><args>
-  let messageArgs = message.split(" ");
-
-  if (messageArgs[1] === "yes") {
-    let found = BOT_COMMANDS.find((x) => x.name == "yes");
-    console.log(found);
-    found.thatShitFunctionToExecute();
+  for (const command of botCommands) {
+    if (command.tryHandleMessage(channel, context, message.split(" "))) {
+      return;
+    }
   }
+}
+
+function handleQuoteCommand(channel, context, message) {
+  //USE FIND INDEX INSTEAD
+
+  const indxIntoQuotes = quotesDB.findIndex((x) => x.author == message[2]);
+  const randomQuote =
+    quotesDB[indxIntoQuotes].quotes[Math.floor(Math.random() * 1)];
+
+  //Math.floor(Math.random() * validIndices.length)
+
+  server.say(channel, `${randomQuote} -@${message[2]}`);
 }
 
 // const CALL_BACK = () => server.say(channel, ":)");
@@ -86,4 +123,13 @@ Others:
         timer?
     !boingboingg
     
+
+
+
+QUOTES MOCKUP:
+
+    QUOTES = [];
+
+    [{author: "@steve7411",
+        quotes: ["JSON file?", "I am deeeply upset by this"]}]
 */
