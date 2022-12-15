@@ -27,9 +27,10 @@ class QuoteCommand extends Command {
     if (this.name === arg1) {
       const foundName = quotesDB.find((x) => x.author == arg2);
       console.log(foundName);
-      if (foundName === undefined) {
-        return false;
-      }
+      //   if (foundName === undefined) {
+
+      //     return false;
+      //   }
 
       this.thatShitFunctionToExecute(channel, context, [
         arg0,
@@ -46,7 +47,41 @@ class QuoteCommand extends Command {
 const botCommands = [];
 const channelCommands = [];
 const quotesDB = [
-  { author: "rulerlefi", quotes: ["stop flexing your python"] },
+  {
+    author: "rulerlefi",
+    quotes: ["Clicks get chicks or something like that?"],
+  },
+  { author: "arthvadrr", quotes: ["CAPS ON SLAPS ON"] },
+  {
+    author: "TrshPuppy",
+    quotes: [
+      "You gotta respect the bottom.",
+      "Ruler stop flexing your python",
+      "Actually one time, I was really proud, this dude got shot...",
+    ],
+  },
+  { author: "Martyn1842", quotes: ["We're gonna need a bigger stack"] },
+  {
+    author: "jcblw",
+    quotes: ["You're in her DMs, I'm in her console. We are not the same."],
+  },
+  {
+    author: "steve7411",
+    quotes: [
+      "Sometimes I type 'pythong' instead of 'python' because 'thong', so it's muscle memory. I do that all the time...",
+    ],
+  },
+  {
+    author: "Trsh_bot",
+    quotes: [
+      "tiddies for shoutouts and stuff.",
+      "I was going to say 'FUCK SAVING LIVES, tiddies is living.'",
+      "tiddies is iconic",
+      "tiddies BIG MOOD",
+      "I can help with some tiddies art.",
+      "Horse-sized tiddies or 100 duck-sized horses?",
+    ],
+  },
 ];
 
 const yesCommand = new Command("yes", [], () =>
@@ -57,9 +92,6 @@ const noCommand = new Command("no", [], () =>
 );
 const quoteCommand = new QuoteCommand("quote", [], handleQuoteCommand);
 
-// ("quote", [], handleQuoteCommand);
-
-// quoteCommand.addArg("rulerlefi");
 yesCommand.addArg("yes");
 noCommand.addArg("no");
 
@@ -77,17 +109,37 @@ export function handleBotSummons(channel, context, message) {
 
 function handleQuoteCommand(channel, context, message) {
   //USE FIND INDEX INSTEAD
+  // HANDLE FINDINDEX returning -1
+  let randomQuote;
+  let currentAuthor;
+  let indxIntoQuotesDB;
 
-  const indxIntoQuotes = quotesDB.findIndex((x) => x.author == message[2]);
-  const randomQuote =
-    quotesDB[indxIntoQuotes].quotes[Math.floor(Math.random() * 1)];
+  if (message[2] === undefined) {
+    indxIntoQuotesDB = Math.floor(Math.random() * quotesDB.length);
+  } else {
+    indxIntoQuotesDB = quotesDB.findIndex(
+      (x) => x.author.toLowerCase() == message[2].toLowerCase()
+    );
+  }
 
-  //Math.floor(Math.random() * validIndices.length)
+  if (indxIntoQuotesDB === -1) {
+    server.say(
+      channel,
+      `I guess @${message[2]} isn't ICONIC enough to be in my database :(`
+    );
+    return;
+  }
 
-  server.say(channel, `${randomQuote} -@${message[2]}`);
+  const quotesArrLength = quotesDB[indxIntoQuotesDB].quotes.length;
+  currentAuthor = quotesDB[indxIntoQuotesDB].author;
+  randomQuote =
+    quotesDB[indxIntoQuotesDB].quotes[
+      Math.floor(Math.random() * quotesArrLength)
+    ];
+
+  server.say(channel, `${randomQuote} - @${currentAuthor}`);
 }
 
-// const CALL_BACK = () => server.say(channel, ":)");
 /*
 Current commands to integrate:
     !lurk / !unlurk
