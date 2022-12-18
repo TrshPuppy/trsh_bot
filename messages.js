@@ -2,7 +2,7 @@
 
 // Imports:
 import { server } from "./trshbot.js";
-import { handleBotSummons } from "./commands.js";
+import { handleBotSummons, handleChannelCommand } from "./commands.js";
 
 // Module globals:
 let lastTiddyTime = new Date(0);
@@ -22,6 +22,7 @@ export default function delegateMessage(channel, context, message) {
     return;
   }
   if (message[0] === "!") {
+    handleChannelCommand(channel, context, message);
     return;
   }
 

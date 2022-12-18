@@ -1,9 +1,11 @@
-// This module is meant to handle chat commands.
-
 // Imports:
+import * as dotenv from "dotenv";
 import { server } from "./trshbot.js";
 
-class Command {
+dotenv.config();
+
+// This class constructs commands directed at the bot ex: "@trsh_bot":
+class BotCommand {
   constructor(name, args, callBack) {
     this.name = name;
     this.args = [];
@@ -21,8 +23,16 @@ class Command {
     }
     return false;
   }
+
+  getManual() {
+    const manualString = `To use this command type: '@${process.env.BOT_USERNAME} ${this.name} <arguments>.'`;
+    // possible arguments?
+    // setter for more uniquee manuals?
+    return manualString;
+  }
 }
-class QuoteCommand extends Command {
+
+class QuoteCommand extends BotCommand {
   tryHandleMessage(channel, context, [arg0, arg1, arg2, ...rest]) {
     if (this.name === arg1) {
       const foundName = quotesDB.find((x) => x.author == arg2);
@@ -44,6 +54,25 @@ class QuoteCommand extends Command {
   }
 }
 
+//This class constructs commands which start with the "!" prefix:
+class ChannelCommand extends BotCommand {
+  // constructor / setter should set the command's authority (who can use this command via badge/role)
+
+  tryHandleMessage(channel, context, [arg0, arg1, arg2, ...rest]) {
+    if (this.name !== arg0) {
+      return false;
+    }
+    if (channelCommands.find((x) => x.name == arg0) === -1) {
+      return false;
+    }
+    //if ( author of command !have authority){
+    //return false
+    // }
+    return true;
+  }
+}
+
+// Current database:
 const botCommands = [];
 const channelCommands = [];
 const quotesDB = [
@@ -80,25 +109,43 @@ const quotesDB = [
       "tiddies BIG MOOD",
       "I can help with some tiddies art.",
       "Horse-sized tiddies or 100 duck-sized horses?",
+      { quote: "But that tiddies also be my vote.", date: "12/16/22" },
+      {
+        quote: "wanna go play catch son? ok grab my tiddies",
+        date: "12/16/22",
+      },
     ],
   },
-];
+  {
+    author: "x684867",
+    quotes: [
+      {
+        quote:
+          "I really enjoy it when their egos meet a good pen test report on their stuff. The REAL big O notation is the expression when I'm handing them their /etc/passwd file.",
+        date: "12/16/22",
+      },
+    ],
+  },
+]; // taladeganights, office spaces
 
-const yesCommand = new Command("yes", [], () =>
+const yesCommand = new BotCommand("yes", [], () =>
   server.say(process.env.CHANNEL, ":)")
 );
-const noCommand = new Command("no", [], () =>
+yesCommand.addArg("yes");
+
+const noCommand = new BotCommand("no", [], () =>
   server.say(process.env.CHANNEL, ":(")
 );
-const quoteCommand = new QuoteCommand("quote", [], handleQuoteCommand);
-
-yesCommand.addArg("yes");
 noCommand.addArg("no");
 
+const quoteCommand = new QuoteCommand("quote", [], handleQuoteCommand);
+
+const manCommand = new ChannelCommand("!man", [], handleManCommand);
+
 botCommands.push(yesCommand, noCommand, quoteCommand);
+channelCommands.push(manCommand);
 
-console.log(botCommands);
-
+// Functions:
 export function handleBotSummons(channel, context, message) {
   for (const command of botCommands) {
     if (command.tryHandleMessage(channel, context, message.split(" "))) {
@@ -106,6 +153,8 @@ export function handleBotSummons(channel, context, message) {
     }
   }
 }
+
+export function handleChannelCommand(channel, context, message) {}
 
 function handleQuoteCommand(channel, context, message) {
   //USE FIND INDEX INSTEAD
@@ -140,6 +189,31 @@ function handleQuoteCommand(channel, context, message) {
   server.say(channel, `${randomQuote} - @${currentAuthor}`);
 }
 
+function handleManCommand() {
+  // "!man quote"
+}
+
+console.log(quoteCommand.getManual());
+
+/*
+Channel commands:
+  - start w/ "!"
+    - delegate from messages module
+
+  channeel command class : "args, name, callbackk"
+  ++  check for user's authoritah
+      (need context.mod)
+
+  Some commands handle data from twitch:
+  !so: shoutout:
+
+
+  {user.name} has returned from chewing up the floor. Hope you're feeling happy and full {user.name}!
+  
+
+
+
+*/
 /*
 Current commands to integrate:
     !lurk / !unlurk
