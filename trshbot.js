@@ -4,6 +4,7 @@ import tmi from "tmi.js";
 import delegateMessage from "./messages.js";
 
 dotenv.config();
+//test
 
 //Setting up TMI to listen to channel chat
 export const server = new tmi.Client({
