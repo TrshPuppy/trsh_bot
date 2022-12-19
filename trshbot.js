@@ -1,29 +1,12 @@
 // Imports:
 import * as dotenv from "dotenv";
+import { checkOAuthStatus } from "api.js";
 // import { test } from "./api.js";
 // import tmi from "tmi.js";
 // import delegateMessage from "./messages.js";
 
 dotenv.config();
-
-const TWITCH_REFRESH_URL = `https://id.twitch.tv/oauth2/token`;
-
-fetch(TWITCH_REFRESH_URL, {
-  method: "POST",
-  body: `grant_type=refresh_token&refresh_token=${process.env.REFRESH_TOKEN}&client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}`,
-  headers: {
-    "Content-Type": `application/x-www-form-urlencoded`,
-  },
-})
-  .then(function (response) {
-    return response.json();
-  })
-  .then(consoleThatShit);
-
-function consoleThatShit(shit) {
-  process.env.OA_TOKEN = shit.access_token;
-  console.log(process.env.OA_TOKEN);
-}
+checkOAuthStatus();
 
 // //Setting up TMI to listen to channel chat
 // export const server = new tmi.Client({
