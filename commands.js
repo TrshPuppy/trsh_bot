@@ -193,69 +193,62 @@ function handleManCommand() {
   // "!man quote"
 }
 
-console.log(quoteCommand.getManual());
+// console.log(quoteCommand.getManual());
 
-/*
-Channel commands:
-  - start w/ "!"
-    - delegate from messages module
+// /*
+// Channel commands:
+//   - start w/ "!"
+//     - delegate from messages module
 
-  channeel command class : "args, name, callbackk"
-  ++  check for user's authoritah
-      (need context.mod)
+//   channeel command class : "args, name, callbackk"
+//   ++  check for user's authoritah
+//       (need context.mod)
 
-  Some commands handle data from twitch:
-  !so: shoutout:
+//   Some commands handle data from twitch:
+//   !so: shoutout:
 
+//   {user.name} has returned from chewing up the floor. Hope you're feeling happy and full {user.name}!
 
-  {user.name} has returned from chewing up the floor. Hope you're feeling happy and full {user.name}!
-  
+// */
+// /*
+// Current commands to integrate:
+//     !lurk / !unlurk
+//     !tiddies (count)
+//     !socials
+//     !so
+//         (data to fetch?)
+//     !raid
+//         (DTF?)
+//     !prompt
+//     !project
+//     !editcommand
+//     !music
+//     !mom
+//     !hazelnut (count)
+//     !discord
+//     !kata
+//     !behave
+//     !to
+//         moderation: timeout / mute
+//     !gamedev
+//     !theme
+//     !hnc
+//     !dolphin
+//     !clan
+//     !codewars
+//     !swearjar / !empty
 
+// Others:
+//     !8ball
+//     !addquote / !quote
+//     !peachfuzz
+//         timer?
+//     !boingboingg
 
+// QUOTES MOCKUP:
 
-*/
-/*
-Current commands to integrate:
-    !lurk / !unlurk
-    !tiddies (count)
-    !socials
-    !so 
-        (data to fetch?)
-    !raid 
-        (DTF?)
-    !prompt
-    !project
-    !editcommand
-    !music
-    !mom
-    !hazelnut (count)
-    !discord
-    !kata
-    !behave
-    !to 
-        moderation: timeout / mute
-    !gamedev
-    !theme
-    !hnc
-    !dolphin
-    !clan
-    !codewars
-    !swearjar / !empty
+//     QUOTES = [];
 
-Others:
-    !8ball
-    !addquote / !quote
-    !peachfuzz
-        timer?
-    !boingboingg
-    
-
-
-
-QUOTES MOCKUP:
-
-    QUOTES = [];
-
-    [{author: "@steve7411",
-        quotes: ["JSON file?", "I am deeeply upset by this"]}]
-*/
+//     [{author: "@steve7411",
+//         quotes: ["JSON file?", "I am deeeply upset by this"]}]
+// */

@@ -81,61 +81,61 @@ function findValidIndex(messageArray) {
   return null;
 }
 
-/*
-bot commands:
-  @trsh_bot:
-              yes
-              no
-              count
-              ty
-              ricky
+// /*
+// bot commands:
+//   @trsh_bot:
+//               yes
+//               no
+//               count
+//               ty
+//               ricky
 
-              botCommands = [yes, no, count, ty]
+//               botCommands = [yes, no, count, ty]
 
-              @trsh_bot quote @arthvadrr
+//               @trsh_bot quote @arthvadrr
 
-                  command = [
-                    command: "quote",
-                    args: {author: @whoever,
-                          quoteArray:["i like to imagine jesus as a littlee baby", "I'm on fire"]},
-                          {author: @arthvadrr, 
-                            quoteArray" ["CAPS ON SLAPS ON"]}
-                          ]
+//                   command = [
+//                     command: "quote",
+//                     args: {author: @whoever,
+//                           quoteArray:["i like to imagine jesus as a littlee baby", "I'm on fire"]},
+//                           {author: @arthvadrr,
+//                             quoteArray" ["CAPS ON SLAPS ON"]}
+//                           ]
 
-                          if( "3h")
-          
-*/
+//                           if( "3h")
 
-// @trsh_bot:
-// yes/ no   commands(count, etc.)
+// */
 
-/*
-[
-  '#trshpuppy',
-  {
-    'badge-info': { subscriber: '4' },
-    badges: { broadcaster: '1', subscriber: '3000' },
-    'client-nonce': 'x',
-    color: '#8A2BE2',
-    'display-name': 'TrshPuppy',
-    emotes: null,
-    'first-msg': false,
-    flags: null,
-    id: 'x-x-x',
-    mod: false,
-    'returning-chatter': false,
-    'room-id': 'x',
-    subscriber: true,
-    'tmi-sent-ts': 'x',
-    turbo: false,
-    'user-id': 'x',
-    'user-type': null,
-    'emotes-raw': null,
-    'badge-info-raw': 'subscriber/4',
-    'badges-raw': 'broadcaster/1,subscriber/3000',
-    username: 'trshpuppy',
-    'message-type': 'chat'
-  },
-  'tiddies'
-]
-*/
+// // @trsh_bot:
+// // yes/ no   commands(count, etc.)
+
+// /*
+// [
+//   '#trshpuppy',
+//   {
+//     'badge-info': { subscriber: '4' },
+//     badges: { broadcaster: '1', subscriber: '3000' },
+//     'client-nonce': 'x',
+//     color: '#8A2BE2',
+//     'display-name': 'TrshPuppy',
+//     emotes: null,
+//     'first-msg': false,
+//     flags: null,
+//     id: 'x-x-x',
+//     mod: false,
+//     'returning-chatter': false,
+//     'room-id': 'x',
+//     subscriber: true,
+//     'tmi-sent-ts': 'x',
+//     turbo: false,
+//     'user-id': 'x',
+//     'user-type': null,
+//     'emotes-raw': null,
+//     'badge-info-raw': 'subscriber/4',
+//     'badges-raw': 'broadcaster/1,subscriber/3000',
+//     username: 'trshpuppy',
+//     'message-type': 'chat'
+//   },
+//   'tiddies'
+// ]
+// */
