@@ -1,32 +1,28 @@
-// This module is for handling Twitch API/ OAuth/ HTTP POST requests:
+import * as dotenv from "dotenv";
 
 //Module Gloabals:
-let timeSinceLastRefresh;
 let lastRefreshTime;
 
+dotenv.config();
+
 export default function checkOAuthStatus() {
-  if (!isOAuthValid()) {
+  if (isOAuthExpired()) {
     // If Oauth is due to expire OR OAuth returns a 404, then:
     refreshOAuth();
   }
+  return;
 }
 
-function isOAuthValid() {
+function isOAuthExpired() {
   // Check if OAuth is due to expire:
   const currentTime = new Date();
   const totalTimeWindow = lastRefreshTime + process.env.OA_EXPIRE;
   const fiveMinsBeforeExp = totalTimeWindow - 300;
 
   if (currentTime >= fiveMinsBeforeExp) {
-    return false;
+    return true;
   }
-
-  // Make Call to API and check for 404:
-  // if(call to API === 404){
-  //return false;
-  //}
-
-  return true;
+  return false;
 }
 
 function refreshOAuth() {
@@ -42,12 +38,28 @@ function refreshOAuth() {
     .then(function (response) {
       return response.json();
     })
-    .then(updateDotenv);
+    .then(checkRefreshResponse);
+
+  function checkRefreshResponse(response) {
+    console.log(response);
+    if (response.message === `Invalid refresh token`) {
+      getNewRefreshToken();
+    } else {
+      updateDotenv(response);
+    }
+  }
 
   function updateDotenv(response) {
     process.env.OA_TOKEN = response.access_token;
     process.env.OA_EXPIRE = response.expires_in;
+
+    // dotenv.config();
   }
 
   lastRefreshTime = new Date() / 1000;
+  return;
+}
+
+function getNewRefreshToken() {
+  console.log("Need new Refresh Token :(");
 }

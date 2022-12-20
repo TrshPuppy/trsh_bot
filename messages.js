@@ -1,85 +1,85 @@
-// // This module is meant to envelope functions r/t parsing through chat messages in order to delegate functions.
+// This module is meant to envelope functions r/t parsing through chat messages in order to delegate functions.
 
-// // Imports:
-// import { server } from "./trshbot.js";
-// import { handleBotSummons, handleChannelCommand } from "./commands.js";
+// Imports:
+import { server } from "./trshbot.js";
+import { handleBotSummons, handleChannelCommand } from "./commands.js";
 
-// // Module globals:
-// let lastTiddyTime = new Date(0);
-// let tiddieLessMessages = 0;
+// Module globals:
+let lastTiddyTime = new Date(0);
+let tiddieLessMessages = 0;
 
-// export default function delegateMessage(channel, context, message) {
-//   message = message.trim();
+export default function delegateMessage(channel, context, message) {
+  message = message.trim();
 
-//   if (message[0] === "/" || message[0] === ".") {
-//     return;
-//   }
-//   if (context.username === server.username) {
-//     return;
-//   }
-//   if (/(@\btrsh_bot\b)/i.test(message)) {
-//     handleBotSummons(channel, context, message);
-//     return;
-//   }
-//   if (message[0] === "!") {
-//     handleChannelCommand(channel, context, message);
-//     return;
-//   }
+  if (message[0] === "/" || message[0] === ".") {
+    return;
+  }
+  if (context.username === server.username) {
+    return;
+  }
+  if (/(@\btrsh_bot\b)/i.test(message)) {
+    handleBotSummons(channel, context, message);
+    return;
+  }
+  if (message[0] === "!") {
+    handleChannelCommand(channel, context, message);
+    return;
+  }
 
-//   handleTiddyMessages(channel, context, message);
-// }
+  handleTiddyMessages(channel, context, message);
+}
 
-// function handleTiddyMessages(channel, context, message) {
-//   tiddieLessMessages += 1;
+function handleTiddyMessages(channel, context, message) {
+  tiddieLessMessages += 1;
 
-//   let secondsFromLastTiddy = (new Date() - lastTiddyTime) / 1000;
-//   if (secondsFromLastTiddy >= 300 && tiddieLessMessages >= 20) {
-//     if (tiddiesQ300(channel, context, message)) {
-//       lastTiddyTime = new Date();
-//       tiddieLessMessages = 0;
-//     }
-//   }
-// }
+  let secondsFromLastTiddy = (new Date() - lastTiddyTime) / 1000;
+  if (secondsFromLastTiddy >= 300 && tiddieLessMessages >= 20) {
+    if (tiddiesQ300(channel, context, message)) {
+      lastTiddyTime = new Date();
+      tiddieLessMessages = 0;
+    }
+  }
+}
 
-// function tiddiesQ300(channel, context, message) {
-//   let messageWords = message.split(" ");
-//   if (messageWords.length === 1 || messageWords.length >= 15) {
-//     return false;
-//   }
+function tiddiesQ300(channel, context, message) {
+  let messageWords = message.split(" ");
+  if (messageWords.length === 1 || messageWords.length >= 15) {
+    return false;
+  }
 
-//   let validIndex = findValidIndex(messageWords);
+  let validIndex = findValidIndex(messageWords);
 
-//   if (validIndex === null) {
-//     return false;
-//   }
+  if (validIndex === null) {
+    return false;
+  }
 
-//   messageWords[validIndex] = "tiddies";
+  messageWords[validIndex] = "tiddies";
 
-//   server.say(channel, messageWords.join(" "));
-//   return true;
-// }
+  server.say(channel, messageWords.join(" "));
+  return true;
+}
 
-// function isValidString(string) {
-//   ///^[a-z]+$/i (^ is beginning, $ is end)
-//   if (/[a-z]+/i.test(string)) {
-//     return true;
-//   }
-//   return false;
-// }
+function isValidString(string) {
+  ///^[a-z]+$/i (^ is beginning, $ is end)
+  if (/[a-z]+/i.test(string)) {
+    return true;
+  }
+  return false;
+}
 
-// function findValidIndex(messageArray) {
-//   const validIndices = Array.from({ length: messageArray.length }, (_, i) => i);
+function findValidIndex(messageArray) {
+  const validIndices = Array.from({ length: messageArray.length }, (_, i) => i);
 
-//   while (validIndices) {
-//     const randomIndx = Math.floor(Math.random() * validIndices.length);
-//     if (isValidString(messageArray[validIndices[randomIndx]])) {
-//       return validIndices[randomIndx];
-//     } else {
-//       validIndices.splice(randomIndx, 1);
-//     }
-//   }
-//   return null;
-// }
+  while (validIndices) {
+    const randomIndx = Math.floor(Math.random() * validIndices.length);
+    if (isValidString(messageArray[validIndices[randomIndx]])) {
+      return validIndices[randomIndx];
+    } else {
+      validIndices.splice(randomIndx, 1);
+    }
+  }
+  return null;
+}
 
 // /*
 // bot commands:
