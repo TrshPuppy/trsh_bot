@@ -41,7 +41,6 @@ function refreshOAuth() {
     .then(checkRefreshResponse);
 
   function checkRefreshResponse(response) {
-    console.log(response);
     if (response.message === `Invalid refresh token`) {
       getNewRefreshToken();
     } else {
