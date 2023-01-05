@@ -114,6 +114,8 @@ const quotesDB = [
         quote: "wanna go play catch son? ok grab my tiddies",
         date: "12/16/22",
       },
+      "<-- tiddies engine :).",
+      "Well tiddies, I wouldn't say I love Windows.",
     ],
   },
   {
