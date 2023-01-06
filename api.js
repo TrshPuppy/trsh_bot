@@ -1,9 +1,12 @@
-import * as dotenv from "dotenv";
+// import * as dotenv from "dotenv";
+// import apiData from "./api.json" assert {type: 'json'};
+import testData from "./test.json" assert { type: "json" };
+import * as fs from "fs";
 
 //Module Gloabals:
 let lastRefreshTime;
 
-dotenv.config();
+// dotenv.config();
 
 export default function checkOAuthStatus() {
   if (isOAuthExpired()) {
@@ -16,7 +19,7 @@ export default function checkOAuthStatus() {
 function isOAuthExpired() {
   // Check if OAuth is due to expire:
   const currentTime = new Date();
-  const totalTimeWindow = lastRefreshTime + process.env.OA_EXPIRE;
+  const totalTimeWindow = lastRefreshTime + apiData.OA_EXPIRE;
   const fiveMinsBeforeExp = totalTimeWindow - 300;
 
   if (currentTime >= fiveMinsBeforeExp) {
@@ -30,7 +33,7 @@ function refreshOAuth() {
 
   fetch(TWITCH_REFRESH_URL, {
     method: "POST",
-    body: `grant_type=refresh_token&refresh_token=${process.env.REFRESH_TOKEN}&client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}`,
+    body: `grant_type=refresh_token&refresh_token=${apiData.REFRESH_TOKEN}&client_id=${apiData.CLIENT_ID}&client_secret=${apiData.CLIENT_SECRET}`,
     headers: {
       "Content-Type": `application/x-www-form-urlencoded`,
     },
@@ -44,13 +47,20 @@ function refreshOAuth() {
     if (response.message === `Invalid refresh token`) {
       getNewRefreshToken();
     } else {
-      updateDotenv(response);
+      updateJSON(response);
     }
   }
 
-  function updateDotenv(response) {
-    process.env.OA_TOKEN = response.access_token;
-    process.env.OA_EXPIRE = response.expires_in;
+  function updateJSON(response) {
+    // process.env.OA_TOKEN = response.access_token;
+    // process.env.OA_EXPIRE = response.expires_in;
+
+    const newRefresh = response.expires_in;
+    const newToken = response.access_token;
+    // const targetFile = "./api.json";
+    const targetFile = JSON.stringify(testData.test);
+
+    fs.open(targetFile);
 
     // dotenv.config();
   }
