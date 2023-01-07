@@ -1,26 +1,17 @@
-// import * as dotenv from "dotenv";
 import fetch from "node-fetch";
 import apiData from "./api.json" assert { type: "json" };
-// import testData from "./test.json" assert { type: "json" };
 import * as fs from "fs";
-
-//Module Gloabals:
-// let lastRefreshTime = new Date() / 1000 - 14106;
 
 export default function checkOAuthStatus() {
   if (isOAuthExpired()) {
     // If Oauth is due to expire OR OAuth returns a 404, then:
     refreshOAuth();
-    console.log("line 16 is where im at yo");
   }
   return;
 }
 
 function isOAuthExpired() {
-  // Check if OAuth is due to expire:
   const currentTime = new Date() / 1000; // in seconds
-  // const totalTimeWindow = lastRefreshTime / 1000 + apiData.OA_EXPIRE;
-  // const fiveMinsBeforeExp = totalTimeWindow - 300;
   const lastRefreshTime = apiData.LAST_REFRESH;
 
   // Check to see if the currentTime is within 5 minutes of the expiration or over:
@@ -33,8 +24,10 @@ function isOAuthExpired() {
 }
 
 function refreshOAuth() {
+  // When OAuth is expired,  && this function called, build fetch URL:
   const TWITCH_REFRESH_URL = `https://id.twitch.tv/oauth2/token`;
 
+  // Fetch new OAuth token:
   fetch(TWITCH_REFRESH_URL, {
     method: "POST",
     body: `client_id=${apiData.CLIENT_ID}&client_secret=${apiData.CLIENT_SECRET}&grant_type=refresh_token&refresh_token=${apiData.REFRESH_TOKEN}`,
@@ -48,6 +41,7 @@ function refreshOAuth() {
     .then(checkRefreshResponse)
     .catch((error) => console.log(`error during fetch = ${error}`));
 
+  // Check response for failure OR update JSON:
   function checkRefreshResponse(response) {
     if (response.message === `Invalid refresh token`) {
       getNewRefreshToken();
@@ -67,9 +61,12 @@ function updateJSON(response) {
   const JSONObj = JSON.stringify(apiData);
   const targetFile = "./api.json";
 
+  // Overwrite api.json w/ updated JSON Object:
   fs.writeFile(targetFile, JSONObj, "utf-8", (error) => {
     if (error) {
-      console.log("Error, failed to write new data to api.json.");
+      console.log(
+        "Error, failed to write new data to api.json. JSON not updated."
+      );
       return;
     }
     console.log("Successfully wrote new data to api.json file!");
@@ -79,5 +76,7 @@ function updateJSON(response) {
 }
 
 function getNewRefreshToken() {
-  console.log("Need new Refresh Token :(");
+  console.log(
+    "Need new Refresh Token :(. Not able to refresh token at this time."
+  );
 }
