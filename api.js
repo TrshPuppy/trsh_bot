@@ -5,14 +5,12 @@ import apiData from "./api.json" assert { type: "json" };
 import * as fs from "fs";
 
 //Module Gloabals:
-let lastRefreshTime = new Date() / 1000 - 300;
-
-// dotenv.config();
+// let lastRefreshTime = new Date() / 1000 - 14106;
 
 export default function checkOAuthStatus() {
   if (isOAuthExpired()) {
     // If Oauth is due to expire OR OAuth returns a 404, then:
-    // refreshOAuth();
+    refreshOAuth();
     console.log("line 16 is where im at yo");
   }
   return;
@@ -20,11 +18,13 @@ export default function checkOAuthStatus() {
 
 function isOAuthExpired() {
   // Check if OAuth is due to expire:
-  const currentTime = new Date() - 0; // in milliseconds
-  const totalTimeWindow = lastRefreshTime / 1000 + apiData.OA_EXPIRE;
-  const fiveMinsBeforeExp = totalTimeWindow - 300;
+  const currentTime = new Date() / 1000; // in seconds
+  // const totalTimeWindow = lastRefreshTime / 1000 + apiData.OA_EXPIRE;
+  // const fiveMinsBeforeExp = totalTimeWindow - 300;
+  const lastRefreshTime = apiData.LAST_REFRESH;
 
-  if (currentTime / 1000 >= fiveMinsBeforeExp) {
+  // Check to see if the currentTime is within 5 minutes of the expiration or over:
+  if (currentTime - lastRefreshTime >= apiData.OA_EXPIRE - 300) {
     console.log("OAuth is expired");
     return true;
   }
@@ -62,6 +62,7 @@ function updateJSON(response) {
   // Update values in JSON object w/ values from API response:
   apiData.OA_TOKEN = response.access_token;
   apiData.OA_EXPIRE = response.expires_in;
+  apiData.LAST_REFRESH = new Date() / 1000; // in seconds
 
   const JSONObj = JSON.stringify(apiData);
   const targetFile = "./api.json";
@@ -74,7 +75,6 @@ function updateJSON(response) {
     console.log("Successfully wrote new data to api.json file!");
   });
 
-  lastRefreshTime = new Date() - 0; // in milliseconds
   return;
 }
 
