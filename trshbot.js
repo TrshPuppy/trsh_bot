@@ -1,12 +1,9 @@
 // Imports:
-// import * as dotenv from "dotenv";
+
 import apiData from "./api.json" assert { type: "json" };
 import checkOAuthStatus from "./api.js";
 import tmi from "tmi.js";
 import delegateMessage from "./messages.js";
-
-// dotenv.config();
-//test
 
 checkOAuthStatus();
 
