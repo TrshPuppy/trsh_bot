@@ -1,30 +1,34 @@
 // import * as dotenv from "dotenv";
-// import apiData from "./api.json" assert {type: 'json'};
-import testData from "./test.json" assert { type: "json" };
+import fetch from "node-fetch";
+import apiData from "./api.json" assert { type: "json" };
+// import testData from "./test.json" assert { type: "json" };
 import * as fs from "fs";
 
 //Module Gloabals:
-let lastRefreshTime;
+let lastRefreshTime = new Date() / 1000 - 300;
 
 // dotenv.config();
 
 export default function checkOAuthStatus() {
   if (isOAuthExpired()) {
     // If Oauth is due to expire OR OAuth returns a 404, then:
-    refreshOAuth();
+    // refreshOAuth();
+    console.log("line 16 is where im at yo");
   }
   return;
 }
 
 function isOAuthExpired() {
   // Check if OAuth is due to expire:
-  const currentTime = new Date();
-  const totalTimeWindow = lastRefreshTime + apiData.OA_EXPIRE;
+  const currentTime = new Date() - 0; // in milliseconds
+  const totalTimeWindow = lastRefreshTime / 1000 + apiData.OA_EXPIRE;
   const fiveMinsBeforeExp = totalTimeWindow - 300;
 
-  if (currentTime >= fiveMinsBeforeExp) {
+  if (currentTime / 1000 >= fiveMinsBeforeExp) {
+    console.log("OAuth is expired");
     return true;
   }
+  console.log("OAuth is not expired");
   return false;
 }
 
@@ -33,7 +37,7 @@ function refreshOAuth() {
 
   fetch(TWITCH_REFRESH_URL, {
     method: "POST",
-    body: `grant_type=refresh_token&refresh_token=${apiData.REFRESH_TOKEN}&client_id=${apiData.CLIENT_ID}&client_secret=${apiData.CLIENT_SECRET}`,
+    body: `client_id=${apiData.CLIENT_ID}&client_secret=${apiData.CLIENT_SECRET}&grant_type=refresh_token&refresh_token=${apiData.REFRESH_TOKEN}`,
     headers: {
       "Content-Type": `application/x-www-form-urlencoded`,
     },
@@ -41,7 +45,8 @@ function refreshOAuth() {
     .then(function (response) {
       return response.json();
     })
-    .then(checkRefreshResponse);
+    .then(checkRefreshResponse)
+    .catch((error) => console.log(`error during fetch = ${error}`));
 
   function checkRefreshResponse(response) {
     if (response.message === `Invalid refresh token`) {
@@ -50,22 +55,26 @@ function refreshOAuth() {
       updateJSON(response);
     }
   }
+  return;
+}
 
-  function updateJSON(response) {
-    // process.env.OA_TOKEN = response.access_token;
-    // process.env.OA_EXPIRE = response.expires_in;
+function updateJSON(response) {
+  // Update values in JSON object w/ values from API response:
+  apiData.OA_TOKEN = response.access_token;
+  apiData.OA_EXPIRE = response.expires_in;
 
-    const newRefresh = response.expires_in;
-    const newToken = response.access_token;
-    // const targetFile = "./api.json";
-    const targetFile = JSON.stringify(testData.test);
+  const JSONObj = JSON.stringify(apiData);
+  const targetFile = "./api.json";
 
-    fs.open(targetFile);
+  fs.writeFile(targetFile, JSONObj, "utf-8", (error) => {
+    if (error) {
+      console.log("Error, failed to write new data to api.json.");
+      return;
+    }
+    console.log("Successfully wrote new data to api.json file!");
+  });
 
-    // dotenv.config();
-  }
-
-  lastRefreshTime = new Date() / 1000;
+  lastRefreshTime = new Date() - 0; // in milliseconds
   return;
 }
 
