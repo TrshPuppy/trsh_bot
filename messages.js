@@ -3,10 +3,11 @@
 // Imports:
 import { server } from "./trshbot.js";
 import { handleBotSummons, handleChannelCommand } from "./commands.js";
+import apiData from "./api.json" assert { type: "json" };
 
 // Module globals:
-let lastTiddyTime = new Date(0);
-let tiddieLessMessages = 0;
+let lastKeywordTime = new Date(0);
+let keywordLessMessages = 0;
 
 export default function delegateMessage(channel, context, message) {
   message = message.trim();
@@ -26,22 +27,22 @@ export default function delegateMessage(channel, context, message) {
     return;
   }
 
-  handleTiddyMessages(channel, context, message);
+  handleKeywordMessages(channel, context, message);
 }
 
-function handleTiddyMessages(channel, context, message) {
-  tiddieLessMessages += 1;
+function handleKeywordMessages(channel, context, message) {
+  keywordLessMessages += 1;
 
-  let secondsFromLastTiddy = (new Date() - lastTiddyTime) / 1000;
-  if (secondsFromLastTiddy >= 300 && tiddieLessMessages >= 20) {
-    if (tiddiesQ300(channel, context, message)) {
-      lastTiddyTime = new Date();
-      tiddieLessMessages = 0;
+  let secondsFromLastKeyword = (new Date() - lastKeywordTime) / 1000;
+  if (secondsFromLastKeyword >= 300 && keywordLessMessages >= 20) {
+    if (keywordQ300(channel, context, message)) {
+      lastKeywordTime = new Date();
+      keywordLessMessages = 0;
     }
   }
 }
 
-function tiddiesQ300(channel, context, message) {
+function keywordQ300(channel, context, message) {
   let messageWords = message.split(" ");
   if (messageWords.length === 1 || messageWords.length >= 15) {
     return false;
@@ -53,7 +54,7 @@ function tiddiesQ300(channel, context, message) {
     return false;
   }
 
-  messageWords[validIndex] = "tiddies";
+  messageWords[validIndex] = `${apiData.KEYWORD}`;
 
   server.say(channel, messageWords.join(" "));
   return true;
