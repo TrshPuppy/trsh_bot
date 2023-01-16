@@ -34,7 +34,7 @@ function handleKeywordMessages(channel, context, message) {
   keywordLessMessages += 1;
 
   let secondsFromLastKeyword = (new Date() - lastKeywordTime) / 1000;
-  if (secondsFromLastKeyword >= 300 && keywordLessMessages >= 20) {
+  if (secondsFromLastKeyword >= 3 && keywordLessMessages >= 2) {
     if (keywordQ300(channel, context, message)) {
       lastKeywordTime = new Date();
       keywordLessMessages = 0;
@@ -54,7 +54,7 @@ function keywordQ300(channel, context, message) {
     return false;
   }
 
-  messageWords[validIndex] = `${apiData.KEYWORD}`;
+  messageWords[validIndex] = `${apiData.Bot.KEYWORD}`;
 
   server.say(channel, messageWords.join(" "));
   return true;
