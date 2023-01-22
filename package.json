@@ -1,7 +1,7 @@
 {
   "type": "module",
   "dependencies": {
-    "dotenv": "^16.0.3",
+    "pos": "^0.4.2",
     "tmi.js": "^1.8.5"
   },
   "name": "trsh_bot",

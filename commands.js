@@ -1,8 +1,6 @@
 // Imports:
-import * as dotenv from "dotenv";
 import { server } from "./trshbot.js";
-
-dotenv.config();
+import apiData from "./api.json" assert { type: "json" };
 
 // This class constructs commands directed at the bot ex: "@trsh_bot":
 class BotCommand {
@@ -25,7 +23,7 @@ class BotCommand {
   }
 
   getManual() {
-    const manualString = `To use this command type: '@${process.env.BOT_USERNAME} ${this.name} <arguments>.'`;
+    const manualString = `To use this command type: '@${apiData.Bot.BOT_USERNAME} ${this.name} <arguments>.'`;
     // possible arguments?
     // setter for more uniquee manuals?
     return manualString;
@@ -114,6 +112,8 @@ const quotesDB = [
         quote: "wanna go play catch son? ok grab my tiddies",
         date: "12/16/22",
       },
+      "<-- tiddies engine :).",
+      "Well tiddies, I wouldn't say I love Windows.",
     ],
   },
   {
@@ -127,14 +127,15 @@ const quotesDB = [
     ],
   },
 ]; // taladeganights, office spaces
+// Remember, the field mouse is fast, but the owl sees at night...
 
 const yesCommand = new BotCommand("yes", [], () =>
-  server.say(process.env.CHANNEL, ":)")
+  server.say(apiData.Bot.CHANNEL, ":)")
 );
 yesCommand.addArg("yes");
 
 const noCommand = new BotCommand("no", [], () =>
-  server.say(process.env.CHANNEL, ":(")
+  server.say(apiData.Bot.CHANNEL, ":(")
 );
 noCommand.addArg("no");
 
@@ -244,6 +245,7 @@ function handleManCommand() {
 //     !peachfuzz
 //         timer?
 //     !boingboingg
+//    !whatstheword (returns a random word)
 
 // QUOTES MOCKUP:
 

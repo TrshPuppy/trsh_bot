@@ -1,12 +1,14 @@
 // This module is meant to envelope functions r/t parsing through chat messages in order to delegate functions.
 
 // Imports:
+const pos = require("pos"); // https://github.com/dariusk/pos-js
 import { server } from "./trshbot.js";
 import { handleBotSummons, handleChannelCommand } from "./commands.js";
+import apiData from "./api.json" assert { type: "json" };
 
 // Module globals:
-let lastTiddyTime = new Date(0);
-let tiddieLessMessages = 0;
+let Fred = new Date(0); // lastKeywordTime
+let keywordLessMessages = 0;
 
 export default function delegateMessage(channel, context, message) {
   message = message.trim();
@@ -26,22 +28,22 @@ export default function delegateMessage(channel, context, message) {
     return;
   }
 
-  handleTiddyMessages(channel, context, message);
+  handleKeywordMessages(channel, context, message);
 }
 
-function handleTiddyMessages(channel, context, message) {
-  tiddieLessMessages += 1;
+function handleKeywordMessages(channel, context, message) {
+  keywordLessMessages += 1;
 
-  let secondsFromLastTiddy = (new Date() - lastTiddyTime) / 1000;
-  if (secondsFromLastTiddy >= 300 && tiddieLessMessages >= 20) {
-    if (tiddiesQ300(channel, context, message)) {
-      lastTiddyTime = new Date();
-      tiddieLessMessages = 0;
+  let secondsFromLastKeyword = (new Date() - Fred) / 1000;
+  if (secondsFromLastKeyword >= 300 && keywordLessMessages >= 20) {
+    if (keywordQ300(channel, context, message)) {
+      Fred = new Date();
+      keywordLessMessages = 0;
     }
   }
 }
 
-function tiddiesQ300(channel, context, message) {
+function keywordQ300(channel, context, message) {
   let messageWords = message.split(" ");
   if (messageWords.length === 1 || messageWords.length >= 15) {
     return false;
@@ -53,7 +55,7 @@ function tiddiesQ300(channel, context, message) {
     return false;
   }
 
-  messageWords[validIndex] = "tiddies";
+  messageWords[validIndex] = `${apiData.Bot.KEYWORD}`;
 
   server.say(channel, messageWords.join(" "));
   return true;
@@ -61,10 +63,49 @@ function tiddiesQ300(channel, context, message) {
 
 function isValidString(string) {
   ///^[a-z]+$/i (^ is beginning, $ is end)
-  if (/[a-z]+/i.test(string)) {
-    return true;
+  if (!/[a-z]+/i.test(string)) {
+    return false;
   }
-  return false;
+
+  /* Words to disclude:
+    pronouns
+    prepositions
+    conjunctions
+
+    OR: select for nouns only
+  if
+  is
+  of
+  or
+  the
+  her
+  his
+  theirs
+  they
+  he
+  she
+  a
+  and
+  what
+  why
+  when
+  where
+  how
+  but
+  that
+  to
+  some
+  ok
+  okay
+  are
+  hi
+  hello
+  bye
+  goodbye
+  did
+  do
+  does
+*/
 }
 
 function findValidIndex(messageArray) {

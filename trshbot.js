@@ -1,24 +1,21 @@
 // Imports:
-import * as dotenv from "dotenv";
-import checkOAuthStatus from "./api.js";
 
+import apiData from "./api.json" assert { type: "json" };
+import checkOAuthStatus from "./api.js";
 import tmi from "tmi.js";
 import delegateMessage from "./messages.js";
 
-dotenv.config();
-//test
-
-checkOAuthStatus();
+checkOAuthStatus(); // make async
 
 //Setting up TMI to listen to channel chat
 export const server = new tmi.Client({
   connection: {
     reconnect: true,
   },
-  channels: [process.env.CHANNEL],
+  channels: [apiData.Bot.CHANNEL],
   identity: {
-    username: process.env.BOT_USERNAME,
-    password: process.env.OA_TOKEN,
+    username: apiData.Bot.BOT_USERNAME,
+    password: apiData.OA_TOKEN,
   },
 });
 

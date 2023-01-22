@@ -1,9 +1,6 @@
-import * as dotenv from "dotenv";
-
-//Module Gloabals:
-let lastRefreshTime;
-
-dotenv.config();
+import fetch from "node-fetch";
+import apiData from "./api.json" assert { type: "json" };
+import * as fs from "fs";
 
 export default function checkOAuthStatus() {
   if (isOAuthExpired()) {
@@ -14,23 +11,26 @@ export default function checkOAuthStatus() {
 }
 
 function isOAuthExpired() {
-  // Check if OAuth is due to expire:
-  const currentTime = new Date();
-  const totalTimeWindow = lastRefreshTime + process.env.OA_EXPIRE;
-  const fiveMinsBeforeExp = totalTimeWindow - 300;
+  const currentTime = new Date() / 1000; // in seconds
+  const lastRefreshTime = apiData.LAST_REFRESH;
 
-  if (currentTime >= fiveMinsBeforeExp) {
+  // Check to see if the currentTime is within 5 minutes of the expiration or over:
+  if (currentTime - lastRefreshTime >= apiData.OA_EXPIRE - 300) {
+    console.log("OAuth is expired");
     return true;
   }
+  console.log("OAuth is not expired");
   return false;
 }
 
 function refreshOAuth() {
+  // When OAuth is expired,  && this function called, build fetch URL:
   const TWITCH_REFRESH_URL = `https://id.twitch.tv/oauth2/token`;
 
+  // Fetch new OAuth token:
   fetch(TWITCH_REFRESH_URL, {
     method: "POST",
-    body: `grant_type=refresh_token&refresh_token=${process.env.REFRESH_TOKEN}&client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}`,
+    body: `client_id=${apiData.CLIENT_ID}&client_secret=${apiData.CLIENT_SECRET}&grant_type=refresh_token&refresh_token=${apiData.REFRESH_TOKEN}`,
     headers: {
       "Content-Type": `application/x-www-form-urlencoded`,
     },
@@ -38,27 +38,45 @@ function refreshOAuth() {
     .then(function (response) {
       return response.json();
     })
-    .then(checkRefreshResponse);
+    .then(checkRefreshResponse)
+    .catch((error) => console.log(`error during fetch = ${error}`));
 
+  // Check response for failure OR update JSON:
   function checkRefreshResponse(response) {
     if (response.message === `Invalid refresh token`) {
       getNewRefreshToken();
     } else {
-      updateDotenv(response);
+      updateJSON(response);
     }
   }
+  return;
+}
 
-  function updateDotenv(response) {
-    process.env.OA_TOKEN = response.access_token;
-    process.env.OA_EXPIRE = response.expires_in;
+function updateJSON(response) {
+  // Update values in JSON object w/ values from API response:
+  apiData.OA_TOKEN = response.access_token;
+  apiData.OA_EXPIRE = response.expires_in;
+  apiData.LAST_REFRESH = new Date() / 1000; // in seconds
 
-    // dotenv.config();
-  }
+  const JSONObj = JSON.stringify(apiData);
+  const targetFile = "./api.json";
 
-  lastRefreshTime = new Date() / 1000;
+  // Overwrite api.json w/ updated JSON Object:
+  fs.writeFile(targetFile, JSONObj, "utf-8", (error) => {
+    if (error) {
+      console.log(
+        "Error, failed to write new data to api.json. JSON not updated."
+      );
+      return;
+    }
+    console.log("Successfully wrote new data to api.json file!");
+  });
+
   return;
 }
 
 function getNewRefreshToken() {
-  console.log("Need new Refresh Token :(");
+  console.log(
+    "Need new Refresh Token :(. Not able to refresh token at this time."
+  );
 }
