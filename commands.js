@@ -127,6 +127,7 @@ const quotesDB = [
     ],
   },
 ]; // taladeganights, office spaces
+// Remember, the field mouse is fast, but the owl sees at night...
 
 const yesCommand = new BotCommand("yes", [], () =>
   server.say(apiData.Bot.CHANNEL, ":)")
@@ -244,6 +245,7 @@ function handleManCommand() {
 //     !peachfuzz
 //         timer?
 //     !boingboingg
+//    !whatstheword (returns a random word)
 
 // QUOTES MOCKUP:
 

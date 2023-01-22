@@ -1,12 +1,13 @@
 // This module is meant to envelope functions r/t parsing through chat messages in order to delegate functions.
 
 // Imports:
+const pos = require("pos"); // https://github.com/dariusk/pos-js
 import { server } from "./trshbot.js";
 import { handleBotSummons, handleChannelCommand } from "./commands.js";
 import apiData from "./api.json" assert { type: "json" };
 
 // Module globals:
-let lastKeywordTime = new Date(0);
+let Fred = new Date(0); // lastKeywordTime
 let keywordLessMessages = 0;
 
 export default function delegateMessage(channel, context, message) {
@@ -33,10 +34,10 @@ export default function delegateMessage(channel, context, message) {
 function handleKeywordMessages(channel, context, message) {
   keywordLessMessages += 1;
 
-  let secondsFromLastKeyword = (new Date() - lastKeywordTime) / 1000;
-  if (secondsFromLastKeyword >= 3 && keywordLessMessages >= 2) {
+  let secondsFromLastKeyword = (new Date() - Fred) / 1000;
+  if (secondsFromLastKeyword >= 300 && keywordLessMessages >= 20) {
     if (keywordQ300(channel, context, message)) {
-      lastKeywordTime = new Date();
+      Fred = new Date();
       keywordLessMessages = 0;
     }
   }
@@ -62,10 +63,49 @@ function keywordQ300(channel, context, message) {
 
 function isValidString(string) {
   ///^[a-z]+$/i (^ is beginning, $ is end)
-  if (/[a-z]+/i.test(string)) {
-    return true;
+  if (!/[a-z]+/i.test(string)) {
+    return false;
   }
-  return false;
+
+  /* Words to disclude:
+    pronouns
+    prepositions
+    conjunctions
+
+    OR: select for nouns only
+  if
+  is
+  of
+  or
+  the
+  her
+  his
+  theirs
+  they
+  he
+  she
+  a
+  and
+  what
+  why
+  when
+  where
+  how
+  but
+  that
+  to
+  some
+  ok
+  okay
+  are
+  hi
+  hello
+  bye
+  goodbye
+  did
+  do
+  does
+*/
 }
 
 function findValidIndex(messageArray) {
