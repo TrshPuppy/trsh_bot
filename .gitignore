@@ -1,6 +1,9 @@
 .env
 node_modules
+notes.mdn
+docker.mdn
 package-lock.json
 package.json
 notes.mdn
 api.json
+
