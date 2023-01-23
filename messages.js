@@ -1,9 +1,12 @@
 // This module is meant to envelope functions r/t parsing through chat messages in order to delegate functions.
 
 // Imports:
-const pos = require("pos"); // https://github.com/dariusk/pos-js
+//const pos = require("pos"); // https://github.com/dariusk/pos-js
 import { server } from "./trshbot.js";
-import { handleBotSummons, handleChannelCommand } from "./commands.js";
+import {
+  handleBotSummons,
+  ifThisDoesntWorkItsStevesFault,
+} from "./commands.js";
 import apiData from "./api.json" assert { type: "json" };
 
 // Module globals:
@@ -24,7 +27,7 @@ export default function delegateMessage(channel, context, message) {
     return;
   }
   if (message[0] === "!") {
-    handleChannelCommand(channel, context, message);
+    ifThisDoesntWorkItsStevesFault(channel, context, message);
     return;
   }
 
@@ -45,7 +48,8 @@ function handleKeywordMessages(channel, context, message) {
 
 function keywordQ300(channel, context, message) {
   let messageWords = message.split(" ");
-  if (messageWords.length === 1 || messageWords.length >= 15) {
+
+  if (messageWords.length === 1 || messageWords.length >= 20) {
     return false;
   }
 
@@ -63,9 +67,10 @@ function keywordQ300(channel, context, message) {
 
 function isValidString(string) {
   ///^[a-z]+$/i (^ is beginning, $ is end)
-  if (!/[a-z]+/i.test(string)) {
-    return false;
+  if (/[a-z]+/i.test(string)) {
+    return true;
   }
+  return false;
 
   /* Words to disclude:
     pronouns

@@ -1,6 +1,7 @@
 // Imports:
 import { server } from "./trshbot.js";
 import apiData from "./api.json" assert { type: "json" };
+import promptQueue from "./promptQueue.json" assert { type: "json" };
 
 // This class constructs commands directed at the bot ex: "@trsh_bot":
 class BotCommand {
@@ -33,13 +34,6 @@ class BotCommand {
 class QuoteCommand extends BotCommand {
   tryHandleMessage(channel, context, [arg0, arg1, arg2, ...rest]) {
     if (this.name === arg1) {
-      const foundName = quotesDB.find((x) => x.author == arg2);
-      console.log(foundName);
-      //   if (foundName === undefined) {
-
-      //     return false;
-      //   }
-
       this.thatShitFunctionToExecute(channel, context, [
         arg0,
         arg1,
@@ -58,18 +52,26 @@ class ChannelCommand extends BotCommand {
 
   tryHandleMessage(channel, context, [arg0, arg1, arg2, ...rest]) {
     if (this.name !== arg0) {
+      console.log(this.name);
       return false;
     }
-    if (channelCommands.find((x) => x.name == arg0) === -1) {
-      return false;
-    }
+
     //if ( author of command !have authority){
     //return false
     // }
+
+    this.thatShitFunctionToExecute(channel, context, [
+      arg0,
+      arg1,
+      arg2,
+      ...rest,
+    ]);
+
     return true;
   }
 }
 
+let currentQueueNumber = 1;
 // Current database:
 const botCommands = [];
 const channelCommands = [];
@@ -128,6 +130,8 @@ const quotesDB = [
   },
 ]; // taladeganights, office spaces
 // Remember, the field mouse is fast, but the owl sees at night...
+// Leaderboard for most iconic chatters
+// chatter quotes featuring TB
 
 const yesCommand = new BotCommand("yes", [], () =>
   server.say(apiData.Bot.CHANNEL, ":)")
@@ -143,8 +147,10 @@ const quoteCommand = new QuoteCommand("quote", [], handleQuoteCommand);
 
 const manCommand = new ChannelCommand("!man", [], handleManCommand);
 
+const promptCommand = new ChannelCommand("!prompt", [], handlePromptCommand);
+
 botCommands.push(yesCommand, noCommand, quoteCommand);
-channelCommands.push(manCommand);
+channelCommands.push(manCommand, promptCommand);
 
 // Functions:
 export function handleBotSummons(channel, context, message) {
@@ -155,7 +161,14 @@ export function handleBotSummons(channel, context, message) {
   }
 }
 
-export function handleChannelCommand(channel, context, message) {}
+//handleChannelCommand
+export function ifThisDoesntWorkItsStevesFault(channel, context, message) {
+  for (const command of channelCommands) {
+    if (command.tryHandleMessage(channel, context, message.split(" "))) {
+      break;
+    }
+  }
+}
 
 function handleQuoteCommand(channel, context, message) {
   //USE FIND INDEX INSTEAD
@@ -192,6 +205,51 @@ function handleQuoteCommand(channel, context, message) {
 
 function handleManCommand() {
   // "!man quote"
+  console.log("im a man");
+}
+
+function handlePromptCommand(channel, context, message) {
+  currentQueueNumber += 1;
+
+  // Prep message for JSON object
+  message.shift();
+
+  const firstPrompt = promptQueue[0];
+
+  // Create prompt to be written to JSON file!
+  const newPrompt = Object.create(firstPrompt);
+
+  newPrompt.prompt = message.join(" ").trimEnd();
+  newPrompt.author = context.username;
+  newPrompt.time = new Date() * 1; // milliseconds
+  newPrompt.completed = 0;
+
+  promptQueue.push(newPrompt);
+
+  console.table(promptQueue);
+
+  /*
+  " !prompt this is a prompt"
+// /////////////////////////////////////////'custom-reward-id': '9cd066ae-2645-4aee-87fe-759d64aef086',
+
+  array:
+    make an object of queued prompts
+    array[0] is the oldest prompt and next in line
+      and author?
+      ? done or not done
+      time submitted
+
+      object gets written to JSON QUeue file
+
+    As we need prompts:
+      ask trshbot for the next prompt
+      !p
+        checks that user is me
+        console logs the next valid (not marked done) prompt
+        ? marks the prompt as finished
+
+        object gets deleted from queue file and written to finished file
+  */
 }
 
 // console.log(quoteCommand.getManual());

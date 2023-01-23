@@ -6,4 +6,5 @@ package-lock.json
 package.json
 notes.mdn
 api.json
+.vscode
 
