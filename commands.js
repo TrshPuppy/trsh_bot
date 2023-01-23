@@ -105,10 +105,6 @@ const quotesDB = [
     author: "Trsh_bot",
     quotes: [
       "tiddies for shoutouts and stuff.",
-      "I was going to say 'FUCK SAVING LIVES, tiddies is living.'",
-      "tiddies is iconic",
-      "tiddies BIG MOOD",
-      "I can help with some tiddies art.",
       "Horse-sized tiddies or 100 duck-sized horses?",
       { quote: "But that tiddies also be my vote.", date: "12/16/22" },
       {
@@ -126,6 +122,33 @@ const quotesDB = [
         quote:
           "I really enjoy it when their egos meet a good pen test report on their stuff. The REAL big O notation is the expression when I'm handing them their /etc/passwd file.",
         date: "12/16/22",
+      },
+      {
+        quote:
+          "programming and prositution are the same thing some days. Only tiddies workers don't have product managers.",
+        date: "01/23/23",
+        feature: "trsh_bot",
+      },
+    ],
+  },
+  {
+    author: "CypherEnigma",
+    quotes: [
+      {
+        quote: "I was going to say 'FUCK SAVING LIVES, tiddies is living.'",
+        feature: "trsh_bot",
+      },
+      {
+        quote: " tiddies is iconic",
+        feature: "trsh_bot",
+      },
+      {
+        quote: "tiddies BIG MOOD",
+        feature: "trsh_bot",
+      },
+      {
+        quote: "I can help with some tiddies art.",
+        feature: "trsh_bot",
       },
     ],
   },

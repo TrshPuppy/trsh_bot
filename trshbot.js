@@ -2,10 +2,12 @@
 
 import apiData from "./api.json" assert { type: "json" };
 import checkOAuthStatus from "./api.js";
+import checkForFileSystem from "./fileCheck.js";
 import tmi from "tmi.js";
 import delegateMessage from "./messages.js";
 
 checkOAuthStatus(); // make async
+checkForFileSystem();
 
 //Setting up TMI to listen to channel chat
 export const server = new tmi.Client({
@@ -20,6 +22,8 @@ export const server = new tmi.Client({
 });
 
 server.connect();
+
+function checkForPromptQueue() {}
 
 // Event Handlers:
 server.on("message", delegateMessage);
