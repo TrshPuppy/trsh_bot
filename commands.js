@@ -2,6 +2,7 @@
 import { server } from "./trshbot.js";
 import apiData from "./api.json" assert { type: "json" };
 import promptQueue from "./promptQueue.json" assert { type: "json" };
+import * as fs from "fs";
 
 // This class constructs commands directed at the bot ex: "@trsh_bot":
 class BotCommand {
@@ -71,7 +72,7 @@ class ChannelCommand extends BotCommand {
   }
 }
 
-let currentQueueNumber = 1;
+let currentQueueNumber = 0;
 // Current database:
 const botCommands = [];
 const channelCommands = [];
@@ -209,8 +210,6 @@ function handleManCommand() {
 }
 
 function handlePromptCommand(channel, context, message) {
-  currentQueueNumber += 1;
-
   // Prep message for JSON object
   message.shift();
 
@@ -226,7 +225,23 @@ function handlePromptCommand(channel, context, message) {
 
   promptQueue.push(newPrompt);
 
-  console.table(promptQueue);
+  // Write new prompt to JSON Object/Array
+  const jSONObj = JSON.stringify(promptQueue);
+  const targetFile = "./promptQueue.json";
+
+  fs.writeFile(targetFile, jSONObj, "utf-8", (error) => {
+    if (error) {
+      console.log(
+        "There was an error writing the new prompt to the JSON. FAILED."
+      );
+      return;
+    }
+    console.log("New prompt successfully added to the queue!");
+  });
+
+  currentQueueNumber += 1;
+  return;
+  //
 
   /*
   " !prompt this is a prompt"
