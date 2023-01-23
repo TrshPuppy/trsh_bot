@@ -1,13 +1,29 @@
 import * as fs from "fs";
-import { open, close } from "node:fs";
 
 export default function checkForFileSystem() {
-  if (checkForPromptQueue() && checkForAPI() && checkForPackageLock()) {
+  if (checkForPromptQueue() && checkForAPI()) {
     console.log("All necessary files are present.");
     return true;
   }
-  console.log("All necessary files are NOT PRESENT!");
+  console.log("The necessary files are NOT PRESENT!");
   return false;
+}
+
+// Check for api.json, if it doesn't exist, make it.
+function checkForAPI() {
+  fs.open("api.json", "wx", (err, fd) => {
+    if (err) {
+      if (err.code === "EEXIST") {
+        console.error("Api.json already exists!");
+        return;
+      }
+      throw err;
+    }
+  });
+  console.log(
+    "api.json file created, but needs to be filled with credentials!"
+  );
+  return true;
 }
 
 // Check for promptQueue.json, if it doesn't exist, make it.
@@ -22,13 +38,5 @@ function checkForPromptQueue() {
     }
   });
   console.log("PromptQueue.json file created. Currently empty.");
-  return true;
-}
-
-function checkForAPI() {
-  return true;
-}
-
-function checkForPackageLock() {
   return true;
 }
