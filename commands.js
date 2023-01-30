@@ -76,7 +76,14 @@ let currentQueueNumber = 0;
 // Current database:
 const botCommands = [];
 const channelCommands = [];
+//killtop09: real programmers write in tiddies:)
 const quotesDB = [
+  {
+    author: "hungryhungryhippo",
+    quote: "@x684867 do you drink tiddies",
+    date: "1/27/23",
+    feature: "trsh_bot",
+  },
   {
     author: "rulerlefi",
     quotes: ["Clicks get chicks or something like that?"],
@@ -149,6 +156,10 @@ const quotesDB = [
       {
         quote: "I can help with some tiddies art.",
         feature: "trsh_bot",
+      },
+      {
+        quote: "You should definitely google tiddies on screen without context",
+        feature: "CypherEnigma",
       },
     ],
   },
@@ -260,6 +271,10 @@ function handlePromptCommand(channel, context, message) {
       return;
     }
     console.log("New prompt successfully added to the queue!");
+    server.say(
+      channel,
+      `Thanks @${context.username}! Your prompt is in the queue.`
+    );
   });
 
   currentQueueNumber += 1;
@@ -267,6 +282,24 @@ function handlePromptCommand(channel, context, message) {
   //
 
   /*
+
+a day where i can imitate trshbot is a good day
+saratonln
+: a day where i can imitate tiddies is a good day
+TommyLuco
+: maybe trshbot should make some miso soup
+Trsh_bot
+: a day tiddies i can imitate tiddies is a good day
+
+
+HARASS RANDOM VIEWER
+
+
+
+
+
+
+
   " !prompt this is a prompt"
 // /////////////////////////////////////////'custom-reward-id': '9cd066ae-2645-4aee-87fe-759d64aef086',
 
