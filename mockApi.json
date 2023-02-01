@@ -1,0 +1,15 @@
+{
+  "OA_TOKEN": "thisisamocktoken",
+  "CLIENT_ID": "thisisamockclientid",
+  "CLIENT_SECRET": "thisisamockclientsecret",
+  "REDIRECT_URI": "http://localhost:3000",
+  "REFRESH_TOKEN": "thisisamockrefreshtoken",
+  "OA_EXPIRE": 123456, // Used to automate getting a new token
+  "LAST_REFRESH": 123456789, // "
+  "Bot": {
+    "PREFIX": "!",
+    "CHANNEL": "TargetTwitchChannel",
+    "BOT_USERNAME": "bot_name",
+    "KEYWORD": "keyword"
+  }
+}
