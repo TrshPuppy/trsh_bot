@@ -3,7 +3,7 @@ import { server } from "./trshbot.js";
 import apiData from "./api.json" assert { type: "json" };
 import promptQueue from "./promptQueue.json" assert { type: "json" };
 import * as fs from "fs";
-import { thighs } from "pos/lexicon.js";
+// import { thighs } from "pos/lexicon.js";
 
 // This class constructs commands directed at the bot ex: "@trsh_bot":
 class BotCommand {
@@ -105,7 +105,7 @@ const quotesDB = [
     quotes: [
       {
         quote: "You're in her DMs, I'm in her console. We are not the same.",
-        date: new Date(12 / 09 / 2022),
+        date: new Date(12 / 9 / 2022),
         feat: 0,
       },
     ],
@@ -116,7 +116,7 @@ const quotesDB = [
       {
         quote:
           "Sometimes I type 'pythong' instead of 'python' because 'thong', so it's muscle memory. I do that all the time...",
-        date: new Date(12 / 09 / 2022),
+        date: new Date(12 / 9 / 2022),
         feat: 0,
       },
     ],

@@ -1,7 +1,7 @@
 import * as fs from "fs";
 
 export default function checkForFileSystem() {
-  if (checkForPromptQueue() && checkForAPI()) {
+  if (checkForPromptQueue() && checkForAPI() && chcekForQuotesDb()) {
     console.log("All necessary files are present.");
     return true;
   }
@@ -38,5 +38,20 @@ function checkForPromptQueue() {
     }
   });
   console.log("PromptQueue.json file created. Currently empty.");
+  return true;
+}
+
+// Check for quotesDB.json, if it doesn't exist, make it.
+function chcekForQuotesDb() {
+  fs.open("quotesDB.json", "wx", (err, fd) => {
+    if (err) {
+      if (err.code === "EEXIST") {
+        console.error("QuotesDB.json already exists!");
+        return;
+      }
+      throw err;
+    }
+  });
+  console.log("QuotesDB.json file created but is empty!");
   return true;
 }
