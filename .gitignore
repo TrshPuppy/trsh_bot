@@ -9,3 +9,25 @@ api.json
 .vscode
 promptQueue.json
 quotesDB.json
+
+
+
+
+[
+  {
+    "author": "hungryhungryhippo",
+    "quotes": [{"quote":"@x684867 do you drink tiddies","date":"1/27/2023","feat":"@x684867"},]
+  },
+  {
+    "author": "rulerlefi",
+    "quotes": [{"quote":"Clicks get chicks or something like that?","date":"12/1/2022","feat":0}],
+  },
+  { "author": "arthvadrr", "quotes": [{"quote":"CAPS ON SLAPS ON","date":"12/2/2022", "feat":0}]},
+  {
+    "author": "TrshPuppy",
+    "quotes": [{"quote":"You gotta respect the bottom.","date":"12/13/2022","feat":0},
+    {"quote":"Ruler stop flexing your python","date":"11/4/2022","feat":0},{"quote":"Actually one time, I was really proud, this dude got shot...","date":"10/25/2022","feat":0}
+    ],
+  },
+  
+];

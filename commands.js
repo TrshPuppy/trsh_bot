@@ -3,7 +3,7 @@ import { server } from "./trshbot.js";
 import apiData from "./api.json" assert { type: "json" };
 import promptQueue from "./promptQueue.json" assert { type: "json" };
 import * as fs from "fs";
-// import { thighs } from "pos/lexicon.js";
+import quotesDBData from "./quotesDB.json" assert { type: "json" };
 
 // This class constructs commands directed at the bot ex: "@trsh_bot":
 class BotCommand {
@@ -88,161 +88,26 @@ let currentQueueNumber = 0;
 
 const botCommands = [];
 const channelCommands = [];
-//killtop09: real programmers write in tiddies:)
-const quotesDB = [
-  {
-    author: "Martyn1842",
-    quotes: [
-      {
-        quote: "We're gonna need a bigger stack",
-        date: new Date(12 / 13 / 2022),
-        feat: 0,
-      },
-    ],
-  },
-  {
-    author: "jcblw",
-    quotes: [
-      {
-        quote: "You're in her DMs, I'm in her console. We are not the same.",
-        date: new Date(12 / 9 / 2022),
-        feat: 0,
-      },
-    ],
-  },
-  {
-    author: "steve7411",
-    quotes: [
-      {
-        quote:
-          "Sometimes I type 'pythong' instead of 'python' because 'thong', so it's muscle memory. I do that all the time...",
-        date: new Date(12 / 9 / 2022),
-        feat: 0,
-      },
-    ],
-  },
-  {
-    author: "plnrnd",
-    quotes: [
-      {
-        quote: "tiddies for shoutouts and stuff.",
-        date: new Date(12 / 13 / 2022),
-        feat: 1,
-      },
-    ],
-  },
-  {
-    author: "trsh_bot",
-    quotes: [
-      {
-        quote: "Horse-sized tiddies or 100 duck-sized horses?",
-        date: new Date(12 / 14 / 2022),
-        feat: undefined,
-      },
-      {
-        quote: "But that tiddies also be my vote.",
-        date: new Date(12 / 16 / 22),
-        feat: undefined,
-      },
-      {
-        quote: "wanna go play catch son? ok grab my tiddies",
-        date: new Date(12 / 16 / 22),
-        feat: undefined,
-      },
-      {
-        quote: "<-- tiddies engine :).",
-        date: new Date(1 / 5 / 2023),
-        feat: undefined,
-      },
-      {
-        quote: "Well tiddies, I wouldn't say I love Windows.",
-        date: new Date(1 / 5 / 2023),
-        feat: undefined,
-      },
-    ],
-  },
-  {
-    author: "x684867",
-    quotes: [
-      {
-        quote:
-          "I really enjoy it when their egos meet a good pen test report on their stuff. The REAL big O notation is the expression when I'm handing them their /etc/passwd file.",
-        date: new Date(12 / 16 / 22),
-        feat: 0,
-      },
-      {
-        quote:
-          "programming and prositution are the same thing some days. Only tiddies workers don't have product managers.",
-        date: new Date(1 / 23 / 2023),
-        feat: 1,
-      },
-    ],
-  },
-  {
-    author: "CypherEnigma",
-    quotes: [
-      {
-        quote: "I was going to say 'FUCK SAVING LIVES, tiddies is living.'",
-        date: new Date(12 / 13 / 2022),
-        feat: 1,
-      },
-      {
-        quote: "tiddies is iconic",
-        date: new Date(12 / 13 / 2022),
-        feat: 1,
-      },
-      {
-        quote: "tiddies BIG MOOD",
-        fdate: new Date(12 / 13 / 2022),
-        feat: 1,
-      },
-      {
-        quote: "I can help with some tiddies art.",
-        date: new Date(12 / 14 / 2022),
-        feat: 1,
-      },
-      {
-        quote: "You should definitely google tiddies on screen without context",
-        date: undefined,
-        feat: 0,
-      },
-    ],
-  },
-  {
-    author: "Nick_Is_Here_Hat",
-    quotes: [
-      {
-        quote: "You got tiddies energy",
-        date: new Date(1 / 30 / 2023),
-        feat: 1,
-      },
-    ],
-  },
-  {
-    author: "xmetrix",
-    quotes: [
-      {
-        quote: "plowed tiddies pink box eh",
-        date: new Date(1 / 30 / 2022),
-        feat: 1,
-      },
-    ],
-  },
-  {
-    author: "psychicstrangeling",
-    quotes: [
-      {
-        quote: "Try Hack Me Hot tiddies Stream",
-        date: new Date(1 / 30 / 2022),
-        feat: 1,
-      },
-    ],
-  },
-];
+
 // taladeganights, office spaces
 // Remember, the field mouse is fast, but the owl sees at night...
 // Leaderboard for most iconic chatters
 // chatter quotes featuring TB
+
+// for (let qu of quotesDB) {
+//   quotesDBData.push(qu);
+// }
+
+// const quoteJSONObj = JSON.stringify(quotesDBData);
+// const quoteFileTarg = "./quotesDB.json";
+
+// fs.writeFile(quoteFileTarg, quoteJSONObj, "utf-8", (err) => {
+//   if (err) {
+//     console.log("Error with writing to quotesDB.json");
+//     return;
+//   }
+//   console.log("Success!");
+// });
 
 // Create commmands:
 const yesCommand = new BotCommand("yes", ["yes", "Yes", "Y", "y", "YES"], () =>
@@ -294,9 +159,9 @@ function handleQuoteCommand(channel, context, message) {
   let indxIntoQuotesDB;
 
   if (message[1] === undefined) {
-    indxIntoQuotesDB = Math.floor(Math.random() * quotesDB.length);
+    indxIntoQuotesDB = Math.floor(Math.random() * quotesDBData.length);
   } else {
-    indxIntoQuotesDB = quotesDB.findIndex(
+    indxIntoQuotesDB = quotesDBData.findIndex(
       (x) => x.author.toLowerCase() == message[1].toLowerCase()
     );
   }
@@ -309,14 +174,23 @@ function handleQuoteCommand(channel, context, message) {
     return;
   }
 
-  const quotesArrLength = quotesDB[indxIntoQuotesDB].quotes.length;
-  currentAuthor = quotesDB[indxIntoQuotesDB].author;
-  randomQuote =
-    quotesDB[indxIntoQuotesDB].quotes[
-      Math.floor(Math.random() * quotesArrLength)
-    ];
+  const quotesArrLength = quotesDBData[indxIntoQuotesDB].quotes.length;
+  currentAuthor = quotesDBData[indxIntoQuotesDB].author;
+  const randomIndx = Math.floor(Math.random() * quotesArrLength);
+  randomQuote = quotesDBData[indxIntoQuotesDB].quotes[randomIndx].quote;
+  const feat =
+    quotesDBData[indxIntoQuotesDB].quotes[randomIndx].feat === 1
+      ? `@${apiData.Bot.CHANNEL}`
+      : undefined;
 
-  server.say(apiData.Bot.CHANNEL, `${randomQuote} - @${currentAuthor}`);
+  if (feat) {
+    server.say(
+      apiData.Bot.CHANNEL,
+      `${randomQuote} - @${currentAuthor} ft. @${apiData.Bot.CHANNEL}`
+    );
+  } else {
+    server.say(apiData.Bot.CHANNEL, `${randomQuote} - @${currentAuthor}`);
+  }
 }
 
 function handleManCommand() {
