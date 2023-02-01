@@ -3,6 +3,7 @@ import { server } from "./trshbot.js";
 import apiData from "./api.json" assert { type: "json" };
 import promptQueue from "./promptQueue.json" assert { type: "json" };
 import * as fs from "fs";
+import { thighs } from "pos/lexicon.js";
 
 // This class constructs commands directed at the bot ex: "@trsh_bot":
 class BotCommand {
@@ -65,7 +66,6 @@ class ChannelCommand extends BotCommand {
 class QuoteCommand extends ChannelCommand {
   tryHandleMessage(channel, context, [arg0, arg1, arg2, ...rest]) {
     if (this.name === arg0) {
-      console.log("yo we made it to the cb");
       this.thatShitFunctionToExecute(channel, context, [
         arg0,
         arg1,
@@ -78,54 +78,87 @@ class QuoteCommand extends ChannelCommand {
   }
 }
 
+const quote = {
+  quote: "",
+  date: new Date() * 1, // milliseconds
+  feat: "",
+};
+
 let currentQueueNumber = 0;
-// Current database:
+
 const botCommands = [];
 const channelCommands = [];
 //killtop09: real programmers write in tiddies:)
 const quotesDB = [
   {
-    author: "hungryhungryhippo",
-    quote: "@x684867 do you drink tiddies",
-    date: "1/27/23",
-    feature: "trsh_bot",
-  },
-  {
-    author: "rulerlefi",
-    quotes: ["Clicks get chicks or something like that?"],
-  },
-  { author: "arthvadrr", quotes: ["CAPS ON SLAPS ON"] },
-  {
-    author: "TrshPuppy",
+    author: "Martyn1842",
     quotes: [
-      "You gotta respect the bottom.",
-      "Ruler stop flexing your python",
-      "Actually one time, I was really proud, this dude got shot...",
+      {
+        quote: "We're gonna need a bigger stack",
+        date: new Date(12 / 13 / 2022),
+        feat: 0,
+      },
     ],
   },
-  { author: "Martyn1842", quotes: ["We're gonna need a bigger stack"] },
   {
     author: "jcblw",
-    quotes: ["You're in her DMs, I'm in her console. We are not the same."],
+    quotes: [
+      {
+        quote: "You're in her DMs, I'm in her console. We are not the same.",
+        date: new Date(12 / 09 / 2022),
+        feat: 0,
+      },
+    ],
   },
   {
     author: "steve7411",
     quotes: [
-      "Sometimes I type 'pythong' instead of 'python' because 'thong', so it's muscle memory. I do that all the time...",
+      {
+        quote:
+          "Sometimes I type 'pythong' instead of 'python' because 'thong', so it's muscle memory. I do that all the time...",
+        date: new Date(12 / 09 / 2022),
+        feat: 0,
+      },
     ],
   },
   {
-    author: "Trsh_bot",
+    author: "plnrnd",
     quotes: [
-      "tiddies for shoutouts and stuff.",
-      "Horse-sized tiddies or 100 duck-sized horses?",
-      { quote: "But that tiddies also be my vote.", date: "12/16/22" },
+      {
+        quote: "tiddies for shoutouts and stuff.",
+        date: new Date(12 / 13 / 2022),
+        feat: 1,
+      },
+    ],
+  },
+  {
+    author: "trsh_bot",
+    quotes: [
+      {
+        quote: "Horse-sized tiddies or 100 duck-sized horses?",
+        date: new Date(12 / 14 / 2022),
+        feat: undefined,
+      },
+      {
+        quote: "But that tiddies also be my vote.",
+        date: new Date(12 / 16 / 22),
+        feat: undefined,
+      },
       {
         quote: "wanna go play catch son? ok grab my tiddies",
-        date: "12/16/22",
+        date: new Date(12 / 16 / 22),
+        feat: undefined,
       },
-      "<-- tiddies engine :).",
-      "Well tiddies, I wouldn't say I love Windows.",
+      {
+        quote: "<-- tiddies engine :).",
+        date: new Date(1 / 5 / 2023),
+        feat: undefined,
+      },
+      {
+        quote: "Well tiddies, I wouldn't say I love Windows.",
+        date: new Date(1 / 5 / 2023),
+        feat: undefined,
+      },
     ],
   },
   {
@@ -134,13 +167,14 @@ const quotesDB = [
       {
         quote:
           "I really enjoy it when their egos meet a good pen test report on their stuff. The REAL big O notation is the expression when I'm handing them their /etc/passwd file.",
-        date: "12/16/22",
+        date: new Date(12 / 16 / 22),
+        feat: 0,
       },
       {
         quote:
           "programming and prositution are the same thing some days. Only tiddies workers don't have product managers.",
-        date: "01/23/23",
-        feature: "trsh_bot",
+        date: new Date(1 / 23 / 2023),
+        feat: 1,
       },
     ],
   },
@@ -149,23 +183,28 @@ const quotesDB = [
     quotes: [
       {
         quote: "I was going to say 'FUCK SAVING LIVES, tiddies is living.'",
-        feature: "trsh_bot",
+        date: new Date(12 / 13 / 2022),
+        feat: 1,
       },
       {
-        quote: " tiddies is iconic",
-        feature: "trsh_bot",
+        quote: "tiddies is iconic",
+        date: new Date(12 / 13 / 2022),
+        feat: 1,
       },
       {
         quote: "tiddies BIG MOOD",
-        feature: "trsh_bot",
+        fdate: new Date(12 / 13 / 2022),
+        feat: 1,
       },
       {
         quote: "I can help with some tiddies art.",
-        feature: "trsh_bot",
+        date: new Date(12 / 14 / 2022),
+        feat: 1,
       },
       {
         quote: "You should definitely google tiddies on screen without context",
-        feature: "CypherEnigma",
+        date: undefined,
+        feat: 0,
       },
     ],
   },
@@ -174,8 +213,8 @@ const quotesDB = [
     quotes: [
       {
         quote: "You got tiddies energy",
-        feature: "trsh_bot",
-        date: "1/30/23",
+        date: new Date(1 / 30 / 2023),
+        feat: 1,
       },
     ],
   },
@@ -184,8 +223,8 @@ const quotesDB = [
     quotes: [
       {
         quote: "plowed tiddies pink box eh",
-        feature: "trsh_bot",
-        date: "1/30/23",
+        date: new Date(1 / 30 / 2022),
+        feat: 1,
       },
     ],
   },
@@ -194,12 +233,13 @@ const quotesDB = [
     quotes: [
       {
         quote: "Try Hack Me Hot tiddies Stream",
-        feature: "trsh_bot",
-        date: "1/31/2023",
+        date: new Date(1 / 30 / 2022),
+        feat: 1,
       },
     ],
   },
-]; // taladeganights, office spaces
+];
+// taladeganights, office spaces
 // Remember, the field mouse is fast, but the owl sees at night...
 // Leaderboard for most iconic chatters
 // chatter quotes featuring TB
@@ -247,7 +287,6 @@ export function ifThisDoesntWorkItsStevesFault(channel, context, message) {
 }
 
 function handleQuoteCommand(channel, context, message) {
-  console.log("yo we made it to the cb");
   //USE FIND INDEX INSTEAD
   // HANDLE FINDINDEX returning -1
   let randomQuote;
