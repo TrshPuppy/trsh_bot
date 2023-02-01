@@ -44,7 +44,6 @@ class ChannelCommand extends BotCommand {
 
   tryHandleMessage(channel, context, [arg0, arg1, arg2, ...rest]) {
     if (this.name !== arg0) {
-      console.log(this.name);
       return false;
     }
 
@@ -88,26 +87,6 @@ let currentQueueNumber = 0;
 
 const botCommands = [];
 const channelCommands = [];
-
-// taladeganights, office spaces
-// Remember, the field mouse is fast, but the owl sees at night...
-// Leaderboard for most iconic chatters
-// chatter quotes featuring TB
-
-// for (let qu of quotesDB) {
-//   quotesDBData.push(qu);
-// }
-
-// const quoteJSONObj = JSON.stringify(quotesDBData);
-// const quoteFileTarg = "./quotesDB.json";
-
-// fs.writeFile(quoteFileTarg, quoteJSONObj, "utf-8", (err) => {
-//   if (err) {
-//     console.log("Error with writing to quotesDB.json");
-//     return;
-//   }
-//   console.log("Success!");
-// });
 
 // Create commmands:
 const yesCommand = new BotCommand("yes", ["yes", "Yes", "Y", "y", "YES"], () =>
@@ -178,6 +157,7 @@ function handleQuoteCommand(channel, context, message) {
   currentAuthor = quotesDBData[indxIntoQuotesDB].author;
   const randomIndx = Math.floor(Math.random() * quotesArrLength);
   randomQuote = quotesDBData[indxIntoQuotesDB].quotes[randomIndx].quote;
+
   const feat =
     quotesDBData[indxIntoQuotesDB].quotes[randomIndx].feat === 1
       ? `@${apiData.Bot.CHANNEL}`
@@ -186,16 +166,19 @@ function handleQuoteCommand(channel, context, message) {
   if (feat) {
     server.say(
       apiData.Bot.CHANNEL,
-      `${randomQuote} - @${currentAuthor} ft. @${apiData.Bot.CHANNEL}`
+      `${randomQuote} - @${currentAuthor} ft. @${apiData.Bot.BOT_USERNAME}`
     );
   } else {
     server.say(apiData.Bot.CHANNEL, `${randomQuote} - @${currentAuthor}`);
   }
+  // taladeganights, office spaces
+  // Remember, the field mouse is fast, but the owl sees at night...
+  // Leaderboard for most iconic chatters
+  // chatter quotes featuring TB
 }
 
 function handleManCommand() {
   // "!man quote"
-  console.log("im a man");
 }
 
 function handlePromptCommand(channel, context, message) {
