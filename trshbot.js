@@ -19,7 +19,7 @@ export const server = new tmi.Client({
     password: apiData.OA_TOKEN,
   },
 });
-
+// 8923076923076922
 server.connect();
 
 // Event Handlers:

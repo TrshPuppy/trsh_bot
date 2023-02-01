@@ -8,7 +8,7 @@ import * as fs from "fs";
 class BotCommand {
   constructor(name, args, callBack) {
     this.name = name;
-    this.args = [];
+    this.args = args;
     this.thatShitFunctionToExecute = callBack;
   }
 
@@ -17,8 +17,13 @@ class BotCommand {
   }
 
   tryHandleMessage(channel, context, [arg0, arg1, arg2, ...rest]) {
-    if (this.name === arg1) {
-      this.thatShitFunctionToExecute();
+    if (this.args.findIndex((x) => x == arg1) !== -1) {
+      this.thatShitFunctionToExecute(channel, context, [
+        arg0,
+        arg1,
+        arg2,
+        ...rest,
+      ]);
       return true;
     }
     return false;
@@ -29,21 +34,6 @@ class BotCommand {
     // possible arguments?
     // setter for more uniquee manuals?
     return manualString;
-  }
-}
-
-class QuoteCommand extends BotCommand {
-  tryHandleMessage(channel, context, [arg0, arg1, arg2, ...rest]) {
-    if (this.name === arg1) {
-      this.thatShitFunctionToExecute(channel, context, [
-        arg0,
-        arg1,
-        arg2,
-        ...rest,
-      ]);
-      return true;
-    }
-    return false;
   }
 }
 
@@ -69,6 +59,22 @@ class ChannelCommand extends BotCommand {
     ]);
 
     return true;
+  }
+}
+
+class QuoteCommand extends ChannelCommand {
+  tryHandleMessage(channel, context, [arg0, arg1, arg2, ...rest]) {
+    if (this.name === arg0) {
+      console.log("yo we made it to the cb");
+      this.thatShitFunctionToExecute(channel, context, [
+        arg0,
+        arg1,
+        arg2,
+        ...rest,
+      ]);
+      return true;
+    }
+    return false;
   }
 }
 
@@ -163,29 +169,64 @@ const quotesDB = [
       },
     ],
   },
+  {
+    author: "Nick_Is_Here_Hat",
+    quotes: [
+      {
+        quote: "You got tiddies energy",
+        feature: "trsh_bot",
+        date: "1/30/23",
+      },
+    ],
+  },
+  {
+    author: "xmetrix",
+    quotes: [
+      {
+        quote: "plowed tiddies pink box eh",
+        feature: "trsh_bot",
+        date: "1/30/23",
+      },
+    ],
+  },
+  {
+    author: "psychicstrangeling",
+    quotes: [
+      {
+        quote: "Try Hack Me Hot tiddies Stream",
+        feature: "trsh_bot",
+        date: "1/31/2023",
+      },
+    ],
+  },
 ]; // taladeganights, office spaces
 // Remember, the field mouse is fast, but the owl sees at night...
 // Leaderboard for most iconic chatters
 // chatter quotes featuring TB
 
-const yesCommand = new BotCommand("yes", [], () =>
+// Create commmands:
+const yesCommand = new BotCommand("yes", ["yes", "Yes", "Y", "y", "YES"], () =>
   server.say(apiData.Bot.CHANNEL, ":)")
 );
 yesCommand.addArg("yes");
 
-const noCommand = new BotCommand("no", [], () =>
+const noCommand = new BotCommand("no", ["no", "No", "N", "n", "NO"], () =>
   server.say(apiData.Bot.CHANNEL, ":(")
 );
 noCommand.addArg("no");
 
-const quoteCommand = new QuoteCommand("quote", [], handleQuoteCommand);
-
+const quoteCommand = new QuoteCommand("!quote", [], handleQuoteCommand);
 const manCommand = new ChannelCommand("!man", [], handleManCommand);
-
 const promptCommand = new ChannelCommand("!prompt", [], handlePromptCommand);
+const hiCommand = new BotCommand(
+  "hi",
+  ["hey", "hi", "hello", "Hi", "Hey", "Hello"],
+  handleHiCommand
+);
 
-botCommands.push(yesCommand, noCommand, quoteCommand);
-channelCommands.push(manCommand, promptCommand);
+// Add commands to command arrays:
+botCommands.push(yesCommand, noCommand, hiCommand);
+channelCommands.push(manCommand, promptCommand, quoteCommand);
 
 // Functions:
 export function handleBotSummons(channel, context, message) {
@@ -206,24 +247,25 @@ export function ifThisDoesntWorkItsStevesFault(channel, context, message) {
 }
 
 function handleQuoteCommand(channel, context, message) {
+  console.log("yo we made it to the cb");
   //USE FIND INDEX INSTEAD
   // HANDLE FINDINDEX returning -1
   let randomQuote;
   let currentAuthor;
   let indxIntoQuotesDB;
 
-  if (message[2] === undefined) {
+  if (message[1] === undefined) {
     indxIntoQuotesDB = Math.floor(Math.random() * quotesDB.length);
   } else {
     indxIntoQuotesDB = quotesDB.findIndex(
-      (x) => x.author.toLowerCase() == message[2].toLowerCase()
+      (x) => x.author.toLowerCase() == message[1].toLowerCase()
     );
   }
 
   if (indxIntoQuotesDB === -1) {
     server.say(
-      channel,
-      `I guess @${message[2]} isn't ICONIC enough to be in my database :(`
+      apiData.Bot.CHANNEL,
+      `I guess @${message[1]} isn't ICONIC enough to be in my database :(`
     );
     return;
   }
@@ -235,7 +277,7 @@ function handleQuoteCommand(channel, context, message) {
       Math.floor(Math.random() * quotesArrLength)
     ];
 
-  server.say(channel, `${randomQuote} - @${currentAuthor}`);
+  server.say(apiData.Bot.CHANNEL, `${randomQuote} - @${currentAuthor}`);
 }
 
 function handleManCommand() {
@@ -272,7 +314,7 @@ function handlePromptCommand(channel, context, message) {
     }
     console.log("New prompt successfully added to the queue!");
     server.say(
-      channel,
+      apiData.Bot.CHANNEL,
       `Thanks @${context.username}! Your prompt is in the queue.`
     );
   });
@@ -321,6 +363,16 @@ HARASS RANDOM VIEWER
 
         object gets deleted from queue file and written to finished file
   */
+}
+
+function handleHiCommand(channel, context, message) {
+  const hiIndx = hiCommand.args.findIndex((arg) => arg == message[1]);
+
+  server.say(
+    apiData.Bot.CHANNEL,
+    `${hiCommand.args[hiIndx]} @${context.username}!`
+  );
+  return;
 }
 
 // console.log(quoteCommand.getManual());

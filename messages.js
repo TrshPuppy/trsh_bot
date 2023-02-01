@@ -30,11 +30,42 @@ export default function delegateMessage(channel, context, message) {
     ifThisDoesntWorkItsStevesFault(channel, context, message);
     return;
   }
+  if (context[`first-msg`] === true) {
+    return;
+  }
+  if (/([Streamlabs])/g.test(context.username)) {
+    return;
+  }
 
   handleKeywordMessages(channel, context, message);
 }
 
 function handleKeywordMessages(channel, context, message) {
+  // {
+  //   'badge-info': null,
+  //   badges: null,
+  //   'client-nonce': 'b100aebfbd742195ed4f22dc59604f60',
+  //   color: '#008000',
+  //   'display-name': 'tjobremannen',
+  //   emotes: null,
+  //   'first-msg': true,
+  //   flags: null,
+  //   id: '2b4f8fff-6dd8-452c-9704-6778b947bf7c',
+  //   mod: false,
+  //   'returning-chatter': false,
+  //   'room-id': '814980966',
+  //   subscriber: false,
+  //   'tmi-sent-ts': '1675179382102',
+  //   turbo: false,
+
+  //   'user-type': null,
+  //   'emotes-raw': null,
+  //   'badge-info-raw': null,
+  //   'badges-raw': null,
+
+  //   'message-type': 'chat'
+  // } @CypherEnigma you like yourself enough?
+
   keywordLessMessages += 1;
 
   let secondsFromLastKeyword = (new Date() - Fred) / 1000;
@@ -54,13 +85,11 @@ function keywordQ300(channel, context, message) {
   }
 
   let validIndex = findValidIndex(messageWords);
-
   if (validIndex === null) {
     return false;
   }
 
   messageWords[validIndex] = `${apiData.Bot.KEYWORD}`;
-
   server.say(channel, messageWords.join(" "));
   return true;
 }
