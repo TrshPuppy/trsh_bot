@@ -1,4 +1,4 @@
-// This module is meant to envelope functions r/t parsing through chat messages in order to delegate functions.
+// This module envelops functions r/t parsing through chat messages in order to delegate functions.
 
 // Imports:
 //const pos = require("pos"); // https://github.com/dariusk/pos-js
@@ -41,31 +41,6 @@ export default function delegateMessage(channel, context, message) {
 }
 
 function handleKeywordMessages(channel, context, message) {
-  // {
-  //   'badge-info': null,
-  //   badges: null,
-  //   'client-nonce': 'b100aebfbd742195ed4f22dc59604f60',
-  //   color: '#008000',
-  //   'display-name': 'tjobremannen',
-  //   emotes: null,
-  //   'first-msg': true,
-  //   flags: null,
-  //   id: '2b4f8fff-6dd8-452c-9704-6778b947bf7c',
-  //   mod: false,
-  //   'returning-chatter': false,
-  //   'room-id': '814980966',
-  //   subscriber: false,
-  //   'tmi-sent-ts': '1675179382102',
-  //   turbo: false,
-
-  //   'user-type': null,
-  //   'emotes-raw': null,
-  //   'badge-info-raw': null,
-  //   'badges-raw': null,
-
-  //   'message-type': 'chat'
-  // } @CypherEnigma you like yourself enough?
-
   keywordLessMessages += 1;
 
   let secondsFromLastKeyword = (new Date() - Fred) / 1000;

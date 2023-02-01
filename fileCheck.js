@@ -1,3 +1,4 @@
+// This module checks for required files and create them if they aren't present.
 import * as fs from "fs";
 
 export default function checkForFileSystem() {
