@@ -31,6 +31,9 @@ tmi.js
 ```
 pos.js
 ```
+```
+sqlite3
+```
 ### Filesystem:
 Upon startup the program will create the following EMPTY files w/i the same directory:
 ```
