@@ -43,7 +43,7 @@ api.json : for holding secured credentials including API key/ client secret etc.
 promptQueue.json : for holding AI art prompts received from chat using the !prompt command
 ```
 ```
-quoteDB.json : for holding a DB of quotes added by chat/ viewers whichin include author, date, etc.
+quoteDB.json : for holding a DB of quotes added by chat/ viewers which include author, date, etc.
 ```
 
   
