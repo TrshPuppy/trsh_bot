@@ -32,8 +32,12 @@ class BotCommand {
     return false;
   }
 
+  addManual(string) {
+    this.manual = string;
+  }
+
   getManual() {
-    const manualString = `To use this command type: '@${apiData.Bot.BOT_USERNAME} ${this.name} <arguments>.'`;
+    const manualString = `Command syntax: ${this.manual}.`;
     // possible arguments?
     // setter for more uniquee manuals?
     return manualString;
@@ -95,21 +99,32 @@ const yesCommand = new BotCommand("yes", ["yes", "Yes", "Y", "y", "YES"], () =>
   server.say(apiData.Bot.CHANNEL, ":)")
 );
 yesCommand.addArg("yes");
+yesCommand.addManual("@trsh_bot yes");
 
 const noCommand = new BotCommand("no", ["no", "No", "N", "n", "NO"], () =>
   server.say(apiData.Bot.CHANNEL, ":(")
 );
 noCommand.addArg("no");
+noCommand.addManual("@trsh_bot no");
 
 const quoteCommand = new QuoteCommand("!quote", [], handleQuoteCommand);
+quoteCommand.addManual("quote <author> (author is optional)");
+
 const addQuoteCommand = new QuoteCommand("!addquote", [], handleAddQuote);
+addQuoteCommand.addManual("!addquote @<author> <quote>");
+
 const manCommand = new ChannelCommand("!man", [], handleManCommand);
+manCommand.addManual("!man <command>");
+
 const promptCommand = new ChannelCommand("!prompt", [], handlePromptCommand);
+promptCommand.addManual("!prompt <prompt>");
+
 const hiCommand = new BotCommand(
   "hi",
   ["hey", "hi", "hello", "Hi", "Hey", "Hello"],
   handleHiCommand
 );
+hiCommand.addManual("@trsh_bot ['hey', 'hi', 'hello', 'Hi', 'Hey', 'Hello']");
 
 // Add commands to command arrays:
 botCommands.push(yesCommand, noCommand, hiCommand);
@@ -220,8 +235,33 @@ function handleAddQuote(channel, context, message) {
   }
 }
 
-function handleManCommand() {
-  // "!man quote"
+function handleManCommand(channel, context, message) {
+  let requestedCommand = message[1].startsWith("!")
+    ? message[1]
+    : "!" + message[1];
+
+  let manMessage;
+
+  // Check Bot commands for requested command:
+  let commandIndx = botCommands.findIndex(
+    (com) =>
+      com.name == requestedCommand || com.name == requestedCommand.slice(1)
+  );
+
+  if (commandIndx !== -1) {
+    manMessage = botCommands[commandIndx].getManual();
+  } else {
+    commandIndx = channelCommands.findIndex(
+      (c) => c.name == requestedCommand || c.name == requestedCommand.slice(1)
+    );
+    if (commandIndx !== -1) {
+      manMessage = channelCommands[commandIndx].getManual();
+    } else {
+      manMessage = "That command doesn't exist, sorry bub.";
+    }
+  }
+  server.say(channel, manMessage);
+  return;
 }
 
 function handlePromptCommand(channel, context, message) {
