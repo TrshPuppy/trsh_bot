@@ -102,6 +102,7 @@ const noCommand = new BotCommand("no", ["no", "No", "N", "n", "NO"], () =>
 noCommand.addArg("no");
 
 const quoteCommand = new QuoteCommand("!quote", [], handleQuoteCommand);
+const addQuoteCommand = new QuoteCommand("!addquote", [], handleAddQuote);
 const manCommand = new ChannelCommand("!man", [], handleManCommand);
 const promptCommand = new ChannelCommand("!prompt", [], handlePromptCommand);
 const hiCommand = new BotCommand(
@@ -112,7 +113,7 @@ const hiCommand = new BotCommand(
 
 // Add commands to command arrays:
 botCommands.push(yesCommand, noCommand, hiCommand);
-channelCommands.push(manCommand, promptCommand, quoteCommand);
+channelCommands.push(manCommand, promptCommand, quoteCommand, addQuoteCommand);
 
 // Functions:
 export function handleBotSummons(channel, context, message) {
@@ -177,6 +178,46 @@ function handleQuoteCommand(channel, context, message) {
   // Remember, the field mouse is fast, but the owl sees at night...
   // Leaderboard for most iconic chatters
   // chatter quotes featuring TB
+}
+
+function handleAddQuote(channel, context, message) {
+  const quoteString = message.slice(2).join(" ");
+  const quoteToAdd = Object.create(quote);
+
+  quoteToAdd.quote = quoteString;
+  quoteToAdd.date = new Date();
+  quoteToAdd.feat = 0;
+
+  const authorSanitized = message[1].startsWith("@")
+    ? message[1].slice(1)
+    : message[1];
+
+  if (
+    quotesDBData.find(
+      (x) => x.author.toLowerCase() == authorSanitized.toLowerCase()
+    ) !== undefined
+  ) {
+    const authorIndx = quotesDBData.findIndex(
+      (y) => y.author == authorSanitized
+    );
+    quotesDBData[authorIndx].quotes.push(quoteToAdd);
+  } else {
+    const authorObj = { author: authorSanitized, quotes: [quoteToAdd] };
+    quotesDBData.push(authorObj);
+  }
+
+  if (overWriteQuotesJSON()) {
+    server.say(
+      channel,
+      `Thank you ${context.username}! The quote by @${authorSanitized} has been added to the database!`
+    );
+  } else {
+    server.say(
+      channel,
+      "Sorry, there was an error adding that quote. Try again?"
+    );
+    return;
+  }
 }
 
 function handleManCommand() {
@@ -273,6 +314,18 @@ function handleHiCommand(channel, context, message) {
   return;
 }
 
+function overWriteQuotesJSON() {
+  const targetFile = "./quotesDB.json";
+  const quotesObj = JSON.stringify(quotesDBData);
+
+  fs.writeFile(targetFile, quotesObj, "utf-8", (err) => {
+    if (err) {
+      return false;
+    }
+  });
+  return true;
+}
+
 // console.log(quoteCommand.getManual());
 
 // /*
@@ -333,3 +386,196 @@ function handleHiCommand(channel, context, message) {
 //     [{author: "@steve7411",
 //         quotes: ["JSON file?", "I am deeeply upset by this"]}]
 // */
+
+/*
+[
+  {
+    "author": "killtop09",
+    "quotes": [{ "quote": "real programmers write in tiddies:)", "feat": 0 }]
+  },
+  {
+    "author": "hungryhungryhippo",
+    "quotes": [
+      {
+        "quote": "@x684867 do you drink tiddies",
+        "date": "1/27/2023",
+        "feat": "@x684867"
+      }
+    ]
+  },
+  {
+    "author": "rulerlefi",
+    "quotes": [
+      {
+        "quote": "Clicks get chicks or something like that?",
+        "date": "12/1/2022",
+        "feat": 0
+      }
+    ]
+  },
+  {
+    "author": "arthvadrr",
+    "quotes": [{ "quote": "CAPS ON SLAPS ON", "date": "12/2/2022", "feat": 0 }]
+  },
+  {
+    "author": "TrshPuppy",
+    "quotes": [
+      {
+        "quote": "You gotta respect the bottom.",
+        "date": "12/13/2022",
+        "feat": 0
+      },
+      {
+        "quote": "Ruler stop flexing your python",
+        "date": "11/4/2022",
+        "feat": 0
+      },
+      {
+        "quote": "Actually one time, I was really proud, this dude got shot...",
+        "date": "10/25/2022",
+        "feat": 0
+      }
+    ]
+  },
+  {
+    "author": "Martyn1842",
+    "quotes": [
+      {
+        "quote": "We're gonna need a bigger stack",
+        "date": "12/13/2022",
+        "feat": 0
+      }
+    ]
+  },
+  {
+    "author": "jcblw",
+    "quotes": [
+      {
+        "quote": "You're in her DMs, I'm in her console. We are not the same.",
+        "date": "12/9/2022",
+        "feat": 0
+      }
+    ]
+  },
+  {
+    "author": "steve7411",
+    "quotes": [
+      {
+        "quote": "Sometimes I type 'pythong' instead of 'python' because 'thong', so it's muscle memory. I do that all the time...",
+        "date": "12/9/2022",
+        "feat": 0
+      }
+    ]
+  },
+  {
+    "author": "plnrnd",
+    "quotes": [
+      {
+        "quote": "tiddies for shoutouts and stuff.",
+        "date": "12/13/2022",
+        "feat": 1
+      }
+    ]
+  },
+  {
+    "author": "trsh_bot",
+    "quotes": [
+      {
+        "quote": "Horse-sized tiddies or 100 duck-sized horses?",
+        "date": "12/14/2022"
+      },
+      { "quote": "But that tiddies also be my vote.", "date": "12/16/2022" },
+      {
+        "quote": "wanna go play catch son? ok grab my tiddies",
+        "date": "12/16/2022"
+      },
+      { "quote": "<-- tiddies engine :).", "date": "1/5/2023" },
+      {
+        "quote": "Well tiddies, I wouldn't say I love Windows.",
+        "date": "1/5/2023"
+      },
+      {
+        "quote": "tldr; @CypherEnigma is tiddies.",
+        "date": "1/6/2023",
+        "feat": "CypherEnigma"
+      },
+      {
+        "quote": "Like tiddies tends asymptotically towards infinity as x tends from1 to 0.",
+        "date": "12/15/2023"
+      }
+    ]
+  },
+  {
+    "author": "x684867",
+    "quotes": [
+      {
+        "quote": "I really enjoy it when their egos meet a good pen test report on their stuff. The REAL big O notation is the expression when I'm handing them their /etc/passwd file.",
+        "date": "12/16/2022",
+        "feat": 0
+      },
+      {
+        "quote": "programming and prositution are the same thing some days. Only tiddies workers don't have product managers.",
+        "date": "1/20/2023",
+        "feat": 1
+      }
+    ]
+  },
+  {
+    "author": "CypherEnigma",
+    "quotes": [
+      {
+        "quote": "I was going to say 'FUCK SAVING LIVES, tiddies is living.'",
+        "date": "12/13/2022",
+        "feat": 1
+      },
+      { "quote": "tiddies is iconic", "date": "12/13/2022", "feat": 1 },
+      { "quote": "tiddies BIG MOOD", "fdate": "12/13/2022", "feat": 1 },
+      {
+        "quote": "I can help with some tiddies art.",
+        "date": "12/14/2022",
+        "feat": 1
+      },
+      {
+        "quote": "You should definitely google tiddies on screen without context",
+        "feat": 0
+      }
+    ]
+  },
+  {
+    "author": "Nick_Is_Here_Hat",
+    "quotes": [
+      { "quote": "You got tiddies energy", "date": "1/30/2023", "feat": 1 },
+      {
+        "quote": "have you tried bacon wrapped tiddies?",
+        "date": "1/24/2023",
+        "feat": 0
+      }
+    ]
+  },
+  {
+    "author": "xmetrix",
+    "quotes": [
+      { "quote": "plowed tiddies pink box eh", "date": "1/30/2023", "feat": 1 }
+    ]
+  },
+  {
+    "author": "psychicstrangeling",
+    "quotes": [
+      {
+        "quote": "Try Hack Me Hot tiddies Stream",
+        "date": "1/30/2023",
+        "feat": 1
+      }
+    ]
+  },
+  {
+    "author": "PianoJames",
+    "quotes": [{ "quote": "tiddies++", "date": "1/6/2023", "feat": 0 }]
+  },
+  {
+    "author": "turing_moon_yatch",
+    "quote": [
+      { "quote": "Guts have shit for brains.", "date": "1/6/2023", "feat": 0 }
+    ]
+  },
+*/

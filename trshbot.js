@@ -24,18 +24,3 @@ server.connect();
 
 // Event Handlers:
 server.on("message", delegateMessage);
-
-// client.on("message", async (channel, context, message) => {
-//   //   const IS_BOT = context.username.toLowerCase() === process.env.BOT_USERNAME;
-//   //   if (!IS_BOT) {
-//   //     client.say(
-//   //       channel,
-//   //       `Responding to ${context.username} message: ${message}`
-//   //     );
-//   //   }
-//   //   console.log("channel", {
-//   //     channel,
-//   //     user: context.username,
-//   //     message,
-//   //   });
-// });

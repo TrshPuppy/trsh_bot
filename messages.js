@@ -14,6 +14,7 @@ let Fred = new Date(0); // lastKeywordTime
 let keywordLessMessages = 0;
 
 export default function delegateMessage(channel, context, message) {
+  // console.log(context);
   message = message.trim();
 
   if (message[0] === "/" || message[0] === ".") {
@@ -33,7 +34,7 @@ export default function delegateMessage(channel, context, message) {
   if (context[`first-msg`] === true) {
     return;
   }
-  if (/([Streamlabs])/g.test(context.username)) {
+  if (/(Streamlabs)/i.test(context.username)) {
     return;
   }
 
