@@ -108,7 +108,7 @@ noCommand.addArg("no");
 noCommand.addManual("@trsh_bot no");
 
 const quoteCommand = new QuoteCommand("!quote", [], handleQuoteCommand);
-quoteCommand.addManual("quote <author> (author is optional)");
+quoteCommand.addManual("!quote <author> (author is optional)");
 
 const addQuoteCommand = new QuoteCommand("!addquote", [], handleAddQuote);
 addQuoteCommand.addManual("!addquote @<author> <quote>");
@@ -198,14 +198,21 @@ function handleQuoteCommand(channel, context, message) {
 function handleAddQuote(channel, context, message) {
   const quoteString = message.slice(2).join(" ");
   const quoteToAdd = Object.create(quote);
+  let authorSanitized;
 
   quoteToAdd.quote = quoteString;
   quoteToAdd.date = new Date();
   quoteToAdd.feat = 0;
 
-  const authorSanitized = message[1].startsWith("@")
-    ? message[1].slice(1)
-    : message[1];
+  if (message[1].startsWith("@")) {
+    authorSanitized = message[1].slice(1);
+  } else {
+    server.say(
+      channel,
+      `${context.username}, please indicate the author by adding '@' before their username, ya scrub.`
+    );
+    return;
+  }
 
   if (
     quotesDBData.find(
@@ -213,7 +220,7 @@ function handleAddQuote(channel, context, message) {
     ) !== undefined
   ) {
     const authorIndx = quotesDBData.findIndex(
-      (y) => y.author == authorSanitized
+      (y) => y.author.toLowerCase() == authorSanitized.toLowerCase()
     );
     quotesDBData[authorIndx].quotes.push(quoteToAdd);
   } else {
@@ -224,7 +231,7 @@ function handleAddQuote(channel, context, message) {
   if (overWriteQuotesJSON()) {
     server.say(
       channel,
-      `Thank you ${context.username}! The quote by @${authorSanitized} has been added to the database!`
+      `Thank you ${context.username}! The quote by @${authorSanitized} has been added to the database! #ICONIC`
     );
   } else {
     server.say(
@@ -237,8 +244,8 @@ function handleAddQuote(channel, context, message) {
 
 function handleManCommand(channel, context, message) {
   let requestedCommand = message[1].startsWith("!")
-    ? message[1]
-    : "!" + message[1];
+    ? message[1].toLowerCase()
+    : "!" + message[1].toLowerCase();
 
   let manMessage;
 
