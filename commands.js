@@ -3,7 +3,7 @@
 // Imports:
 import { server } from "./trshbot.js";
 import apiData from "./api.json" assert { type: "json" };
-import promptQueue from "./promptQueue.json" assert { type: "json" };
+import promptQueueData from "./promptQueue.json" assert { type: "json" };
 import * as fs from "fs";
 import quotesDBData from "./quotesDB.json" assert { type: "json" };
 
@@ -89,7 +89,7 @@ const quote = {
   feat: "",
 };
 
-let currentQueueNumber = 0;
+let previousQueueNumber = 0;
 
 const botCommands = [];
 const channelCommands = [];
@@ -119,6 +119,11 @@ manCommand.addManual("!man <command>");
 const promptCommand = new ChannelCommand("!prompt", [], handlePromptCommand);
 promptCommand.addManual("!prompt <prompt>");
 
+const getPrompt = new ChannelCommand("!getprompt", [], handleTiddies);
+getPrompt.addManual(
+  "!getprompt (trsh_bot will respond w/ the next prompt in queue."
+);
+
 const hiCommand = new BotCommand(
   "hi",
   ["hey", "hi", "hello", "Hi", "Hey", "Hello"],
@@ -128,7 +133,13 @@ hiCommand.addManual("@trsh_bot ['hey', 'hi', 'hello', 'Hi', 'Hey', 'Hello']");
 
 // Add commands to command arrays:
 botCommands.push(yesCommand, noCommand, hiCommand);
-channelCommands.push(manCommand, promptCommand, quoteCommand, addQuoteCommand);
+channelCommands.push(
+  manCommand,
+  promptCommand,
+  quoteCommand,
+  addQuoteCommand,
+  getPrompt
+);
 
 // Functions:
 export function handleBotSummons(channel, context, message) {
@@ -228,7 +239,7 @@ function handleAddQuote(channel, context, message) {
     quotesDBData.push(authorObj);
   }
 
-  if (overWriteQuotesJSON()) {
+  if (overwriteSelectedJSON()) {
     server.say(
       channel,
       `Thank you ${context.username}! The quote by @${authorSanitized} has been added to the database! #ICONIC`
@@ -276,7 +287,7 @@ function handlePromptCommand(channel, context, message) {
   // Prep message for JSON object
   message.shift();
 
-  const firstPrompt = promptQueue[0];
+  const firstPrompt = promptQueueData[0];
 
   // Create prompt to be written to JSON file!
   const newPrompt = Object.create(firstPrompt);
@@ -286,27 +297,28 @@ function handlePromptCommand(channel, context, message) {
   newPrompt.time = new Date() * 1; // milliseconds
   newPrompt.completed = 0;
 
-  promptQueue.push(newPrompt);
+  promptQueueData.push(newPrompt);
 
   // Write new prompt to JSON Object/Array
-  const jSONObj = JSON.stringify(promptQueue);
-  const targetFile = "./promptQueue.json";
+  overwritePromptJson();
+  // const jSONObj = JSON.stringify(promptQueueData);
+  // const targetFile = "./promptQueue.json";
 
-  fs.writeFile(targetFile, jSONObj, "utf-8", (error) => {
-    if (error) {
-      console.log(
-        "There was an error writing the new prompt to the JSON. FAILED."
-      );
-      return;
-    }
-    console.log("New prompt successfully added to the queue!");
-    server.say(
-      apiData.Bot.CHANNEL,
-      `Thanks @${context.username}! Your prompt is in the queue.`
-    );
-  });
+  // fs.writeFile(targetFile, jSONObj, "utf-8", (error) => {
+  //   if (error) {
+  //     console.log(
+  //       "There was an error writing the new prompt to the JSON. FAILED."
+  //     );
+  //     return;
+  //   }
+  //   console.log("New prompt successfully added to the queue!");
+  //   server.say(
+  //     apiData.Bot.CHANNEL,
+  //     `Thanks @${context.username}! Your prompt is in the queue.`
+  //   );
+  // });
 
-  currentQueueNumber += 1;
+  previousQueueNumber += 1;
   return;
   //
 
@@ -362,16 +374,46 @@ function handleHiCommand(channel, context, message) {
   return;
 }
 
-function overWriteQuotesJSON() {
-  const targetFile = "./quotesDB.json";
-  const quotesObj = JSON.stringify(quotesDBData);
-
-  fs.writeFile(targetFile, quotesObj, "utf-8", (err) => {
+const overwriteSelectedJSON = (target, JSONObj) => {
+  fs.writeFile(target, JSONObj, "utf-8", (err) => {
     if (err) {
-      return false;
+      console.error(`Unable to write object to file. Error: ${err}`);
+    } else {
+      console.log(`Success writing obje to file: ${target}`);
     }
   });
-  return true;
+};
+
+function overwritePromptJson() {
+  overwriteSelectedJSON("./promptQueue.json", promptQueueData);
+}
+
+function overwriteQuotesJson() {
+  overwriteSelectedJSON("./quotesDB.json", quotesDBData);
+}
+
+// handleGetPrompt()
+function handleTiddies() {
+  let previousPromptIndx = promptQueueData.findIndex((x) => x.completed == 0); //nextPromptIndex
+
+  if (previousPromptIndx === -1) {
+    server.say(
+      apiData.Bot.CHANNEL,
+      "There are not more prompts in the queue :("
+    );
+    return;
+  }
+
+  previousQueueNumber = previousPromptIndx;
+  const currentPrompt = promptQueueData[previousQueueNumber].prompt;
+
+  server.say(
+    apiData.Bot.CHANNEL,
+    `${currentPrompt} - by ${promptQueueData[previousQueueNumber].author}`
+  );
+
+  promptQueueData[previousQueueNumber].completed = 1;
+  overwritePromptJson();
 }
 
 // console.log(quoteCommand.getManual());
