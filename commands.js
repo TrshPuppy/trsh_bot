@@ -239,18 +239,19 @@ function handleAddQuote(channel, context, message) {
     quotesDBData.push(authorObj);
   }
 
-  if (overwriteSelectedJSON()) {
-    server.say(
-      channel,
-      `Thank you ${context.username}! The quote by @${authorSanitized} has been added to the database! #ICONIC`
-    );
-  } else {
-    server.say(
-      channel,
-      "Sorry, there was an error adding that quote. Try again?"
-    );
-    return;
-  }
+  overwriteQuotesJson();
+  // if (overwriteQuotesJson()) {
+  //   server.say(
+  //     channel,
+  //     `Thank you ${context.username}! The quote by @${authorSanitized} has been added to the database! #ICONIC`
+  //   );
+  // } else {
+  //   server.say(
+  //     channel,
+  //     "Sorry, there was an error adding that quote. Try again?"
+  //   );
+  //   return;
+  // }
 }
 
 function handleManCommand(channel, context, message) {
@@ -375,7 +376,9 @@ function handleHiCommand(channel, context, message) {
 }
 
 const overwriteSelectedJSON = (target, JSONObj) => {
-  fs.writeFile(target, JSONObj, "utf-8", (err) => {
+  const JSONStringData = JSON.stringify(JSONObj);
+
+  fs.writeFile(target, JSONStringData, "utf-8", (err) => {
     if (err) {
       console.error(`Unable to write object to file. Error: ${err}`);
     } else {
