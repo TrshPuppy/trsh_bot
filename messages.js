@@ -14,7 +14,6 @@ let Fred = new Date(0); // lastKeywordTime
 let keywordLessMessages = 0;
 
 export default function delegateMessage(channel, context, message) {
-  // console.log(context);
   message = message.trim();
 
   if (message[0] === "/" || message[0] === ".") {
@@ -23,10 +22,14 @@ export default function delegateMessage(channel, context, message) {
   if (context.username === server.username) {
     return;
   }
-  if (/(@\btrsh_bot\b)/i.test(message)) {
+
+  const botSummons = `@${apiData.Bot.BOT_USERNAME}`;
+  const messageArr = message.split(" ");
+  if (messageArr[0].toLowerCase() === botSummons.toLowerCase()) {
     handleBotSummons(channel, context, message);
     return;
   }
+
   if (message[0] === "!") {
     ifThisDoesntWorkItsStevesFault(channel, context, message);
     return;
@@ -34,7 +37,7 @@ export default function delegateMessage(channel, context, message) {
   if (context[`first-msg`] === true) {
     return;
   }
-  if (/(Streamlabs)/i.test(context.username)) {
+  if (context.username === "streamlabs") {
     return;
   }
 

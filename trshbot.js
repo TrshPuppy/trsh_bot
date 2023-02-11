@@ -24,3 +24,10 @@ server.connect();
 
 // Event Handlers:
 server.on("message", delegateMessage);
+
+// server.on("message", (channel, tags, message, self) => {
+//   console.log("channel = " + channel);
+//   console.log("tags = " + JSON.stringify(tags));
+//   console.log("message = " + message);
+//   console.log("self = " + self);
+// });

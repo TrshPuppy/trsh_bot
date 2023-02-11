@@ -37,10 +37,7 @@ class BotCommand {
   }
 
   getManual() {
-    const manualString = `Command syntax: ${this.manual}.`;
-    // possible arguments?
-    // setter for more uniquee manuals?
-    return manualString;
+    return `Command syntax: ${this.manual}.`;
   }
 }
 
