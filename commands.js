@@ -88,6 +88,13 @@ const quote = {
   date: new Date() * 1, // milliseconds
   feat: "",
 };
+const newPromptSuccess = () =>
+  server.say(apiData.Bot.CHANNEL, "Your prompt is in the queue!");
+const newQuoteSuccess = () =>
+  server.say(
+    apiData.Bot.CHANNEL,
+    "Your quote was added to the database! Congrats on being so ICONIC!"
+  );
 
 let previousQueueNumber = 0;
 
@@ -106,6 +113,15 @@ const noCommand = new BotCommand("no", ["no", "No", "N", "n", "NO"], () =>
 );
 noCommand.addArg("no");
 noCommand.addManual("@trsh_bot no");
+
+const breakTheUniverseCommand = new BotCommand(
+  "/0",
+  ["divide by 0", "divide by zero", "/zero", "/0"],
+  () => server.say(apiData.Bot.CHANNEL, "8008135")
+);
+breakTheUniverseCommand.addManual(
+  "@trsh_bot ['/0', 'divide by zero', '/zero', 'divide by 0']"
+);
 
 const quoteCommand = new QuoteCommand("!quote", [], handleQuoteCommand);
 quoteCommand.addManual("!quote <author> (author is optional)");
@@ -132,7 +148,7 @@ const hiCommand = new BotCommand(
 hiCommand.addManual("@trsh_bot ['hey', 'hi', 'hello', 'Hi', 'Hey', 'Hello']");
 
 // Add commands to command arrays:
-botCommands.push(yesCommand, noCommand, hiCommand);
+botCommands.push(yesCommand, noCommand, hiCommand, breakTheUniverseCommand);
 channelCommands.push(
   manCommand,
   promptCommand,
@@ -239,7 +255,7 @@ function handleAddQuote(channel, context, message) {
     quotesDBData.push(authorObj);
   }
 
-  overwriteQuotesJson();
+  overwriteQuotesJson(newQuoteSuccess);
   // if (overwriteQuotesJson()) {
   //   server.say(
   //     channel,
@@ -255,6 +271,13 @@ function handleAddQuote(channel, context, message) {
 }
 
 function handleManCommand(channel, context, message) {
+  if (message[1] === undefined) {
+    server.say(
+      apiData.Bot.CHANNEL,
+      `Sorry @${context.username}, TrshPuppy already has a man :(. Try again?`
+    );
+    return;
+  }
   let requestedCommand = message[1].startsWith("!")
     ? message[1].toLowerCase()
     : "!" + message[1].toLowerCase();
@@ -288,6 +311,10 @@ function handlePromptCommand(channel, context, message) {
   // Prep message for JSON object
   message.shift();
 
+  if (!isThisInputClean(message, context)) {
+    return;
+  }
+
   const firstPrompt = promptQueueData[0];
 
   // Create prompt to be written to JSON file!
@@ -301,23 +328,7 @@ function handlePromptCommand(channel, context, message) {
   promptQueueData.push(newPrompt);
 
   // Write new prompt to JSON Object/Array
-  overwritePromptJson();
-  // const jSONObj = JSON.stringify(promptQueueData);
-  // const targetFile = "./promptQueue.json";
-
-  // fs.writeFile(targetFile, jSONObj, "utf-8", (error) => {
-  //   if (error) {
-  //     console.log(
-  //       "There was an error writing the new prompt to the JSON. FAILED."
-  //     );
-  //     return;
-  //   }
-  //   console.log("New prompt successfully added to the queue!");
-  //   server.say(
-  //     apiData.Bot.CHANNEL,
-  //     `Thanks @${context.username}! Your prompt is in the queue.`
-  //   );
-  // });
+  overwritePromptJson(newPromptSuccess);
 
   previousQueueNumber += 1;
   return;
@@ -375,24 +386,25 @@ function handleHiCommand(channel, context, message) {
   return;
 }
 
-const overwriteSelectedJSON = (target, JSONObj) => {
+const overwriteSelectedJSON = (target, JSONObj, cb) => {
   const JSONStringData = JSON.stringify(JSONObj);
 
   fs.writeFile(target, JSONStringData, "utf-8", (err) => {
     if (err) {
       console.error(`Unable to write object to file. Error: ${err}`);
     } else {
+      cb?.();
       console.log(`Success writing obje to file: ${target}`);
     }
   });
 };
 
-function overwritePromptJson() {
-  overwriteSelectedJSON("./promptQueue.json", promptQueueData);
+function overwritePromptJson(cb) {
+  overwriteSelectedJSON("./promptQueue.json", promptQueueData, cb);
 }
 
-function overwriteQuotesJson() {
-  overwriteSelectedJSON("./quotesDB.json", quotesDBData);
+function overwriteQuotesJson(cb) {
+  overwriteSelectedJSON("./quotesDB.json", quotesDBData, cb);
 }
 
 // handleGetPrompt()
@@ -402,7 +414,7 @@ function handleTiddies() {
   if (previousPromptIndx === -1) {
     server.say(
       apiData.Bot.CHANNEL,
-      "There are not more prompts in the queue :("
+      "There are no more prompts in the queue :("
     );
     return;
   }
@@ -417,6 +429,19 @@ function handleTiddies() {
 
   promptQueueData[previousQueueNumber].completed = 1;
   overwritePromptJson();
+}
+
+export function isThisInputClean(message, context) {
+  let firstWord = message[0].split("");
+
+  if (firstWord[0] === "!" || firstWord[0] === "/" || message[0] === ".") {
+    server.say(
+      apiData.Bot.CHANNEL,
+      `We got a 1337 Haxxor over here. @${context.username}, you should try your hand at the Gibson!`
+    );
+    return false;
+  }
+  return true;
 }
 
 // console.log(quoteCommand.getManual());
