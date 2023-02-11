@@ -80,21 +80,14 @@ class QuoteCommand extends ChannelCommand {
   }
 }
 
+// Globals:
 const quote = {
   quote: "",
   date: new Date() * 1, // milliseconds
   feat: "",
 };
-const newPromptSuccess = () =>
-  server.say(apiData.Bot.CHANNEL, "Your prompt is in the queue!");
-const newQuoteSuccess = () =>
-  server.say(
-    apiData.Bot.CHANNEL,
-    "Your quote was added to the database! Congrats on being so ICONIC!"
-  );
 
 let previousQueueNumber = 0;
-
 const botCommands = [];
 const channelCommands = [];
 
@@ -155,6 +148,15 @@ channelCommands.push(
 );
 
 // Functions:
+const newPromptSuccess = () =>
+  server.say(apiData.Bot.CHANNEL, "Your prompt is in the queue!");
+
+const newQuoteSuccess = () =>
+  server.say(
+    apiData.Bot.CHANNEL,
+    "Your quote was added to the database! Congrats on being so ICONIC!"
+  );
+
 export function handleBotSummons(channel, context, message) {
   for (const command of botCommands) {
     if (command.tryHandleMessage(channel, context, message.split(" "))) {
@@ -221,6 +223,11 @@ function handleQuoteCommand(channel, context, message) {
 
 function handleAddQuote(channel, context, message) {
   const quoteString = message.slice(2).join(" ");
+
+  if (!isThisInputClean(quoteString, context)) {
+    return;
+  }
+
   const quoteToAdd = Object.create(quote);
   let authorSanitized;
 
@@ -329,7 +336,6 @@ function handlePromptCommand(channel, context, message) {
 
   previousQueueNumber += 1;
   return;
-  //
 
   /*
 
@@ -341,35 +347,8 @@ TommyLuco
 Trsh_bot
 : a day tiddies i can imitate tiddies is a good day
 
-
 HARASS RANDOM VIEWER
 
-
-
-
-
-
-
-  " !prompt this is a prompt"
-// /////////////////////////////////////////'custom-reward-id': '9cd066ae-2645-4aee-87fe-759d64aef086',
-
-  array:
-    make an object of queued prompts
-    array[0] is the oldest prompt and next in line
-      and author?
-      ? done or not done
-      time submitted
-
-      object gets written to JSON QUeue file
-
-    As we need prompts:
-      ask trshbot for the next prompt
-      !p
-        checks that user is me
-        console logs the next valid (not marked done) prompt
-        ? marks the prompt as finished
-
-        object gets deleted from queue file and written to finished file
   */
 }
 
@@ -440,8 +419,6 @@ export function isThisInputClean(message, context) {
   }
   return true;
 }
-
-// console.log(quoteCommand.getManual());
 
 // /*
 // Channel commands:
