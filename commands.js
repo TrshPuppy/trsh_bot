@@ -96,13 +96,13 @@ const yesCommand = new BotCommand("yes", ["yes", "Yes", "Y", "y", "YES"], () =>
   server.say(apiData.Bot.CHANNEL, ":)")
 );
 yesCommand.addArg("yes");
-yesCommand.addManual("@trsh_bot yes");
+yesCommand.addManual(`@${apiData.Bot.BOT_USERNAME} yes`);
 
 const noCommand = new BotCommand("no", ["no", "No", "N", "n", "NO"], () =>
   server.say(apiData.Bot.CHANNEL, ":(")
 );
 noCommand.addArg("no");
-noCommand.addManual("@trsh_bot no");
+noCommand.addManual(`@${apiData.Bot.BOT_USERNAME} no`);
 
 const breakTheUniverseCommand = new BotCommand(
   "/0",
@@ -110,7 +110,7 @@ const breakTheUniverseCommand = new BotCommand(
   () => server.say(apiData.Bot.CHANNEL, "8008135")
 );
 breakTheUniverseCommand.addManual(
-  "@trsh_bot ['/0', 'divide by zero', '/zero', 'divide by 0']"
+  `@${apiData.Bot.BOT_USERNAME}  ['/0', 'divide by zero', '/zero', 'divide by 0']`
 );
 
 const quoteCommand = new QuoteCommand("!quote", [], handleQuoteCommand);
@@ -127,7 +127,7 @@ promptCommand.addManual("!prompt <prompt>");
 
 const getPrompt = new ChannelCommand("!getprompt", [], handleTiddies);
 getPrompt.addManual(
-  "!getprompt (trsh_bot will respond w/ the next prompt in queue."
+  `!getprompt (${apiData.Bot.BOT_USERNAME} will respond w/ the next prompt in queue).`
 );
 
 const hiCommand = new BotCommand(
@@ -135,7 +135,9 @@ const hiCommand = new BotCommand(
   ["hey", "hi", "hello", "Hi", "Hey", "Hello"],
   handleHiCommand
 );
-hiCommand.addManual("@trsh_bot ['hey', 'hi', 'hello', 'Hi', 'Hey', 'Hello']");
+hiCommand.addManual(
+  `@${apiData.Bot.BOT_USERNAME} ['hey', 'hi', 'hello', 'Hi', 'Hey', 'Hello']`
+);
 
 // Add commands to command arrays:
 botCommands.push(yesCommand, noCommand, hiCommand, breakTheUniverseCommand);
@@ -175,8 +177,6 @@ export function ifThisDoesntWorkItsStevesFault(channel, context, message) {
 }
 
 function handleQuoteCommand(channel, context, message) {
-  //USE FIND INDEX INSTEAD
-  // HANDLE FINDINDEX returning -1
   let randomQuote;
   let currentAuthor;
   let indxIntoQuotesDB;
@@ -239,7 +239,7 @@ function handleAddQuote(channel, context, message) {
     authorSanitized = message[1].slice(1);
   } else {
     server.say(
-      channel,
+      apiData.Bot.CHANNEL,
       `${context.username}, please indicate the author by adding '@' before their username, ya scrub.`
     );
     return;
@@ -260,25 +260,13 @@ function handleAddQuote(channel, context, message) {
   }
 
   overwriteQuotesJson(newQuoteSuccess);
-  // if (overwriteQuotesJson()) {
-  //   server.say(
-  //     channel,
-  //     `Thank you ${context.username}! The quote by @${authorSanitized} has been added to the database! #ICONIC`
-  //   );
-  // } else {
-  //   server.say(
-  //     channel,
-  //     "Sorry, there was an error adding that quote. Try again?"
-  //   );
-  //   return;
-  // }
 }
 
 function handleManCommand(channel, context, message) {
   if (message[1] === undefined) {
     server.say(
       apiData.Bot.CHANNEL,
-      `Sorry @${context.username}, TrshPuppy already has a man :(. Try again?`
+      `Sorry @${context.username}, @${apiData.Bot.STREAMER_NICK} already has a man :( Try again?`
     );
     return;
   }
@@ -307,7 +295,7 @@ function handleManCommand(channel, context, message) {
       manMessage = "That command doesn't exist, sorry bub.";
     }
   }
-  server.say(channel, manMessage);
+  server.say(apiData.Bot.CHANNEL, manMessage);
   return;
 }
 

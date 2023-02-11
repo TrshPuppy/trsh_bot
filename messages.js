@@ -69,7 +69,7 @@ function keywordQ300(channel, context, message) {
   }
 
   messageWords[validIndex] = `${apiData.Bot.KEYWORD}`;
-  server.say(channel, messageWords.join(" "));
+  server.say(apiData.Bot.CHANNEL, messageWords.join(" "));
   return true;
 }
 
