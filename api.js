@@ -1,3 +1,4 @@
+// This module handles automating the OAuth2 token and refresh token
 import fetch from "node-fetch";
 import apiData from "./api.json" assert { type: "json" };
 import * as fs from "fs";

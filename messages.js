@@ -1,4 +1,4 @@
-// This module is meant to envelope functions r/t parsing through chat messages in order to delegate functions.
+// This module envelops functions r/t parsing through chat messages in order to delegate functions.
 
 // Imports:
 //const pos = require("pos"); // https://github.com/dariusk/pos-js
@@ -22,12 +22,22 @@ export default function delegateMessage(channel, context, message) {
   if (context.username === server.username) {
     return;
   }
-  if (/(@\btrsh_bot\b)/i.test(message)) {
+
+  const botSummons = `@${apiData.Bot.BOT_USERNAME}`;
+  const messageArr = message.split(" ");
+  if (messageArr[0].toLowerCase() === botSummons.toLowerCase()) {
     handleBotSummons(channel, context, message);
     return;
   }
+
   if (message[0] === "!") {
     ifThisDoesntWorkItsStevesFault(channel, context, message);
+    return;
+  }
+  if (context[`first-msg`] === true) {
+    return;
+  }
+  if (context.username === "streamlabs") {
     return;
   }
 
@@ -54,14 +64,12 @@ function keywordQ300(channel, context, message) {
   }
 
   let validIndex = findValidIndex(messageWords);
-
   if (validIndex === null) {
     return false;
   }
 
   messageWords[validIndex] = `${apiData.Bot.KEYWORD}`;
-
-  server.say(channel, messageWords.join(" "));
+  server.say(apiData.Bot.CHANNEL, messageWords.join(" "));
   return true;
 }
 

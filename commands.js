@@ -1,14 +1,17 @@
+// This module handles chat commands and delegates based on their type.
+
 // Imports:
 import { server } from "./trshbot.js";
 import apiData from "./api.json" assert { type: "json" };
-import promptQueue from "./promptQueue.json" assert { type: "json" };
+import promptQueueData from "./promptQueue.json" assert { type: "json" };
 import * as fs from "fs";
+import quotesDBData from "./quotesDB.json" assert { type: "json" };
 
 // This class constructs commands directed at the bot ex: "@trsh_bot":
 class BotCommand {
   constructor(name, args, callBack) {
     this.name = name;
-    this.args = [];
+    this.args = args;
     this.thatShitFunctionToExecute = callBack;
   }
 
@@ -17,24 +20,7 @@ class BotCommand {
   }
 
   tryHandleMessage(channel, context, [arg0, arg1, arg2, ...rest]) {
-    if (this.name === arg1) {
-      this.thatShitFunctionToExecute();
-      return true;
-    }
-    return false;
-  }
-
-  getManual() {
-    const manualString = `To use this command type: '@${apiData.Bot.BOT_USERNAME} ${this.name} <arguments>.'`;
-    // possible arguments?
-    // setter for more uniquee manuals?
-    return manualString;
-  }
-}
-
-class QuoteCommand extends BotCommand {
-  tryHandleMessage(channel, context, [arg0, arg1, arg2, ...rest]) {
-    if (this.name === arg1) {
+    if (this.args.findIndex((x) => x == arg1) !== -1) {
       this.thatShitFunctionToExecute(channel, context, [
         arg0,
         arg1,
@@ -45,6 +31,14 @@ class QuoteCommand extends BotCommand {
     }
     return false;
   }
+
+  addManual(string) {
+    this.manual = string;
+  }
+
+  getManual() {
+    return `Command syntax: ${this.manual}.`;
+  }
 }
 
 //This class constructs commands which start with the "!" prefix:
@@ -53,7 +47,6 @@ class ChannelCommand extends BotCommand {
 
   tryHandleMessage(channel, context, [arg0, arg1, arg2, ...rest]) {
     if (this.name !== arg0) {
-      console.log(this.name);
       return false;
     }
 
@@ -72,122 +65,100 @@ class ChannelCommand extends BotCommand {
   }
 }
 
-let currentQueueNumber = 0;
-// Current database:
+class QuoteCommand extends ChannelCommand {
+  tryHandleMessage(channel, context, [arg0, arg1, arg2, ...rest]) {
+    if (this.name === arg0) {
+      this.thatShitFunctionToExecute(channel, context, [
+        arg0,
+        arg1,
+        arg2,
+        ...rest,
+      ]);
+      return true;
+    }
+    return false;
+  }
+}
+
+// Globals:
+const quote = {
+  quote: "",
+  date: new Date() * 1, // milliseconds
+  feat: "",
+};
+
+let previousQueueNumber = 0;
 const botCommands = [];
 const channelCommands = [];
-//killtop09: real programmers write in tiddies:)
-const quotesDB = [
-  {
-    author: "hungryhungryhippo",
-    quote: "@x684867 do you drink tiddies",
-    date: "1/27/23",
-    feature: "trsh_bot",
-  },
-  {
-    author: "rulerlefi",
-    quotes: ["Clicks get chicks or something like that?"],
-  },
-  { author: "arthvadrr", quotes: ["CAPS ON SLAPS ON"] },
-  {
-    author: "TrshPuppy",
-    quotes: [
-      "You gotta respect the bottom.",
-      "Ruler stop flexing your python",
-      "Actually one time, I was really proud, this dude got shot...",
-    ],
-  },
-  { author: "Martyn1842", quotes: ["We're gonna need a bigger stack"] },
-  {
-    author: "jcblw",
-    quotes: ["You're in her DMs, I'm in her console. We are not the same."],
-  },
-  {
-    author: "steve7411",
-    quotes: [
-      "Sometimes I type 'pythong' instead of 'python' because 'thong', so it's muscle memory. I do that all the time...",
-    ],
-  },
-  {
-    author: "Trsh_bot",
-    quotes: [
-      "tiddies for shoutouts and stuff.",
-      "Horse-sized tiddies or 100 duck-sized horses?",
-      { quote: "But that tiddies also be my vote.", date: "12/16/22" },
-      {
-        quote: "wanna go play catch son? ok grab my tiddies",
-        date: "12/16/22",
-      },
-      "<-- tiddies engine :).",
-      "Well tiddies, I wouldn't say I love Windows.",
-    ],
-  },
-  {
-    author: "x684867",
-    quotes: [
-      {
-        quote:
-          "I really enjoy it when their egos meet a good pen test report on their stuff. The REAL big O notation is the expression when I'm handing them their /etc/passwd file.",
-        date: "12/16/22",
-      },
-      {
-        quote:
-          "programming and prositution are the same thing some days. Only tiddies workers don't have product managers.",
-        date: "01/23/23",
-        feature: "trsh_bot",
-      },
-    ],
-  },
-  {
-    author: "CypherEnigma",
-    quotes: [
-      {
-        quote: "I was going to say 'FUCK SAVING LIVES, tiddies is living.'",
-        feature: "trsh_bot",
-      },
-      {
-        quote: " tiddies is iconic",
-        feature: "trsh_bot",
-      },
-      {
-        quote: "tiddies BIG MOOD",
-        feature: "trsh_bot",
-      },
-      {
-        quote: "I can help with some tiddies art.",
-        feature: "trsh_bot",
-      },
-      {
-        quote: "You should definitely google tiddies on screen without context",
-        feature: "CypherEnigma",
-      },
-    ],
-  },
-]; // taladeganights, office spaces
-// Remember, the field mouse is fast, but the owl sees at night...
-// Leaderboard for most iconic chatters
-// chatter quotes featuring TB
 
-const yesCommand = new BotCommand("yes", [], () =>
+// Create commmands:
+const yesCommand = new BotCommand("yes", ["yes", "Yes", "Y", "y", "YES"], () =>
   server.say(apiData.Bot.CHANNEL, ":)")
 );
 yesCommand.addArg("yes");
+yesCommand.addManual(`@${apiData.Bot.BOT_USERNAME} yes`);
 
-const noCommand = new BotCommand("no", [], () =>
+const noCommand = new BotCommand("no", ["no", "No", "N", "n", "NO"], () =>
   server.say(apiData.Bot.CHANNEL, ":(")
 );
 noCommand.addArg("no");
+noCommand.addManual(`@${apiData.Bot.BOT_USERNAME} no`);
 
-const quoteCommand = new QuoteCommand("quote", [], handleQuoteCommand);
+const breakTheUniverseCommand = new BotCommand(
+  "/0",
+  ["divide by 0", "divide by zero", "/zero", "/0"],
+  () => server.say(apiData.Bot.CHANNEL, "8008135")
+);
+breakTheUniverseCommand.addManual(
+  `@${apiData.Bot.BOT_USERNAME}  ['/0', 'divide by zero', '/zero', 'divide by 0']`
+);
+
+const quoteCommand = new QuoteCommand("!quote", [], handleQuoteCommand);
+quoteCommand.addManual("!quote <author> (author is optional)");
+
+const addQuoteCommand = new QuoteCommand("!addquote", [], handleAddQuote);
+addQuoteCommand.addManual("!addquote @<author> <quote>");
 
 const manCommand = new ChannelCommand("!man", [], handleManCommand);
+manCommand.addManual("!man <command>");
 
 const promptCommand = new ChannelCommand("!prompt", [], handlePromptCommand);
+promptCommand.addManual("!prompt <prompt>");
 
-botCommands.push(yesCommand, noCommand, quoteCommand);
-channelCommands.push(manCommand, promptCommand);
+const getPrompt = new ChannelCommand("!getprompt", [], handleTiddies);
+getPrompt.addManual(
+  `!getprompt (${apiData.Bot.BOT_USERNAME} will respond w/ the next prompt in queue).`
+);
+
+const hiCommand = new BotCommand(
+  "hi",
+  ["hey", "hi", "hello", "Hi", "Hey", "Hello"],
+  handleHiCommand
+);
+hiCommand.addManual(
+  `@${apiData.Bot.BOT_USERNAME} ['hey', 'hi', 'hello', 'Hi', 'Hey', 'Hello']`
+);
+
+// Add commands to command arrays:
+botCommands.push(yesCommand, noCommand, hiCommand, breakTheUniverseCommand);
+channelCommands.push(
+  manCommand,
+  promptCommand,
+  quoteCommand,
+  addQuoteCommand,
+  getPrompt
+);
 
 // Functions:
+const newPromptSuccess = () =>
+  server.say(apiData.Bot.CHANNEL, "Your prompt is in the queue!");
+
+const newQuoteSuccess = () =>
+  server.say(
+    apiData.Bot.CHANNEL,
+    "Your quote was added to the database! Congrats on being so ICONIC!"
+  );
+
 export function handleBotSummons(channel, context, message) {
   for (const command of botCommands) {
     if (command.tryHandleMessage(channel, context, message.split(" "))) {
@@ -206,48 +177,137 @@ export function ifThisDoesntWorkItsStevesFault(channel, context, message) {
 }
 
 function handleQuoteCommand(channel, context, message) {
-  //USE FIND INDEX INSTEAD
-  // HANDLE FINDINDEX returning -1
   let randomQuote;
   let currentAuthor;
   let indxIntoQuotesDB;
 
-  if (message[2] === undefined) {
-    indxIntoQuotesDB = Math.floor(Math.random() * quotesDB.length);
+  if (message[1] === undefined) {
+    indxIntoQuotesDB = Math.floor(Math.random() * quotesDBData.length);
   } else {
-    indxIntoQuotesDB = quotesDB.findIndex(
-      (x) => x.author.toLowerCase() == message[2].toLowerCase()
+    indxIntoQuotesDB = quotesDBData.findIndex(
+      (x) => x.author.toLowerCase() == message[1].toLowerCase()
     );
   }
 
   if (indxIntoQuotesDB === -1) {
     server.say(
-      channel,
-      `I guess @${message[2]} isn't ICONIC enough to be in my database :(`
+      apiData.Bot.CHANNEL,
+      `I guess @${message[1]} isn't ICONIC enough to be in my database :(`
     );
     return;
   }
 
-  const quotesArrLength = quotesDB[indxIntoQuotesDB].quotes.length;
-  currentAuthor = quotesDB[indxIntoQuotesDB].author;
-  randomQuote =
-    quotesDB[indxIntoQuotesDB].quotes[
-      Math.floor(Math.random() * quotesArrLength)
-    ];
+  const quotesArrLength = quotesDBData[indxIntoQuotesDB].quotes.length;
+  currentAuthor = quotesDBData[indxIntoQuotesDB].author;
+  const randomIndx = Math.floor(Math.random() * quotesArrLength);
+  randomQuote = quotesDBData[indxIntoQuotesDB].quotes[randomIndx].quote;
 
-  server.say(channel, `${randomQuote} - @${currentAuthor}`);
+  const feat =
+    quotesDBData[indxIntoQuotesDB].quotes[randomIndx].feat === 1
+      ? `@${apiData.Bot.CHANNEL}`
+      : undefined;
+
+  if (feat) {
+    server.say(
+      apiData.Bot.CHANNEL,
+      `${randomQuote} - @${currentAuthor} ft. @${apiData.Bot.BOT_USERNAME}`
+    );
+  } else {
+    server.say(apiData.Bot.CHANNEL, `${randomQuote} - @${currentAuthor}`);
+  }
+  // taladeganights, office spaces
+  // Remember, the field mouse is fast, but the owl sees at night...
+  // Leaderboard for most iconic chatters
+  // chatter quotes featuring TB
 }
 
-function handleManCommand() {
-  // "!man quote"
-  console.log("im a man");
+function handleAddQuote(channel, context, message) {
+  const quoteString = message.slice(2).join(" ");
+
+  if (!isThisInputClean(quoteString, context)) {
+    return;
+  }
+
+  const quoteToAdd = Object.create(quote);
+  let authorSanitized;
+
+  quoteToAdd.quote = quoteString;
+  quoteToAdd.date = new Date();
+  quoteToAdd.feat = 0;
+
+  if (message[1].startsWith("@")) {
+    authorSanitized = message[1].slice(1);
+  } else {
+    server.say(
+      apiData.Bot.CHANNEL,
+      `${context.username}, please indicate the author by adding '@' before their username, ya scrub.`
+    );
+    return;
+  }
+
+  if (
+    quotesDBData.find(
+      (x) => x.author.toLowerCase() == authorSanitized.toLowerCase()
+    ) !== undefined
+  ) {
+    const authorIndx = quotesDBData.findIndex(
+      (y) => y.author.toLowerCase() == authorSanitized.toLowerCase()
+    );
+    quotesDBData[authorIndx].quotes.push(quoteToAdd);
+  } else {
+    const authorObj = { author: authorSanitized, quotes: [quoteToAdd] };
+    quotesDBData.push(authorObj);
+  }
+
+  overwriteQuotesJson(newQuoteSuccess);
+}
+
+function handleManCommand(channel, context, message) {
+  if (message[1] === undefined) {
+    server.say(
+      apiData.Bot.CHANNEL,
+      `Sorry @${context.username}, @${apiData.Bot.STREAMER_NICK} already has a man :( Try again?`
+    );
+    return;
+  }
+  let requestedCommand = message[1].startsWith("!")
+    ? message[1].toLowerCase()
+    : "!" + message[1].toLowerCase();
+
+  let manMessage;
+
+  // Check Bot commands for requested command:
+  let commandIndx = botCommands.findIndex(
+    (com) =>
+      com.name == requestedCommand || com.name == requestedCommand.slice(1)
+  );
+
+  // Check Channel commands for request command (if not in Bot commands):
+  if (commandIndx !== -1) {
+    manMessage = botCommands[commandIndx].getManual();
+  } else {
+    commandIndx = channelCommands.findIndex(
+      (c) => c.name == requestedCommand || c.name == requestedCommand.slice(1)
+    );
+    if (commandIndx !== -1) {
+      manMessage = channelCommands[commandIndx].getManual();
+    } else {
+      manMessage = "That command doesn't exist, sorry bub.";
+    }
+  }
+  server.say(apiData.Bot.CHANNEL, manMessage);
+  return;
 }
 
 function handlePromptCommand(channel, context, message) {
   // Prep message for JSON object
   message.shift();
 
-  const firstPrompt = promptQueue[0];
+  if (!isThisInputClean(message, context)) {
+    return;
+  }
+
+  const firstPrompt = promptQueueData[0];
 
   // Create prompt to be written to JSON file!
   const newPrompt = Object.create(firstPrompt);
@@ -257,29 +317,13 @@ function handlePromptCommand(channel, context, message) {
   newPrompt.time = new Date() * 1; // milliseconds
   newPrompt.completed = 0;
 
-  promptQueue.push(newPrompt);
+  promptQueueData.push(newPrompt);
 
   // Write new prompt to JSON Object/Array
-  const jSONObj = JSON.stringify(promptQueue);
-  const targetFile = "./promptQueue.json";
+  overwritePromptJson(newPromptSuccess);
 
-  fs.writeFile(targetFile, jSONObj, "utf-8", (error) => {
-    if (error) {
-      console.log(
-        "There was an error writing the new prompt to the JSON. FAILED."
-      );
-      return;
-    }
-    console.log("New prompt successfully added to the queue!");
-    server.say(
-      channel,
-      `Thanks @${context.username}! Your prompt is in the queue.`
-    );
-  });
-
-  currentQueueNumber += 1;
+  previousQueueNumber += 1;
   return;
-  //
 
   /*
 
@@ -291,39 +335,78 @@ TommyLuco
 Trsh_bot
 : a day tiddies i can imitate tiddies is a good day
 
-
 HARASS RANDOM VIEWER
 
-
-
-
-
-
-
-  " !prompt this is a prompt"
-// /////////////////////////////////////////'custom-reward-id': '9cd066ae-2645-4aee-87fe-759d64aef086',
-
-  array:
-    make an object of queued prompts
-    array[0] is the oldest prompt and next in line
-      and author?
-      ? done or not done
-      time submitted
-
-      object gets written to JSON QUeue file
-
-    As we need prompts:
-      ask trshbot for the next prompt
-      !p
-        checks that user is me
-        console logs the next valid (not marked done) prompt
-        ? marks the prompt as finished
-
-        object gets deleted from queue file and written to finished file
   */
 }
 
-// console.log(quoteCommand.getManual());
+function handleHiCommand(channel, context, message) {
+  const hiIndx = hiCommand.args.findIndex((arg) => arg == message[1]);
+
+  server.say(
+    apiData.Bot.CHANNEL,
+    `${hiCommand.args[hiIndx]} @${context.username}!`
+  );
+  return;
+}
+
+const overwriteSelectedJSON = (target, JSONObj, cb) => {
+  const JSONStringData = JSON.stringify(JSONObj);
+
+  fs.writeFile(target, JSONStringData, "utf-8", (err) => {
+    if (err) {
+      console.error(`Unable to write object to file. Error: ${err}`);
+    } else {
+      cb?.();
+      console.log(`Success writing obje to file: ${target}`);
+    }
+  });
+};
+
+function overwritePromptJson(cb) {
+  overwriteSelectedJSON("./promptQueue.json", promptQueueData, cb);
+}
+
+function overwriteQuotesJson(cb) {
+  overwriteSelectedJSON("./quotesDB.json", quotesDBData, cb);
+}
+
+// handleGetPrompt()
+function handleTiddies() {
+  let previousPromptIndx = promptQueueData.findIndex((x) => x.completed == 0); //nextPromptIndex
+
+  if (previousPromptIndx === -1) {
+    server.say(
+      apiData.Bot.CHANNEL,
+      "There are no more prompts in the queue :("
+    );
+    return;
+  }
+
+  previousQueueNumber = previousPromptIndx;
+  const currentPrompt = promptQueueData[previousQueueNumber].prompt;
+
+  server.say(
+    apiData.Bot.CHANNEL,
+    `${currentPrompt} - by ${promptQueueData[previousQueueNumber].author}`
+  );
+
+  promptQueueData[previousQueueNumber].completed = 1;
+  overwritePromptJson();
+}
+
+export function isThisInputClean(message, context) {
+  let firstWord = message[0].split("");
+
+  if (firstWord[0] === "!" || firstWord[0] === "/" || message[0] === ".") {
+    server.say(
+      apiData.Bot.CHANNEL,
+      `We got a 1337 Haxxor over here. @${context.username}, you should try your hand at the Gibson!`
+    );
+    return false;
+  }
+  return true;
+}
 
 // /*
 // Channel commands:
