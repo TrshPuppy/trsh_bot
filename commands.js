@@ -3,7 +3,9 @@
 // Imports:
 import { server } from "./trshbot.js";
 import apiData from "./api.json" assert { type: "json" };
-import promptQueueData from "./promptQueue.json" assert { type: "json" };
+import addPrompt from "./testRequire.js";
+import { getPromptFromDB } from "./testRequire.js";
+// import promptQueueData from "./promptQueue.json" assert { type: "json" };
 import * as fs from "fs";
 import quotesDBData from "./quotesDB.json" assert { type: "json" };
 
@@ -85,6 +87,13 @@ const quote = {
   quote: "",
   date: new Date() * 1, // milliseconds
   feat: "",
+};
+
+const prompt = {
+  time: undefined,
+  prompt: undefined,
+  author: undefined,
+  completed: undefined,
 };
 
 let previousQueueNumber = 0;
@@ -300,6 +309,32 @@ function handleManCommand(channel, context, message) {
 }
 
 function handlePromptCommand(channel, context, message) {
+  //Prep message for promptObj:
+  message.shift();
+
+  if (!isThisInputClean(message, context)) {
+    return;
+  }
+
+  // Create promptObj to be added to DB:
+  const promptObj = Object.create(prompt);
+
+  promptObj.time = new Date() * 1; // in milliseconds
+  promptObj.prompt = message.join(" ").trimEnd();
+  promptObj.author = context.username;
+  promptObj.completed = 0;
+
+  // Send promptObj to be added to DB:
+  const wasThePromptAddSuccessful = addPrompt(promptObj);
+
+  wasThePromptAddSuccessful
+    ? newPromptSuccess()
+    : server.say(
+        apiData.Bot.CHANNEL,
+        "Sorry, your prompt didn't make it into the queue :("
+      );
+
+  /*  OLD JSON DB WAY:
   // Prep message for JSON object
   message.shift();
 
@@ -307,7 +342,7 @@ function handlePromptCommand(channel, context, message) {
     return;
   }
 
-  const firstPrompt = promptQueueData[0];
+  // const firstPrompt = promptQueueData[0];
 
   // Create prompt to be written to JSON file!
   const newPrompt = Object.create(firstPrompt);
@@ -325,19 +360,20 @@ function handlePromptCommand(channel, context, message) {
   previousQueueNumber += 1;
   return;
 
-  /*
 
-a day where i can imitate trshbot is a good day
-saratonln
-: a day where i can imitate tiddies is a good day
-TommyLuco
-: maybe trshbot should make some miso soup
-Trsh_bot
-: a day tiddies i can imitate tiddies is a good day
 
-HARASS RANDOM VIEWER
+// a day where i can imitate trshbot is a good day
+// saratonln
+// : a day where i can imitate tiddies is a good day
+// TommyLuco
+// : maybe trshbot should make some miso soup
+// Trsh_bot
+// : a day tiddies i can imitate tiddies is a good day
 
-  */
+// HARASS RANDOM VIEWER
+
+
+ */
 }
 
 function handleHiCommand(channel, context, message) {
@@ -373,26 +409,27 @@ function overwriteQuotesJson(cb) {
 
 // handleGetPrompt()
 function handleTiddies() {
-  let previousPromptIndx = promptQueueData.findIndex((x) => x.completed == 0); //nextPromptIndex
+  getPromptFromDB();
+  // let previousPromptIndx = promptQueueData.findIndex((x) => x.completed == 0); //nextPromptIndex
 
-  if (previousPromptIndx === -1) {
-    server.say(
-      apiData.Bot.CHANNEL,
-      "There are no more prompts in the queue :("
-    );
-    return;
-  }
+  // if (previousPromptIndx === -1) {
+  //   server.say(
+  //     apiData.Bot.CHANNEL,
+  //     "There are no more prompts in the queue :("
+  //   );
+  //   return;
+  // }
 
-  previousQueueNumber = previousPromptIndx;
-  const currentPrompt = promptQueueData[previousQueueNumber].prompt;
+  // previousQueueNumber = previousPromptIndx;
+  // const currentPrompt = promptQueueData[previousQueueNumber].prompt;
 
-  server.say(
-    apiData.Bot.CHANNEL,
-    `${currentPrompt} - by ${promptQueueData[previousQueueNumber].author}`
-  );
+  // server.say(
+  //   apiData.Bot.CHANNEL,
+  //   `${currentPrompt} - by ${promptQueueData[previousQueueNumber].author}`
+  // );
 
-  promptQueueData[previousQueueNumber].completed = 1;
-  overwritePromptJson();
+  // promptQueueData[previousQueueNumber].completed = 1;
+  // overwritePromptJson();
 }
 
 export function isThisInputClean(message, context) {

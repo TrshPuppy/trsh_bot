@@ -1,5 +1,6 @@
 // This module checks for required files and create them if they aren't present.
 import * as fs from "fs";
+import { createPromptDB } from "./testRequire.js";
 
 export default function checkForFileSystem() {
   if (checkForPromptQueue() && checkForAPI() && chcekForQuotesDb()) {
@@ -29,17 +30,19 @@ function checkForAPI() {
 
 // Check for promptQueue.json, if it doesn't exist, make it.
 function checkForPromptQueue() {
-  fs.open("promptQueue.json", "wx", (err, fd) => {
-    if (err) {
-      if (err.code === "EEXIST") {
-        console.error("PromptQueue.json already exists!");
-        return;
-      }
-      throw err;
-    }
-  });
-  console.log("PromptQueue.json file created. Currently empty.");
+  createPromptDB();
   return true;
+  // fs.open("promptQueue.json", "wx", (err, fd) => {
+  //   if (err) {
+  //     if (err.code === "EEXIST") {
+  //       console.error("PromptQueue.json already exists!");
+  //       return;
+  //     }
+  //     throw err;
+  //   }
+  // });
+  // console.log("PromptQueue.json file created. Currently empty.");
+  // return true;
 }
 
 // Check for quotesDB.json, if it doesn't exist, make it.
