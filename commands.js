@@ -89,7 +89,7 @@ const quote = {
   feat: "",
 };
 
-const prompt = {
+export const prompt = {
   time: undefined,
   prompt: undefined,
   author: undefined,
@@ -150,13 +150,7 @@ hiCommand.addManual(
 
 // Add commands to command arrays:
 botCommands.push(yesCommand, noCommand, hiCommand, breakTheUniverseCommand);
-channelCommands.push(
-  manCommand,
-  promptCommand,
-  quoteCommand,
-  addQuoteCommand,
-  getPrompt
-);
+channelCommands.push(manCommand, quoteCommand, addQuoteCommand, getPrompt);
 
 // Functions:
 const newPromptSuccess = () =>
@@ -408,8 +402,14 @@ function overwriteQuotesJson(cb) {
 }
 
 // handleGetPrompt()
-function handleTiddies() {
-  getPromptFromDB();
+async function handleTiddies() {
+  const currentPromptInQueue = await getPromptFromDB();
+  console.log(currentPromptInQueue);
+
+  // server.say(
+  //   apiData.Bot.CHANNEL,
+  //   `${currentPromptInQueue.prompt} - by ${currentPromptInQueue.author}`
+  // );
   // let previousPromptIndx = promptQueueData.findIndex((x) => x.completed == 0); //nextPromptIndex
 
   // if (previousPromptIndx === -1) {
