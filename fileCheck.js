@@ -30,7 +30,7 @@ function checkForAPI() {
 
 // Check for promptQueue.json, if it doesn't exist, make it.
 function checkForPromptQueue() {
-  createPromptDB();
+  // createPromptDB();
   return true;
   // fs.open("promptQueue.json", "wx", (err, fd) => {
   //   if (err) {

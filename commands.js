@@ -151,7 +151,13 @@ hiCommand.addManual(
 
 // Add commands to command arrays:
 botCommands.push(yesCommand, noCommand, hiCommand, breakTheUniverseCommand);
-channelCommands.push(manCommand, quoteCommand, addQuoteCommand, getPrompt);
+channelCommands.push(
+  manCommand,
+  quoteCommand,
+  addQuoteCommand,
+  getPrompt,
+  promptCommand
+);
 
 // Functions:
 const newPromptSuccess = () =>
