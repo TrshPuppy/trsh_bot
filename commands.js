@@ -3,9 +3,10 @@
 // Imports:
 import { server } from "./trshbot.js";
 import apiData from "./api.json" assert { type: "json" };
-import addPrompt from "./testRequire.js";
-import { getPromptFromDB } from "./testRequire.js";
-// import promptQueueData from "./promptQueue.json" assert { type: "json" };
+import addPrompt, {
+  markPromptIncomplete,
+  getPromptFromDB,
+} from "./testRequire.js";
 import * as fs from "fs";
 import quotesDBData from "./quotesDB.json" assert { type: "json" };
 
@@ -403,13 +404,37 @@ function overwriteQuotesJson(cb) {
 
 // handleGetPrompt()
 async function handleTiddies() {
-  const currentPromptInQueue = await getPromptFromDB();
-  console.log(currentPromptInQueue);
+  let currentPromptInQueue;
+  try {
+    currentPromptInQueue = await getPromptFromDB();
+    if (!currentPromptInQueue) {
+      server.say(
+        apiData.Bot.CHANNEL,
+        "There are no more prompts in the queue :("
+      );
+      return;
+    }
+  } catch (err) {
+    server.say(
+      apiData.Bot.CHANNEL,
+      "Oops! There was an error getting the next prompt"
+    );
+    console.log("Error: getting prompt from DB! " + err);
+    return;
+  }
 
-  // server.say(
-  //   apiData.Bot.CHANNEL,
-  //   `${currentPromptInQueue.prompt} - by ${currentPromptInQueue.author}`
-  // );
+  server.say(
+    apiData.Bot.CHANNEL,
+    `${currentPromptInQueue.prompt} - by ${currentPromptInQueue.author}`
+  );
+
+  try {
+    await markPromptIncomplete(currentPromptInQueue.rowid);
+  } catch (err) {
+    console.log("Error: marking prompt as complete! " + err);
+    return;
+  }
+  return;
   // let previousPromptIndx = promptQueueData.findIndex((x) => x.completed == 0); //nextPromptIndex
 
   // if (previousPromptIndx === -1) {

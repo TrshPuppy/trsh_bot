@@ -5,7 +5,7 @@ const require = createRequire(import.meta.url);
 
 // Require sqlite3 and create database (liljiblets):
 const sqlite3 = require("sqlite3").verbose();
-const liljiblets = new sqlite3.Database("./data/test.db");
+const liljiblets = new sqlite3.Database("./data/test.sqlite");
 
 export default function addPrompt(promptObj) {
   liljiblets.serialize(() => {
@@ -31,8 +31,26 @@ export async function getPromptFromDB() {
           reject("ERROR getting prompt from DB: " + err);
         }
         resolve(what_WaS_ThiS_VaRiaBLes_NAME_SuppOSeD_To_bE_1234509876);
+      },
+      (err, rows) => {
+        if (err) {
+          reject("Error getting prompt from DB: " + err);
+        }
+        if (!rows) {
+          resolve(rows);
+        }
       }
     );
+  });
+}
+
+export async function markPromptIncomplete(rowID) {
+  return await new Promise((resolve, reject) => {
+    const st = liljiblets.prepare(
+      `UPDATE prompts SET completed = 1 WHERE rowid = ?`
+    );
+
+    st.run(rowID);
   });
 }
 
