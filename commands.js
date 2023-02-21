@@ -97,7 +97,6 @@ export const prompt = {
   completed: undefined,
 };
 
-let previousQueueNumber = 0;
 const botCommands = [];
 const channelCommands = [];
 
@@ -310,10 +309,14 @@ function handleManCommand(channel, context, message) {
 }
 
 function handlePromptCommand(channel, context, message) {
-  //Prep message for promptObj:
+  // Prep message for promptObj:
   message.shift();
 
-  if (!isThisInputClean(message, context)) {
+  if (!isThisInputClean(message)) {
+    server.say(
+      apiData.Bot.CHANNEL,
+      `Your prompt is invalid @${context.username}!`
+    );
     return;
   }
 
@@ -335,46 +338,15 @@ function handlePromptCommand(channel, context, message) {
         "Sorry, your prompt didn't make it into the queue :("
       );
 
-  /*  OLD JSON DB WAY:
-  // Prep message for JSON object
-  message.shift();
+  // a day where i can imitate trshbot is a good day
+  // saratonln
+  // : a day where i can imitate tiddies is a good day
+  // TommyLuco
+  // : maybe trshbot should make some miso soup
+  // Trsh_bot
+  // : a day tiddies i can imitate tiddies is a good day
 
-  if (!isThisInputClean(message, context)) {
-    return;
-  }
-
-  // const firstPrompt = promptQueueData[0];
-
-  // Create prompt to be written to JSON file!
-  const newPrompt = Object.create(firstPrompt);
-
-  newPrompt.prompt = message.join(" ").trimEnd();
-  newPrompt.author = context.username;
-  newPrompt.time = new Date() * 1; // milliseconds
-  newPrompt.completed = 0;
-
-  promptQueueData.push(newPrompt);
-
-  // Write new prompt to JSON Object/Array
-  overwritePromptJson(newPromptSuccess);
-
-  previousQueueNumber += 1;
-  return;
-
-
-
-// a day where i can imitate trshbot is a good day
-// saratonln
-// : a day where i can imitate tiddies is a good day
-// TommyLuco
-// : maybe trshbot should make some miso soup
-// Trsh_bot
-// : a day tiddies i can imitate tiddies is a good day
-
-// HARASS RANDOM VIEWER
-
-
- */
+  // HARASS RANDOM VIEWER
 }
 
 function handleHiCommand(channel, context, message) {
@@ -401,7 +373,7 @@ const overwriteSelectedJSON = (target, JSONObj, cb) => {
 };
 
 function overwritePromptJson(cb) {
-  overwriteSelectedJSON("./promptQueue.json", promptQueueData, cb);
+  // overwriteSelectedJSON("./promptQueue.json", promptQueueData, cb);
 }
 
 function overwriteQuotesJson(cb) {
@@ -441,38 +413,39 @@ async function handleTiddies() {
     return;
   }
   return;
-  // let previousPromptIndx = promptQueueData.findIndex((x) => x.completed == 0); //nextPromptIndex
-
-  // if (previousPromptIndx === -1) {
-  //   server.say(
-  //     apiData.Bot.CHANNEL,
-  //     "There are no more prompts in the queue :("
-  //   );
-  //   return;
-  // }
-
-  // previousQueueNumber = previousPromptIndx;
-  // const currentPrompt = promptQueueData[previousQueueNumber].prompt;
-
-  // server.say(
-  //   apiData.Bot.CHANNEL,
-  //   `${currentPrompt} - by ${promptQueueData[previousQueueNumber].author}`
-  // );
-
-  // promptQueueData[previousQueueNumber].completed = 1;
-  // overwritePromptJson();
 }
 
-export function isThisInputClean(message, context) {
-  let firstWord = message[0].split("");
+export function isThisInputClean(message) {
+  const firstWord = message[0].split("");
 
-  if (firstWord[0] === "!" || firstWord[0] === "/" || message[0] === ".") {
-    server.say(
-      apiData.Bot.CHANNEL,
-      `We got a 1337 Haxxor over here. @${context.username}, you should try your hand at the Gibson!`
-    );
+  if (
+    firstWord[0] === "!" ||
+    firstWord[0] === "/" ||
+    firstWord[0] === "." ||
+    firstWord[0] === "'" ||
+    firstWord[0] === `"` ||
+    firstWord[0] === "`" ||
+    firstWord[0] === "-" ||
+    firstWord[0] === "#"
+  ) {
     return false;
   }
+
+  for (const word of message) {
+    const wordArr = word.split("");
+
+    if (wordArr.includes("#")) {
+      return false;
+    }
+
+    let dashIndx = wordArr.findIndex((x) => (x = "-"));
+    if (dashIndx !== -1) {
+      if (wordArr[dashIndx + 1] === "-" || wordArr[dashIndx + 1] === "-") {
+        return false;
+      }
+    }
+  }
+
   return true;
 }
 

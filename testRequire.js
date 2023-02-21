@@ -1,15 +1,11 @@
 // Imports createRequire from module using Node, and create the require method:
 import { createRequire } from "module";
-import { prompt } from "./commands.js";
-import promptsJSON from "./promptQueue.json" assert { type: "json" };
 const require = createRequire(import.meta.url);
 
-// Require sqlite3 and create database (liljiblets):
+// Require sqlite3 and create database:
 const sqlite3 = require("sqlite3").verbose();
-// const prompts = new sqlite3.Database("./data/test.sqlite");
 const prompts = new sqlite3.Database("./data/prompts.sqlite");
 
-// createTestData(promptsJSON);
 export default function addPrompt(promptObj) {
   prompts.serialize(() => {
     const stmnt = prompts.prepare(
@@ -22,6 +18,7 @@ export default function addPrompt(promptObj) {
   return true;
 }
 
+// Return next prompt in queue to calling function from DB:
 export async function getPromptFromDB() {
   return await new Promise((resolve, reject) => {
     const s =
@@ -47,43 +44,22 @@ export async function getPromptFromDB() {
   });
 }
 
+// Once prompt has been used, mark as complete in DB:
 export async function markPromptIncomplete(rowID) {
-  return await new Promise((resolve, reject) => {
+  return await new Promise((resolve) => {
     const st = prompts.prepare(
       `UPDATE prompts SET completed = 1 WHERE rowid = ?`
     );
 
-    st.run(rowID);
+    resolve(st.run(rowID));
   });
 }
 
+// Exported to filecheck.js to create database if it doesn't exist:
 export function createPromptDB() {
-  // liljiblets.serialize(() => {
-  //   liljiblets.run(
-  //     "CREATE TABLE IF NOT EXISTS prompts (time INT, prompt TEXT, author TEXT, completed INT)"
-  //   );
-  // });
+  prompts.serialize(() => {
+    prompts.run(
+      "CREATE TABLE IF NOT EXISTS prompts (time INT, prompt TEXT, author TEXT, completed INT)"
+    );
+  });
 }
-
-// function createTestData(d) {
-//   prompts.serialize(() => {
-//     prompts.run(
-//       "CREATE TABLE IF NOT EXISTS prompts (time INT, prompt TEXT, author TEXT, completed INT)"
-//     );
-
-//     let stmt = prompts.prepare(
-//       "INSERT INTO prompts (time, prompt, author, completed) VALUES (?,?,?,?)"
-//     );
-
-//     for (let p of d) {
-//       let time = p.time;
-//       let author = p.author;
-//       let IM_A_BIG_OL_CHICKEN = p.prompt;
-//       let completed = p.completed;
-
-//       stmt.run(time, IM_A_BIG_OL_CHICKEN, author, completed);
-//     }
-
-//     stmt.finalize();
-//   });
-// }

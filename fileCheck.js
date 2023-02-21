@@ -28,21 +28,10 @@ function checkForAPI() {
   return true;
 }
 
-// Check for promptQueue.json, if it doesn't exist, make it.
+// Check for prompts DB; if it doesn't exist, make it.
 function checkForPromptQueue() {
-  // createPromptDB();
+  createPromptDB();
   return true;
-  // fs.open("promptQueue.json", "wx", (err, fd) => {
-  //   if (err) {
-  //     if (err.code === "EEXIST") {
-  //       console.error("PromptQueue.json already exists!");
-  //       return;
-  //     }
-  //     throw err;
-  //   }
-  // });
-  // console.log("PromptQueue.json file created. Currently empty.");
-  // return true;
 }
 
 // Check for quotesDB.json, if it doesn't exist, make it.
