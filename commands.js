@@ -12,10 +12,11 @@ import quotesDBData from "./quotesDB.json" assert { type: "json" };
 
 // This class constructs commands directed at the bot ex: "@trsh_bot":
 class BotCommand {
-  constructor(name, args, callBack) {
+  constructor(name, args, callBack, authority) {
     this.name = name;
     this.args = args;
     this.thatShitFunctionToExecute = callBack;
+    this.authority = authority;
   }
 
   addArg(arg) {
@@ -49,6 +50,11 @@ class ChannelCommand extends BotCommand {
   // constructor / setter should set the command's authority (who can use this command via badge/role)
 
   tryHandleMessage(channel, context, [arg0, arg1, arg2, ...rest]) {
+    if (this.authority !== undefined) {
+      if (context.username.toLowerCase() !== this.authority.toLowerCase()) {
+        return;
+      }
+    }
     if (this.name !== arg0) {
       return false;
     }
@@ -134,7 +140,12 @@ manCommand.addManual("!man <command>");
 const promptCommand = new ChannelCommand("!prompt", [], handlePromptCommand);
 promptCommand.addManual("!prompt <prompt>");
 
-const getPrompt = new ChannelCommand("!getprompt", [], handleTiddies);
+const getPrompt = new ChannelCommand(
+  "!getprompt",
+  [],
+  handleTiddies,
+  "trshpuppy"
+);
 getPrompt.addManual(
   `!getprompt (${apiData.Bot.BOT_USERNAME} will respond w/ the next prompt in queue).`
 );
