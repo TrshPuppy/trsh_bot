@@ -49,26 +49,17 @@ class BotCommand {
 class ChannelCommand extends BotCommand {
   // constructor / setter should set the command's authority (who can use this command via badge/role)
 
-  tryHandleMessage(channel, context, [arg0, arg1, arg2, ...rest]) {
-    if (this.authority !== undefined) {
-      if (context.username.toLowerCase() !== this.authority.toLowerCase()) {
-        return;
-      }
-    }
+  tryHandleMessage(channel, context, [arg0, arg1, ...rest]) {
     if (this.name !== arg0) {
       return false;
     }
+    if (this.authority !== undefined) {
+      if (context.username.toLowerCase() !== this.authority.toLowerCase()) {
+        return false;
+      }
+    }
 
-    //if ( author of command !have authority){
-    //return false
-    // }
-
-    this.thatShitFunctionToExecute(channel, context, [
-      arg0,
-      arg1,
-      arg2,
-      ...rest,
-    ]);
+    this.thatShitFunctionToExecute(channel, context, [arg0, arg1, ...rest]);
 
     return true;
   }
@@ -144,7 +135,7 @@ const getPrompt = new ChannelCommand(
   "!getprompt",
   [],
   handleTiddies,
-  "trshpuppy"
+  apiData.Bot.STREAMER_NICK
 );
 getPrompt.addManual(
   `!getprompt (${apiData.Bot.BOT_USERNAME} will respond w/ the next prompt in queue).`
@@ -320,6 +311,10 @@ function handleManCommand(channel, context, message) {
 }
 
 function handlePromptCommand(channel, context, message) {
+  if (message[1] === undefined) {
+    return;
+  }
+
   // Prep message for promptObj:
   message.shift();
 
@@ -427,32 +422,34 @@ async function handleTiddies() {
 }
 
 export function isThisInputClean(message) {
-  const firstWord = message[0].split("");
+  const lastWord = message[0].split(""); //firstWord
 
   if (
-    firstWord[0] === "!" ||
-    firstWord[0] === "/" ||
-    firstWord[0] === "." ||
-    firstWord[0] === "'" ||
-    firstWord[0] === `"` ||
-    firstWord[0] === "`" ||
-    firstWord[0] === "-" ||
-    firstWord[0] === "#"
+    lastWord[0] === "!" ||
+    lastWord[0] === "/" ||
+    lastWord[0] === "." ||
+    lastWord[0] === "'" ||
+    lastWord[0] === `"` ||
+    lastWord[0] === "`" ||
+    lastWord[0] === "-" ||
+    lastWord[0] === "#"
   ) {
     return false;
   }
 
-  for (const word of message) {
-    const wordArr = word.split("");
+  if (message.length > 1 || message[1] !== undefined) {
+    for (const word of message) {
+      const wordArr = word.split("");
 
-    if (wordArr.includes("#")) {
-      return false;
-    }
-
-    let dashIndx = wordArr.findIndex((x) => (x = "-"));
-    if (dashIndx !== -1) {
-      if (wordArr[dashIndx + 1] === "-" || wordArr[dashIndx + 1] === "-") {
+      if (wordArr.includes("#")) {
         return false;
+      }
+
+      let dashIndx = wordArr.findIndex((x) => (x = "-"));
+      if (dashIndx !== -1) {
+        if (wordArr[dashIndx + 1] === "-" || wordArr[dashIndx + 1] === "-") {
+          return false;
+        }
       }
     }
   }
