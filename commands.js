@@ -312,6 +312,7 @@ function handleManCommand(channel, context, message) {
 
 function handlePromptCommand(channel, context, message) {
   if (message[1] === undefined) {
+    server.say(apiData.Bot.CHANNEL, `@${context.username} RTFM!`);
     return;
   }
 
@@ -409,7 +410,7 @@ async function handleTiddies() {
 
   server.say(
     apiData.Bot.CHANNEL,
-    `${currentPromptInQueue.prompt} - by ${currentPromptInQueue.author}`
+    `'${currentPromptInQueue.prompt}' - by ${currentPromptInQueue.author}`
   );
 
   try {
