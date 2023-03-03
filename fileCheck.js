@@ -1,6 +1,6 @@
 // This module checks for required files and create them if they aren't present.
 import * as fs from "fs";
-import { createPromptDB } from "./testRequire.js";
+import { createPromptDB } from "./promptQueue.js";
 
 export default function checkForFileSystem() {
   if (checkForPromptQueue() && checkForAPI() && chcekForQuotesDb()) {

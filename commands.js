@@ -6,7 +6,7 @@ import apiData from "./api.json" assert { type: "json" };
 import addPrompt, {
   markPromptIncomplete,
   getPromptFromDB,
-} from "./testRequire.js";
+} from "./promptQueue.js";
 import * as fs from "fs";
 import quotesDBData from "./quotesDB.json" assert { type: "json" };
 
@@ -503,16 +503,10 @@ export function isThisInputClean(message) {
 
 // Others:
 //     !8ball
-//     !addquote / !quote
+
 //     !peachfuzz
 //         timer?
-//     !boingboingg
+//     !boingboing
 //    !whatstheword (returns a random word)
 
-// QUOTES MOCKUP:
-
-//     QUOTES = [];
-
-//     [{author: "@steve7411",
-//         quotes: ["JSON file?", "I am deeeply upset by this"]}]
 // */
