@@ -9,3 +9,6 @@ api.json
 .vscode
 promptQueue.json
 quotesDB.json
+/data
+/data/test.sqlite
+/data/prompts.sqlite

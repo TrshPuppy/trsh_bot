@@ -146,18 +146,6 @@ function findValidIndex(messageArray) {
 
 //               botCommands = [yes, no, count, ty]
 
-//               @trsh_bot quote @arthvadrr
-
-//                   command = [
-//                     command: "quote",
-//                     args: {author: @whoever,
-//                           quoteArray:["i like to imagine jesus as a littlee baby", "I'm on fire"]},
-//                           {author: @arthvadrr,
-//                             quoteArray" ["CAPS ON SLAPS ON"]}
-//                           ]
-
-//                           if( "3h")
-
 // */
 
 // // @trsh_bot:

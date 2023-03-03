@@ -3,18 +3,20 @@
 // Imports:
 import { server } from "./trshbot.js";
 import apiData from "./api.json" assert { type: "json" };
-import addPrompt from "./testRequire.js";
-import { getPromptFromDB } from "./testRequire.js";
-// import promptQueueData from "./promptQueue.json" assert { type: "json" };
+import addPrompt, {
+  markPromptIncomplete,
+  getPromptFromDB,
+} from "./testRequire.js";
 import * as fs from "fs";
 import quotesDBData from "./quotesDB.json" assert { type: "json" };
 
 // This class constructs commands directed at the bot ex: "@trsh_bot":
 class BotCommand {
-  constructor(name, args, callBack) {
+  constructor(name, args, callBack, authority) {
     this.name = name;
     this.args = args;
     this.thatShitFunctionToExecute = callBack;
+    this.authority = authority;
   }
 
   addArg(arg) {
@@ -47,21 +49,17 @@ class BotCommand {
 class ChannelCommand extends BotCommand {
   // constructor / setter should set the command's authority (who can use this command via badge/role)
 
-  tryHandleMessage(channel, context, [arg0, arg1, arg2, ...rest]) {
+  tryHandleMessage(channel, context, [arg0, arg1, ...rest]) {
     if (this.name !== arg0) {
       return false;
     }
+    if (this.authority !== undefined) {
+      if (context.username.toLowerCase() !== this.authority.toLowerCase()) {
+        return false;
+      }
+    }
 
-    //if ( author of command !have authority){
-    //return false
-    // }
-
-    this.thatShitFunctionToExecute(channel, context, [
-      arg0,
-      arg1,
-      arg2,
-      ...rest,
-    ]);
+    this.thatShitFunctionToExecute(channel, context, [arg0, arg1, ...rest]);
 
     return true;
   }
@@ -89,14 +87,13 @@ const quote = {
   feat: "",
 };
 
-const prompt = {
+export const prompt = {
   time: undefined,
   prompt: undefined,
   author: undefined,
   completed: undefined,
 };
 
-let previousQueueNumber = 0;
 const botCommands = [];
 const channelCommands = [];
 
@@ -134,7 +131,12 @@ manCommand.addManual("!man <command>");
 const promptCommand = new ChannelCommand("!prompt", [], handlePromptCommand);
 promptCommand.addManual("!prompt <prompt>");
 
-const getPrompt = new ChannelCommand("!getprompt", [], handleTiddies);
+const getPrompt = new ChannelCommand(
+  "!getprompt",
+  [],
+  handleTiddies,
+  apiData.Bot.STREAMER_NICK
+);
 getPrompt.addManual(
   `!getprompt (${apiData.Bot.BOT_USERNAME} will respond w/ the next prompt in queue).`
 );
@@ -152,10 +154,10 @@ hiCommand.addManual(
 botCommands.push(yesCommand, noCommand, hiCommand, breakTheUniverseCommand);
 channelCommands.push(
   manCommand,
-  promptCommand,
   quoteCommand,
   addQuoteCommand,
-  getPrompt
+  getPrompt,
+  promptCommand
 );
 
 // Functions:
@@ -309,10 +311,19 @@ function handleManCommand(channel, context, message) {
 }
 
 function handlePromptCommand(channel, context, message) {
-  //Prep message for promptObj:
+  if (message[1] === undefined) {
+    server.say(apiData.Bot.CHANNEL, `@${context.username} RTFM!`);
+    return;
+  }
+
+  // Prep message for promptObj:
   message.shift();
 
-  if (!isThisInputClean(message, context)) {
+  if (!isThisInputClean(message)) {
+    server.say(
+      apiData.Bot.CHANNEL,
+      `Your prompt is invalid @${context.username}!`
+    );
     return;
   }
 
@@ -334,46 +345,15 @@ function handlePromptCommand(channel, context, message) {
         "Sorry, your prompt didn't make it into the queue :("
       );
 
-  /*  OLD JSON DB WAY:
-  // Prep message for JSON object
-  message.shift();
+  // a day where i can imitate trshbot is a good day
+  // saratonln
+  // : a day where i can imitate tiddies is a good day
+  // TommyLuco
+  // : maybe trshbot should make some miso soup
+  // Trsh_bot
+  // : a day tiddies i can imitate tiddies is a good day
 
-  if (!isThisInputClean(message, context)) {
-    return;
-  }
-
-  // const firstPrompt = promptQueueData[0];
-
-  // Create prompt to be written to JSON file!
-  const newPrompt = Object.create(firstPrompt);
-
-  newPrompt.prompt = message.join(" ").trimEnd();
-  newPrompt.author = context.username;
-  newPrompt.time = new Date() * 1; // milliseconds
-  newPrompt.completed = 0;
-
-  promptQueueData.push(newPrompt);
-
-  // Write new prompt to JSON Object/Array
-  overwritePromptJson(newPromptSuccess);
-
-  previousQueueNumber += 1;
-  return;
-
-
-
-// a day where i can imitate trshbot is a good day
-// saratonln
-// : a day where i can imitate tiddies is a good day
-// TommyLuco
-// : maybe trshbot should make some miso soup
-// Trsh_bot
-// : a day tiddies i can imitate tiddies is a good day
-
-// HARASS RANDOM VIEWER
-
-
- */
+  // HARASS RANDOM VIEWER
 }
 
 function handleHiCommand(channel, context, message) {
@@ -400,7 +380,7 @@ const overwriteSelectedJSON = (target, JSONObj, cb) => {
 };
 
 function overwritePromptJson(cb) {
-  overwriteSelectedJSON("./promptQueue.json", promptQueueData, cb);
+  // overwriteSelectedJSON("./promptQueue.json", promptQueueData, cb);
 }
 
 function overwriteQuotesJson(cb) {
@@ -408,40 +388,73 @@ function overwriteQuotesJson(cb) {
 }
 
 // handleGetPrompt()
-function handleTiddies() {
-  getPromptFromDB();
-  // let previousPromptIndx = promptQueueData.findIndex((x) => x.completed == 0); //nextPromptIndex
-
-  // if (previousPromptIndx === -1) {
-  //   server.say(
-  //     apiData.Bot.CHANNEL,
-  //     "There are no more prompts in the queue :("
-  //   );
-  //   return;
-  // }
-
-  // previousQueueNumber = previousPromptIndx;
-  // const currentPrompt = promptQueueData[previousQueueNumber].prompt;
-
-  // server.say(
-  //   apiData.Bot.CHANNEL,
-  //   `${currentPrompt} - by ${promptQueueData[previousQueueNumber].author}`
-  // );
-
-  // promptQueueData[previousQueueNumber].completed = 1;
-  // overwritePromptJson();
-}
-
-export function isThisInputClean(message, context) {
-  let firstWord = message[0].split("");
-
-  if (firstWord[0] === "!" || firstWord[0] === "/" || message[0] === ".") {
+async function handleTiddies() {
+  let currentPromptInQueue;
+  try {
+    currentPromptInQueue = await getPromptFromDB();
+    if (!currentPromptInQueue) {
+      server.say(
+        apiData.Bot.CHANNEL,
+        "There are no more prompts in the queue :("
+      );
+      return;
+    }
+  } catch (err) {
     server.say(
       apiData.Bot.CHANNEL,
-      `We got a 1337 Haxxor over here. @${context.username}, you should try your hand at the Gibson!`
+      "Oops! There was an error getting the next prompt"
     );
+    console.log("Error: getting prompt from DB! " + err);
+    return;
+  }
+
+  server.say(
+    apiData.Bot.CHANNEL,
+    `'${currentPromptInQueue.prompt}' - by ${currentPromptInQueue.author}`
+  );
+
+  try {
+    await markPromptIncomplete(currentPromptInQueue.rowid);
+  } catch (err) {
+    console.log("Error: marking prompt as complete! " + err);
+    return;
+  }
+  return;
+}
+
+export function isThisInputClean(message) {
+  const lastWord = message[0].split(""); //firstWord
+
+  if (
+    lastWord[0] === "!" ||
+    lastWord[0] === "/" ||
+    lastWord[0] === "." ||
+    lastWord[0] === "'" ||
+    lastWord[0] === `"` ||
+    lastWord[0] === "`" ||
+    lastWord[0] === "-" ||
+    lastWord[0] === "#"
+  ) {
     return false;
   }
+
+  if (message.length > 1 || message[1] !== undefined) {
+    for (const word of message) {
+      const wordArr = word.split("");
+
+      if (wordArr.includes("#")) {
+        return false;
+      }
+
+      let dashIndx = wordArr.findIndex((x) => (x = "-"));
+      if (dashIndx !== -1) {
+        if (wordArr[dashIndx + 1] === "-" || wordArr[dashIndx + 1] === "-") {
+          return false;
+        }
+      }
+    }
+  }
+
   return true;
 }
 
