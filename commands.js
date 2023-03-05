@@ -8,7 +8,7 @@ import addPrompt, {
   getPromptFromDB,
 } from "./promptQueue.js";
 import * as fs from "fs";
-import quotesDBData from "./quotesDB.json" assert { type: "json" };
+import quotesDBData from "./data/quotesDB.json" assert { type: "json" };
 
 // This class constructs commands directed at the bot ex: "@trsh_bot":
 class BotCommand {

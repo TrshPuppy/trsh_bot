@@ -16,15 +16,16 @@ function checkForAPI() {
   fs.open("api.json", "wx", (err, fd) => {
     if (err) {
       if (err.code === "EEXIST") {
-        console.error("Api.json already exists!");
         return;
+      } else {
+        console.log(
+          "api.json file created, but needs to be filled with credentials!"
+        );
       }
       throw err;
     }
   });
-  console.log(
-    "api.json file created, but needs to be filled with credentials!"
-  );
+
   return true;
 }
 
@@ -36,15 +37,16 @@ function checkForPromptQueue() {
 
 // Check for quotesDB.json, if it doesn't exist, make it.
 function chcekForQuotesDb() {
-  fs.open("quotesDB.json", "wx", (err, fd) => {
+  fs.open("./data/quotesDB.json", "wx", (err, fd) => {
     if (err) {
       if (err.code === "EEXIST") {
-        console.error("QuotesDB.json already exists!");
         return;
+      } else {
+        console.log("QuotesDB.json file created but is empty!");
       }
       throw err;
     }
   });
-  console.log("QuotesDB.json file created but is empty!");
+
   return true;
 }
