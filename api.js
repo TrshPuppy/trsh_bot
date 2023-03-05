@@ -7,6 +7,7 @@ export default function checkOAuthStatus() {
   if (isOAuthExpired()) {
     // If Oauth is due to expire OR OAuth returns a 404, then:
     refreshOAuth();
+    checkOAuthStatus();
   }
   return;
 }
@@ -25,7 +26,7 @@ function isOAuthExpired() {
 }
 
 function refreshOAuth() {
-  // When OAuth is expired,  && this function called, build fetch URL:
+  // When OAuth is expired && this function called, build fetch URL:
   const TWITCH_REFRESH_URL = `https://id.twitch.tv/oauth2/token`;
 
   // Fetch new OAuth token:
