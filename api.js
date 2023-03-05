@@ -1,6 +1,6 @@
 // This module handles automating the OAuth2 token and refresh token
 import fetch from "node-fetch";
-import apiData from "./api.json" assert { type: "json" };
+import apiData from "./data/api.json" assert { type: "json" };
 import * as fs from "fs";
 
 export default function checkOAuthStatus() {
@@ -60,7 +60,7 @@ function updateJSON(response) {
   apiData.LAST_REFRESH = new Date() / 1000; // in seconds
 
   const JSONObj = JSON.stringify(apiData);
-  const targetFile = "./api.json";
+  const targetFile = "./data/api.json";
 
   // Overwrite api.json w/ updated JSON Object:
   fs.writeFile(targetFile, JSONObj, "utf-8", (error) => {

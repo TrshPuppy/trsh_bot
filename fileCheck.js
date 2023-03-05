@@ -13,7 +13,7 @@ export default function checkForFileSystem() {
 
 // Check for api.json, if it doesn't exist, make it.
 function checkForAPI() {
-  fs.open("api.json", "wx", (err, fd) => {
+  fs.open("./data/api.json", "wx", (err, fd) => {
     if (err) {
       if (err.code === "EEXIST") {
         return;

@@ -7,7 +7,7 @@ import {
   handleBotSummons,
   ifThisDoesntWorkItsStevesFault,
 } from "./commands.js";
-import apiData from "./api.json" assert { type: "json" };
+import apiData from "./data/api.json" assert { type: "json" };
 
 // Module globals:
 let Fred = new Date(0); // lastKeywordTime

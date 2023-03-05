@@ -2,7 +2,7 @@
 
 // Imports:
 import { server } from "./trshbot.js";
-import apiData from "./api.json" assert { type: "json" };
+import apiData from "./data/api.json" assert { type: "json" };
 import addPrompt, {
   markPromptIncomplete,
   getPromptFromDB,
