@@ -51,10 +51,10 @@ docker
 
 ### Filesystem:
 
-Upon startup the program will create the following EMPTY files w/i the same directory:
+Upon startup the program will create the following EMPTY files w/i the `/data` directory:
 
 ```
-api.json : for holding secured credentials including API key/ client secret etc. (Please refer to "mockApi.json" as a reference for formatting environment variables).
+data/api.json : for holding secured credentials including API key/ client secret etc. (Please refer to "mockApi.json" as a reference for formatting environment variables).
 ```
 
 ```
@@ -62,5 +62,5 @@ data/prompts.sqlite : for holding AI art prompts received from chat using the !p
 ```
 
 ```
-quoteDB.json : for holding a DB of quotes added by chat/ viewers which include author, date, etc.
+data/quoteDB.json : for holding a DB of quotes added by chat/ viewers which include author, date, etc.
 ```
