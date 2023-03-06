@@ -5,8 +5,8 @@ import checkForFileSystem from "./fileCheck.js";
 import tmi from "tmi.js";
 import delegateMessage from "./messages.js";
 
-checkForFileSystem();
-checkOAuthStatus(); // make async
+// checkForFileSystem();
+await checkOAuthStatus(); // make async
 
 //Setting up TMI to listen to channel chat
 export const server = new tmi.Client({

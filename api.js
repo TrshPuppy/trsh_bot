@@ -1,23 +1,18 @@
 // This module handles automating the OAuth2 token and refresh token
 import fetch from "node-fetch";
 import apiData from "./data/api.json" assert { type: "json" };
-import * as fs from "fs";
+import * as fs from "fs/promises";
 
 export default async function checkOAuthStatus() {
-  // if (isOAuthExpired()) {
-  //   await test;
-  // }
-  // return;
   if (isOAuthExpired()) {
     // If Oauth is due to expire OR OAuth returns a 404, then:
-    refreshOAuth();
-  }
-  return;
-}
+    const response = await refreshOAuth();
 
-// const test = new Promise((res, rej) => {
-//   res(refreshOAuth()).then(checkOAuthStatus());
-// });
+    const json = await response.json();
+
+    await checkRefreshInJSON(json);
+  }
+}
 
 function isOAuthExpired() {
   const currentTime = new Date() / 1000; // in seconds
@@ -37,31 +32,31 @@ function refreshOAuth() {
   const TWITCH_REFRESH_URL = `https://id.twitch.tv/oauth2/token`;
 
   // Fetch new OAuth token:
-  fetch(TWITCH_REFRESH_URL, {
+  return fetch(TWITCH_REFRESH_URL, {
     method: "POST",
     body: `client_id=${apiData.CLIENT_ID}&client_secret=${apiData.CLIENT_SECRET}&grant_type=refresh_token&refresh_token=${apiData.REFRESH_TOKEN}`,
     headers: {
       "Content-Type": `application/x-www-form-urlencoded`,
     },
-  })
-    .then(function (response) {
-      return response.json();
-    })
-    .then(checkRefreshResponse)
-    .catch((error) => console.log(`error during fetch = ${error}`));
+  });
+  // .then(function (response) {
+  //   return response.json();
+  // })
+  // .then(checkRefreshInJSON)
+  // .catch((error) => console.log(`error during fetch = ${error}`));
 
   // Check response for failure OR update JSON:
-  function checkRefreshResponse(response) {
-    if (response.message === `Invalid refresh token`) {
-      getNewRefreshToken();
-    } else {
-      updateJSON(response);
-    }
-  }
-  return;
 }
 
-function updateJSON(response) {
+async function checkRefreshInJSON(json) {
+  if (json.message === `Invalid refresh token`) {
+    getNewRefreshToken();
+  } else {
+    await updateJSON(json);
+  }
+}
+
+async function updateJSON(response) {
   // Update values in JSON object w/ values from API response:
   apiData.OA_TOKEN = response.access_token;
   apiData.OA_EXPIRE = response.expires_in;
@@ -71,17 +66,17 @@ function updateJSON(response) {
   const targetFile = "./data/api.json";
 
   // Overwrite api.json w/ updated JSON Object:
-  fs.writeFile(targetFile, JSONObj, "utf-8", (error) => {
-    if (error) {
-      console.log(
-        "Error, failed to write new data to api.json. JSON not updated."
-      );
-      return;
-    }
-    console.log("Successfully wrote new data to api.json file!");
-  });
+  await fs.writeFile(targetFile, JSONObj, "utf-8");
 
-  return;
+  //(error) => {
+  //     if (error) {
+  //       console.log(
+  //         "Error, failed to write new data to api.json. JSON not updated."
+  //       );
+  //       return;
+  //     }
+  //     console.log("Successfully wrote new data to api.json file!");
+  //   });
 }
 
 function getNewRefreshToken() {
