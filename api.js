@@ -3,14 +3,21 @@ import fetch from "node-fetch";
 import apiData from "./data/api.json" assert { type: "json" };
 import * as fs from "fs";
 
-export default function checkOAuthStatus() {
+export default async function checkOAuthStatus() {
+  // if (isOAuthExpired()) {
+  //   await test;
+  // }
+  // return;
   if (isOAuthExpired()) {
     // If Oauth is due to expire OR OAuth returns a 404, then:
     refreshOAuth();
-    checkOAuthStatus();
   }
   return;
 }
+
+// const test = new Promise((res, rej) => {
+//   res(refreshOAuth()).then(checkOAuthStatus());
+// });
 
 function isOAuthExpired() {
   const currentTime = new Date() / 1000; // in seconds
