@@ -5,10 +5,9 @@ docker.mdn
 package-lock.json
 package.json
 notes.mdn
-api.json
+data/api.json
 .vscode
-promptQueue.json
-quotesDB.json
-/data
-/data/test.sqlite
-/data/prompts.sqlite
+data/promptQueue.json
+data/quotesDB.json
+
+data/prompts.sqlite

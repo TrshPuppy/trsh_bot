@@ -1,5 +1,5 @@
 // Imports:
-import apiData from "./api.json" assert { type: "json" };
+import apiData from "./data/api.json" assert { type: "json" };
 import checkOAuthStatus from "./api.js";
 import checkForFileSystem from "./fileCheck.js";
 import tmi from "tmi.js";

@@ -2,13 +2,13 @@
 
 // Imports:
 import { server } from "./trshbot.js";
-import apiData from "./api.json" assert { type: "json" };
+import apiData from "./data/api.json" assert { type: "json" };
 import addPrompt, {
   markPromptIncomplete,
   getPromptFromDB,
 } from "./promptQueue.js";
 import * as fs from "fs";
-import quotesDBData from "./quotesDB.json" assert { type: "json" };
+import quotesDBData from "./data/quotesDB.json" assert { type: "json" };
 
 // This class constructs commands directed at the bot ex: "@trsh_bot":
 class BotCommand {
