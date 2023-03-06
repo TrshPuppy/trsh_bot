@@ -1,52 +1,51 @@
 // This module checks for required files and create them if they aren't present.
-import * as fs from "fs";
+import * as fs from "fs/promises";
 import { createPromptDB } from "./promptQueue.js";
 
-export default function checkForFileSystem() {
-  if (checkForPromptQueue() && checkForAPI() && chcekForQuotesDb()) {
-    console.log("All necessary files are present.");
-    return true;
+export default async function checkForFileSystem() {
+  try {
+    await checkForAPI();
+  } catch (err) {
+    if (err.errno === -17) {
+      console.log("API.json already exists.");
+    } else {
+      console.log("Unknown error opening or creating API.json. Err: " + err);
+      throw err;
+    }
   }
-  console.log("The necessary files are NOT PRESENT!");
-  return false;
+
+  try {
+    await checkForPromptQueue();
+  } catch (err) {
+    console.log("Unknown error creating promptDB. Err: " + err);
+  }
+
+  try {
+    await checkForQuotesDB();
+  } catch (err) {
+    if (err.errno === -17) {
+      console.log("quotesDB.json already exists!");
+    } else {
+      console.log(
+        "Unknown error opening or creating quotesDB.json. Err: " + err
+      );
+      throw err;
+    }
+  }
 }
 
 // Check for api.json, if it doesn't exist, make it.
-function checkForAPI() {
-  fs.open("./data/api.json", "wx", (err, fd) => {
-    if (err) {
-      if (err.code === "EEXIST") {
-        return;
-      } else {
-        console.log(
-          "api.json file created, but needs to be filled with credentials!"
-        );
-      }
-      throw err;
-    }
-  });
-
-  return true;
+async function checkForAPI() {
+  await fs.open("./data/api.json", "wx");
 }
 
 // Check for prompts DB; if it doesn't exist, make it.
-function checkForPromptQueue() {
-  createPromptDB();
+async function checkForPromptQueue() {
+  await createPromptDB();
   return true;
 }
 
 // Check for quotesDB.json, if it doesn't exist, make it.
-function chcekForQuotesDb() {
-  fs.open("./data/quotesDB.json", "wx", (err, fd) => {
-    if (err) {
-      if (err.code === "EEXIST") {
-        return;
-      } else {
-        console.log("QuotesDB.json file created but is empty!");
-      }
-      throw err;
-    }
-  });
-
-  return true;
+async function checkForQuotesDB() {
+  await fs.open("./data/quotesDB.json", "wx");
 }

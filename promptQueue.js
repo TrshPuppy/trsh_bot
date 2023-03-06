@@ -56,8 +56,8 @@ export async function markPromptIncomplete(rowID) {
 }
 
 // Exported to filecheck.js to create database if it doesn't exist:
-export function createPromptDB() {
-  prompts.serialize(() => {
+export async function createPromptDB() {
+  return await prompts.serialize(() => {
     prompts.run(
       "CREATE TABLE IF NOT EXISTS prompts (time INT, prompt TEXT, author TEXT, completed INT)"
     );
