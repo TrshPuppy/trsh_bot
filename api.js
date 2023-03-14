@@ -1,4 +1,5 @@
 // This module handles automating the OAuth2 token and refresh token
+console.log("hi");
 import fetch from "node-fetch";
 import apiData from "./data/api.json" assert { type: "json" };
 import * as fs from "fs/promises";
@@ -84,3 +85,10 @@ function getNewRefreshToken() {
     "Need new Refresh Token :(. Not able to refresh token at this time."
   );
 }
+
+/*
+f wherever you want to access the data you use `getApiData()`, and only in that function you use `require`, and only the first time that it gets called, then `require` will only be called later on in the program's execution, not when the files get loaded as an import
+
+
+Another option is, create an api.js file. Requiring that file will return the object you store in module.exports inside of that file. Any file that requires api.js will get a reference to that same object. It doesn't matter if that object is empty at the beginning of the project. Later on, you can set values on that object (e.g. module.exports.token = blabla). And any file that required api.js will be able to access whatever data you store in that object.
+*/

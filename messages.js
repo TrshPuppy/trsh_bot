@@ -2,7 +2,7 @@
 
 // Imports:
 //const pos = require("pos"); // https://github.com/dariusk/pos-js
-import { server } from "./trshbot.js";
+import { server } from "./server.js";
 import {
   handleBotSummons,
   ifThisDoesntWorkItsStevesFault,
@@ -14,6 +14,7 @@ let Fred = new Date(0); // lastKeywordTime
 let keywordLessMessages = 0;
 
 export default function delegateMessage(channel, context, message) {
+  console.log(`@${context.username}: "${message}"`);
   message = message.trim();
 
   if (message[0] === "/" || message[0] === ".") {

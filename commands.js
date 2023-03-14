@@ -1,7 +1,7 @@
 // This module handles chat commands and delegates based on their type.
 
 // Imports:
-import { server } from "./trshbot.js";
+import { server } from "./server.js";
 import apiData from "./data/api.json" assert { type: "json" };
 import addPrompt, {
   markPromptIncomplete,
