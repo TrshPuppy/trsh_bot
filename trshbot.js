@@ -14,6 +14,8 @@ try {
 
 createServer();
 
+const OAuthInterval = setInterval(checkOAuthStatus, 3600000);
+
 // make async
 
 //Setting up TMI to listen to channel chat
