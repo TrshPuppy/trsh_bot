@@ -6,6 +6,6 @@ COPY . .
 
 RUN npm install
 
-ENTRYPOINT ["/bin/bash"]
+# ENTRYPOINT ["/bin/bash"]
 
-# CMD ["node", "trshbot.js"]
+CMD ["node", "trshbot.js"]
