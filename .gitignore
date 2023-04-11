@@ -9,5 +9,5 @@ data/api.json
 .vscode
 data/promptQueue.json
 data/quotesDB.json
-
+run_tb.sh
 data/prompts.sqlite
