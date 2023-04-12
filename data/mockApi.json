@@ -11,7 +11,8 @@
     "CHANNEL": "TargetTwitchChannel",
     "STREAMER_NICK": "This is the name the streamer wants the bot to refer to them as",
     "BOT_USERNAME": "bot_name",
-    "KEYWORD": "keyword",
+    "KEYWORD_PLURAL": "keywords",
+    "KEYWORD_SINGULAR": "keyword",
     "MODLIST": [
       "moderator-username1",
       "moderator_username2",

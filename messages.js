@@ -79,9 +79,9 @@ function keywordQ300(channel, context, message) {
   }
 
   if (randomNoun.isPlural().length > 0) {
-    randomNoun.replaceWith(apiData.Bot.KEYWORD);
+    randomNoun.replaceWith(apiData.Bot.KEYWORD_PLURAL);
   } else {
-    randomNoun.replaceWith("tiddy");
+    randomNoun.replaceWith(apiData.Bot.KEYWORD_SINGULAR);
   }
 
   // console.log("Random noun text after loop = " + randomNoun.text());
