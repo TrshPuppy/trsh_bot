@@ -2,7 +2,7 @@
 
 # Check out my [video](https://www.youtube.com/watch?v=beX7J6xCqIM) about my process and lessons learned!
 
-## Trsh_bot is a Twitch chat bot made using JS, tmi.js, node, node fs, and compromise.
+## Trsh_bot is a Twitch chat bot made using JS, tmi.js, node, node fs, and pos.js
 
 This is a personal project for my [Twitch channel](https://www.twitch.tv/trshpuppy) and is being created and maintained by me w/ help and input from interested community members.
 
@@ -28,9 +28,6 @@ Coding @trsh_bot has taught me:
   - creating files on startup with node filesystem
 
 ...more to come
-
-### Want to use trshbot as your own Twitch Bot?
-Check out the [Wiki](https://github.com/TrshPuppy/trsh_bot/wiki) for install and configuration instructions!
 
 ### Dependencies
 

@@ -9,7 +9,7 @@ try {
   await checkOAuthStatus();
 } catch (err) {
   console.log("Unknown error: " + err);
-  throw err;
+  //throw err;
 }
 
 createServer();
