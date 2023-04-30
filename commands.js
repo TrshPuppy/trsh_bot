@@ -191,19 +191,28 @@ function handleQuoteCommand(channel, context, message) {
   let randomQuote;
   let currentAuthor;
   let indxIntoQuotesDB;
+  let fixedAuthorName;
 
   if (message[1] === undefined) {
     indxIntoQuotesDB = Math.floor(Math.random() * quotesDBData.length);
   } else {
+    const authorArr = message[1].split("");
+
+    if (authorArr[0] === '@') {
+      fixedAuthorName = authorArr.slice(1).join("");
+    } else {
+      fixedAuthorName = authorArr.join("");
+    }
+
     indxIntoQuotesDB = quotesDBData.findIndex(
-      (x) => x.author.toLowerCase() == message[1].toLowerCase()
+      (x) => x.author.toLowerCase() == fixedAuthorName.toLowerCase()
     );
   }
 
   if (indxIntoQuotesDB === -1) {
     server.say(
       apiData.Bot.CHANNEL,
-      `I guess @${message[1]} isn't ICONIC enough to be in my database :(`
+      `I guess @${fixedAuthorName} isn't ICONIC enough to be in my database :(`
     );
     return;
   }
@@ -341,9 +350,9 @@ function handlePromptCommand(channel, context, message) {
   wasThePromptAddSuccessful
     ? newPromptSuccess()
     : server.say(
-        apiData.Bot.CHANNEL,
-        "Sorry, your prompt didn't make it into the queue :("
-      );
+      apiData.Bot.CHANNEL,
+      "Sorry, your prompt didn't make it into the queue :("
+    );
 
   // a day where i can imitate trshbot is a good day
   // saratonln
@@ -384,7 +393,7 @@ function overwritePromptJson(cb) {
 }
 
 function overwriteQuotesJson(cb) {
-  overwriteSelectedJSON("./quotesDB.json", quotesDBData, cb);
+  overwriteSelectedJSON("./data/quotesDB.json", quotesDBData, cb);
 }
 
 // handleGetPrompt()
