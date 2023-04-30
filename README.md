@@ -38,7 +38,7 @@ tmi.js
 ```
 
 ```
-pos.js
+compromise
 ```
 
 ```

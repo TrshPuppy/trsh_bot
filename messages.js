@@ -1,8 +1,8 @@
 // This module envelops functions r/t parsing through chat messages in order to delegate functions.
 
 // Imports:
-//const pos = require("pos"); // https://github.com/dariusk/pos-js
 import { server } from "./server.js";
+import nlp from "compromise";
 import {
   handleBotSummons,
   ifThisDoesntWorkItsStevesFault,
@@ -48,7 +48,8 @@ export default function delegateMessage(channel, context, message) {
 function handleKeywordMessages(channel, context, message) {
   keywordLessMessages += 1;
 
-  let secondsFromLastKeyword = (new Date() - Fred) / 1000;
+  const secondsFromLastKeyword = (new Date() - Fred) / 1000;
+
   if (secondsFromLastKeyword >= 300 && keywordLessMessages >= 20) {
     if (keywordQ300(channel, context, message)) {
       Fred = new Date();
@@ -58,82 +59,35 @@ function handleKeywordMessages(channel, context, message) {
 }
 
 function keywordQ300(channel, context, message) {
-  let messageWords = message.split(" ");
+  const wordCount = message.split(" ").length;
 
-  if (messageWords.length === 1 || messageWords.length >= 20) {
+  if (wordCount === 1 || wordCount >= 20) {
     return false;
   }
 
-  let validIndex = findValidIndex(messageWords);
-  if (validIndex === null) {
+  const doc = nlp(message);
+
+  if (!doc.has("#Noun")) {
     return false;
   }
 
-  messageWords[validIndex] = `${apiData.Bot.KEYWORD}`;
-  server.say(apiData.Bot.CHANNEL, messageWords.join(" "));
+  let randomNoun = doc.nouns().random();
+  // console.log("Random noun.terms length= " + randomNoun.terms().length);
+
+  while (randomNoun.terms().length > 1) {
+    randomNoun = randomNoun.terms().nouns().random();
+  }
+
+  if (randomNoun.isPlural().length > 0) {
+    randomNoun.replaceWith(apiData.Bot.KEYWORD_PLURAL);
+  } else {
+    randomNoun.replaceWith(apiData.Bot.KEYWORD_SINGULAR);
+  }
+
+  // console.log("Random noun text after loop = " + randomNoun.text());
+
+  server.say(apiData.Bot.CHANNEL, doc.text());
   return true;
-}
-
-function isValidString(string) {
-  ///^[a-z]+$/i (^ is beginning, $ is end)
-  if (/[a-z]+/i.test(string)) {
-    return true;
-  }
-  return false;
-
-  /* Words to disclude:
-    pronouns
-    prepositions
-    conjunctions
-
-    OR: select for nouns only
-  if
-  is
-  of
-  or
-  the
-  her
-  his
-  theirs
-  they
-  he
-  she
-  a
-  and
-  what
-  why
-  when
-  where
-  how
-  but
-  that
-  to
-  some
-  ok
-  okay
-  are
-  hi
-  hello
-  bye
-  goodbye
-  did
-  do
-  does
-*/
-}
-
-function findValidIndex(messageArray) {
-  const validIndices = Array.from({ length: messageArray.length }, (_, i) => i);
-
-  while (validIndices) {
-    const randomIndx = Math.floor(Math.random() * validIndices.length);
-    if (isValidString(messageArray[validIndices[randomIndx]])) {
-      return validIndices[randomIndx];
-    } else {
-      validIndices.splice(randomIndx, 1);
-    }
-  }
-  return null;
 }
 
 // /*
