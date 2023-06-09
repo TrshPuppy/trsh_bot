@@ -10,7 +10,7 @@ export default async function checkForFileSystem() {
       console.log("API.json already exists.");
     } else {
       console.log("Unknown error opening or creating API.json. Err: " + err);
-      throw err;
+      // throw err;
     }
   }
 
@@ -29,7 +29,7 @@ export default async function checkForFileSystem() {
       console.log(
         "Unknown error opening or creating quotesDB.json. Err: " + err
       );
-      throw err;
+      // throw err;
     }
   }
 }
