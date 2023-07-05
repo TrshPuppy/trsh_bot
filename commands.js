@@ -9,6 +9,7 @@ import addPrompt, {
 } from "./promptQueue.js";
 import * as fs from "fs";
 import quotesDBData from "./data/quotesDB.json" assert { type: "json" };
+import { ServerResponse } from "http";
 
 // This class constructs commands directed at the bot ex: "@trsh_bot":
 class BotCommand {
@@ -18,6 +19,8 @@ class BotCommand {
     this.thatShitFunctionToExecute = callBack;
     this.authority = authority;
   }
+
+  aliases = [];
 
   addArg(arg) {
     this.args.push(arg);
@@ -41,7 +44,17 @@ class BotCommand {
   }
 
   getManual() {
-    return `Command syntax: ${this.manual}.`;
+    return `Command syntax: ${
+      this.manual
+    }. You can also use these aliases: ${this.aliases.map(
+      (a) => (a = ` ${a}`)
+    )}`;
+  }
+
+  addAlias(aliasArr) {
+    for (let a of aliasArr) {
+      this.aliases.push(a);
+    }
   }
 }
 
@@ -51,10 +64,16 @@ class ChannelCommand extends BotCommand {
 
   tryHandleMessage(channel, context, [arg0, arg1, ...rest]) {
     if (this.name !== arg0) {
-      return false;
+      if (this.aliases.findIndex((a) => a == arg0) === -1) {
+        return false;
+      }
     }
     if (this.authority !== undefined) {
-      if (context.username.toLowerCase() !== this.authority.toLowerCase()) {
+      // if (context.username.toLowerCase() !== this.authority.toLowerCase()) {
+      //   return false;
+      // }
+
+      if (this.authority.find((x) => (x = context.username)) === -1) {
         return false;
       }
     }
@@ -80,6 +99,18 @@ class QuoteCommand extends ChannelCommand {
   }
 }
 
+class TimerCommand {
+  constructor(message, interval) {
+    this.message = message;
+    this.interval = interval;
+  }
+
+  sendMessage() {
+    console.log(this.message);
+    server.say(apiData.Bot.CHANNEL, this.message);
+  }
+}
+
 // Globals:
 const quote = {
   quote: "",
@@ -93,6 +124,10 @@ export const prompt = {
   author: undefined,
   completed: undefined,
 };
+
+// const timer = (cb, ms) => {
+//   setInterval(cb, ms);
+// };
 
 const botCommands = [];
 const channelCommands = [];
@@ -131,15 +166,13 @@ manCommand.addManual("!man <command>");
 const promptCommand = new ChannelCommand("!prompt", [], handlePromptCommand);
 promptCommand.addManual("!prompt <prompt>");
 
-const getPrompt = new ChannelCommand(
-  "!getprompt",
-  [],
-  handleTiddies,
-  apiData.Bot.STREAMER_NICK
-);
+const getPrompt = new ChannelCommand("!g", [], handleTiddies, [
+  apiData.Bot.STREAMER_NICK,
+]);
 getPrompt.addManual(
   `!getprompt (${apiData.Bot.BOT_USERNAME} will respond w/ the next prompt in queue).`
 );
+getPrompt.addAlias(["!getprompt"]);
 
 const hiCommand = new BotCommand(
   "hi",
@@ -150,6 +183,154 @@ hiCommand.addManual(
   `@${apiData.Bot.BOT_USERNAME} ['hey', 'hi', 'hello', 'Hi', 'Hey', 'Hello']`
 );
 
+/* .......................................... MIGRATE STREAMLABS ..............................................*/
+const clawCommand = new ChannelCommand("!claw", [], () => {
+  server.say(
+    apiData.Bot.CHANNEL,
+    " If you think you like the Trash Heap, you're gonna love the Claw! --> https://www.theclaw.team <-- We code, we build stuff, we love tech!"
+  );
+});
+
+const lurkCommand = new ChannelCommand("!lurk", [], (ch, co, msg) => {
+  server.say(
+    apiData.Bot.CHANNEL,
+    `Puppies are such a handful... @${co.username} has gone to eat some flooring! At least it'll tire them out.`
+  );
+});
+
+const unlurkCommand = new ChannelCommand("!unlurk", [], (ch, co, msg) => {
+  server.say(
+    apiData.Bot.CHANNEL,
+    `@${co.username} has returned from chewing up the floor. Hope you're feeling happy and full @${co.username}!`
+  );
+});
+
+const keyWordCommand = new ChannelCommand(
+  `!${apiData.Bot.KEYWORD_PLURAL}`,
+  [],
+  (ch, co, msg) => {
+    server.say(
+      apiData.Bot.CHANNEL,
+      `TP loves ${apiData.Bot.KEYWORD_PLURAL} so much she's devoted at least 6969{count tiddies 5}{count tiddies +1} lines of code to them!`
+    );
+  }
+);
+
+const kataCommand = new ChannelCommand(`!kata`, [], (ch, co, msg) => {
+  server.say(
+    apiData.Bot.CHANNEL,
+    "This is the kata we're doing right now --> https://www.codewars.com/kata/52dc4688eca89d0f820004c6"
+  );
+});
+kataCommand.addAlias([`!codewars`]);
+
+const clanCommand = new ChannelCommand(`!clan`, [], (ch, co, msg) => {
+  server.say(
+    apiData.Bot.CHANNEL,
+    "Join our Codewars clan! Go to: Codewars --> Account Settings --> Clan --> then type in 'TrshPuppies'."
+  );
+});
+
+const momCommand = new ChannelCommand(`!mom`, [], (ch, co, msg) => {
+  server.say(
+    apiData.Bot.CHANNEL,
+    "TP's mom is in the chat and, from now on, you will refer to her as 'Big Dog' or risk cruel and unusual punishment!"
+  );
+});
+momCommand.addAlias([`!Mom`, "!bigdog", "!BigDog", "!Bigdog"]);
+momCommand.addManual("!mom");
+
+const hncCommand = new ChannelCommand("!hnc", [], () => {
+  server.say(
+    apiData.Bot.CHANNEL,
+    "Check out my spooky podcast which I co-host with my cousin! --> https://www.twitch.tv/hauntzncreepz --> https://open.spotify.com/show/7hcpFnIoWhveRQeNRTNpbM"
+  );
+});
+
+const musicCommand = new ChannelCommand("!music", [], () => {
+  server.say(
+    apiData.Bot.CHANNEL,
+    "We're listening to some tasty Chilljop --> https://chillhop.com/"
+  );
+});
+musicCommand.addAlias(["!song", "!playlist"]);
+
+const behaveCommand = new ChannelCommand(
+  "!behave",
+  [],
+  (ch, co, msg) => {
+    server.say(
+      apiData.Bot.CHANNEL,
+      `${msg[1]} BAD DOG! Don't make TP get the spray bottle!`
+    );
+    server.say(apiData.Bot.CHANNEL, `/timeout ${msg[1]} 1`);
+  },
+  [apiData.Bot.MODLIST, apiData.Bot.STREAMER_NICK]
+);
+
+const projectCommand = new ChannelCommand("!project", [], () => {
+  server.say(apiData.Bot.CHANNEL, "Today we're learning Golang!");
+});
+projectCommand.addAlias(["!today", `!project`]);
+
+const htbCommand = new ChannelCommand("!htb", [], () => {
+  server.say(
+    apiData.Bot.CHANNEL,
+    "We're working through HTB's starting point, tier 2 --> https://app.hackthebox.com/starting-point"
+  );
+});
+
+const imoCommand = new ChannelCommand("!imo", [], (ch, co, msg) => {
+  server.say(
+    apiData.Bot.CHANNEL,
+    `Thanks for the suggestion ${co.username}! I'm putting it in the suggestion box for TP to review later :)`
+  );
+});
+imoCommand.addAlias(["!ithink", "!youshould", "!Ithink", "!justdo"]);
+imoCommand.addManual('"!imo <your suggestion goes here>"');
+
+const emptySuggestionBox = new ChannelCommand(
+  "!suggestionbox",
+  [],
+  (ch, co, msg) => {
+    server.say(
+      apiData.Bot.CHANNEL,
+      `...Dang, where did I put those suggestions...`
+    );
+    server.say(
+      apiData.Bot.CHANNEL,
+      `They should be right here where TP keeps the fucks she gives... `
+    );
+  },
+  [apiData.Bot.STREAMER_NICK]
+);
+
+const maleCommand = new ChannelCommand("!male", [], (ch, co, msg) => {
+  server.say(apiData.Bot.CHANNEL, `male command`);
+});
+maleCommand.addAlias([
+  "!mail",
+  "!male",
+  "!Mail",
+  "!Male",
+  "!mailman",
+  "!maleman",
+]);
+maleCommand.getManual = (x) => {
+  console.log("UTTER CHAOS" + " " + x);
+};
+maleCommand.addManual("male string manual");
+
+/* .......................................... TIMED MESSAGES ..............................................*/
+// const YTMessage = new TimerCommand(
+//   "Checkout my new video about Codewars! --> https://www.youtube.com/watch?v=wTIcR4GxQrI",
+//   5000
+// );
+
+// console.log(YTMessage.message);
+// setInterval(YTMessage.sendMessage, YTMessage.interval);
+// // 3600000
+
 // Add commands to command arrays:
 botCommands.push(yesCommand, noCommand, hiCommand, breakTheUniverseCommand);
 channelCommands.push(
@@ -157,7 +338,21 @@ channelCommands.push(
   quoteCommand,
   addQuoteCommand,
   getPrompt,
-  promptCommand
+  promptCommand,
+  clawCommand,
+  lurkCommand,
+  unlurkCommand,
+  kataCommand,
+  clanCommand,
+  momCommand,
+  hncCommand,
+  musicCommand,
+  behaveCommand,
+  projectCommand,
+  htbCommand,
+  imoCommand,
+  emptySuggestionBox
+  //  maleCommand
 );
 
 // Functions:
@@ -198,7 +393,7 @@ function handleQuoteCommand(channel, context, message) {
   } else {
     const authorArr = message[1].split("");
 
-    if (authorArr[0] === '@') {
+    if (authorArr[0] === "@") {
       fixedAuthorName = authorArr.slice(1).join("");
     } else {
       fixedAuthorName = authorArr.join("");
@@ -239,6 +434,8 @@ function handleQuoteCommand(channel, context, message) {
   // Remember, the field mouse is fast, but the owl sees at night...
   // Leaderboard for most iconic chatters
   // chatter quotes featuring TB
+  // !TZ=Europe/Copenhagen date <- command request
+  // feature request, command: !/bin/bash response: she-bang
 }
 
 function handleAddQuote(channel, context, message) {
@@ -350,9 +547,9 @@ function handlePromptCommand(channel, context, message) {
   wasThePromptAddSuccessful
     ? newPromptSuccess()
     : server.say(
-      apiData.Bot.CHANNEL,
-      "Sorry, your prompt didn't make it into the queue :("
-    );
+        apiData.Bot.CHANNEL,
+        "Sorry, your prompt didn't make it into the queue :("
+      );
 
   // a day where i can imitate trshbot is a good day
   // saratonln
