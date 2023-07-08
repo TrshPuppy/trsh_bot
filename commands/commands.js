@@ -1,14 +1,14 @@
 // This module handles chat commands and delegates based on their type.
 
 // Imports:
-import { server } from "./server.js";
-import apiData from "./data/api.json" assert { type: "json" };
+import { server } from "../server.js";
+import apiData from "../data/api.json" assert { type: "json" };
 import addPrompt, {
   markPromptIncomplete,
   getPromptFromDB,
-} from "./promptQueue.js";
+} from "../promptQueue.js";
 import * as fs from "fs";
-import quotesDBData from "./data/quotesDB.json" assert { type: "json" };
+import quotesDBData from "../data/quotesDB.json" assert { type: "json" };
 
 // This class constructs commands directed at the bot ex: "@trsh_bot":
 class BotCommand {

@@ -9,7 +9,7 @@ import nlp from "compromise";
 import {
   handleBotSummons,
   ifThisDoesntWorkItsStevesFault,
-} from "./commands.js";
+} from "./commands/commands.js";
 import apiData from "./data/api.json" assert { type: "json" };
 
 // Module globals:
