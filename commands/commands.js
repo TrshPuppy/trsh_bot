@@ -13,269 +13,270 @@ import addPrompt, {
 } from "../promptQueue.js";
 import * as fs from "fs";
 import CommandLibrary from "./CommandLibrary.js";
+import Command from "./CommandClass.js";
 // import quotesDBData from "../data/quotesDB.json" assert { type: "json" };
 
-// Globals:
-const quote = {
-  quote: "",
-  date: new Date() * 1, // milliseconds
-  feat: "",
-};
+// // Globals:
+// const quote = {
+//   quote: "",
+//   date: new Date() * 1, // milliseconds
+//   feat: "",
+// };
 
-export const prompt = {
-  time: undefined,
-  prompt: undefined,
-  author: undefined,
-  completed: undefined,
-};
+// export const prompt = {
+//   time: undefined,
+//   prompt: undefined,
+//   author: undefined,
+//   completed: undefined,
+// };
 
-const channelCommands = [];
+// const channelCommands = [];
 
-// const quoteCommand = new QuoteCommand("!quote", [], handleQuoteCommand);
-// quoteCommand.addManual("!quote <author> (author is optional)");
+// // const quoteCommand = new QuoteCommand("!quote", [], handleQuoteCommand);
+// // quoteCommand.addManual("!quote <author> (author is optional)");
 
-// const addQuoteCommand = new QuoteCommand("!addquote", [], handleAddQuote);
-// addQuoteCommand.addManual("!addquote @<author> <quote>");
+// // const addQuoteCommand = new QuoteCommand("!addquote", [], handleAddQuote);
+// // addQuoteCommand.addManual("!addquote @<author> <quote>");
 
-const manCommand = new ChannelCommand("!man", [], handleManCommand);
-manCommand.addManual("!man <command>");
+// const manCommand = new ChannelCommand("!man", [], handleManCommand);
+// manCommand.addManual("!man <command>");
 
-const promptCommand = new ChannelCommand("!prompt", [], handlePromptCommand);
-promptCommand.addManual("!prompt <prompt>");
+// const promptCommand = new ChannelCommand("!prompt", [], handlePromptCommand);
+// promptCommand.addManual("!prompt <prompt>");
 
-const getPrompt = new ChannelCommand("!g", [], handleTiddies, [
-  apiData.Bot.STREAMER_NICK,
-]);
-getPrompt.addManual(
-  `!getprompt (${apiData.Bot.BOT_USERNAME} will respond w/ the next prompt in queue).`
-);
-getPrompt.addAlias(["!getprompt"]);
+// const getPrompt = new ChannelCommand("!g", [], handleTiddies, [
+//   apiData.Bot.STREAMER_NICK,
+// ]);
+// getPrompt.addManual(
+//   `!getprompt (${apiData.Bot.BOT_USERNAME} will respond w/ the next prompt in queue).`
+// );
+// getPrompt.addAlias(["!getprompt"]);
 
-/* .......................................... MIGRATE STREAMLABS ..............................................*/
-const clawCommand = new ChannelCommand("!claw", [], () => {
-  server.say(
-    apiData.Bot.CHANNEL,
-    " If you think you like the Trash Heap, you're gonna love the Claw! --> https://www.theclaw.team <-- We code, we build stuff, we love tech!"
-  );
-});
+// /* .......................................... MIGRATE STREAMLABS ..............................................*/
+// const clawCommand = new ChannelCommand("!claw", [], () => {
+//   server.say(
+//     apiData.Bot.CHANNEL,
+//     " If you think you like the Trash Heap, you're gonna love the Claw! --> https://www.theclaw.team <-- We code, we build stuff, we love tech!"
+//   );
+// });
 
-const lurkCommand = new ChannelCommand("!lurk", [], (ch, co, msg) => {
-  server.say(
-    apiData.Bot.CHANNEL,
-    `Puppies are such a handful... @${co.username} has gone to eat some flooring! At least it'll tire them out.`
-  );
-});
+// const lurkCommand = new ChannelCommand("!lurk", [], (ch, co, msg) => {
+//   server.say(
+//     apiData.Bot.CHANNEL,
+//     `Puppies are such a handful... @${co.username} has gone to eat some flooring! At least it'll tire them out.`
+//   );
+// });
 
-const unlurkCommand = new ChannelCommand("!unlurk", [], (ch, co, msg) => {
-  server.say(
-    apiData.Bot.CHANNEL,
-    `@${co.username} has returned from chewing up the floor. Hope you're feeling happy and full @${co.username}!`
-  );
-});
+// const unlurkCommand = new ChannelCommand("!unlurk", [], (ch, co, msg) => {
+//   server.say(
+//     apiData.Bot.CHANNEL,
+//     `@${co.username} has returned from chewing up the floor. Hope you're feeling happy and full @${co.username}!`
+//   );
+// });
 
-const keyWordCommand = new ChannelCommand(
-  `!${apiData.Bot.KEYWORD_PLURAL}`,
-  [],
-  (ch, co, msg) => {
-    server.say(
-      apiData.Bot.CHANNEL,
-      `TP loves ${apiData.Bot.KEYWORD_PLURAL} so much she's devoted at least 6969{count tiddies 5}{count tiddies +1} lines of code to them!`
-    );
-  }
-);
-
-const kataCommand = new ChannelCommand(`!kata`, [], (ch, co, msg) => {
-  server.say(
-    apiData.Bot.CHANNEL,
-    "This is the kata we're doing right now --> https://www.codewars.com/kata/52dc4688eca89d0f820004c6"
-  );
-});
-kataCommand.addAlias([`!codewars`]);
-
-const clanCommand = new ChannelCommand(`!clan`, [], (ch, co, msg) => {
-  server.say(
-    apiData.Bot.CHANNEL,
-    "Join our Codewars clan! Go to: Codewars --> Account Settings --> Clan --> then type in 'TrshPuppies'."
-  );
-});
-
-const momCommand = new ChannelCommand(`!mom`, [], (ch, co, msg) => {
-  server.say(
-    apiData.Bot.CHANNEL,
-    "TP's mom is in the chat and, from now on, you will refer to her as 'Big Dog' or risk cruel and unusual punishment!"
-  );
-});
-momCommand.addAlias([`!Mom`, "!bigdog", "!BigDog", "!Bigdog"]);
-momCommand.addManual("!mom");
-
-const hncCommand = new ChannelCommand("!hnc", [], () => {
-  server.say(
-    apiData.Bot.CHANNEL,
-    "Check out my spooky podcast which I co-host with my cousin! --> https://www.twitch.tv/hauntzncreepz --> https://open.spotify.com/show/7hcpFnIoWhveRQeNRTNpbM"
-  );
-});
-
-const musicCommand = new ChannelCommand("!music", [], () => {
-  server.say(
-    apiData.Bot.CHANNEL,
-    "We're listening to the delicious synthwave of White Bat Audio --> https://whitebataudio.com/"
-  );
-});
-musicCommand.addAlias(["!song", "!playlist"]);
-
-const behaveCommand = new ChannelCommand(
-  "!behave",
-  [],
-  (ch, co, msg) => {
-    server.say(
-      apiData.Bot.CHANNEL,
-      `${msg[1]} BAD DOG! Don't make TP get the spray bottle!`
-    );
-    server.say(apiData.Bot.CHANNEL, `/timeout ${msg[1]} 1`);
-  },
-  [apiData.Bot.MODLIST, apiData.Bot.STREAMER_NICK]
-);
-
-const projectCommand = new ChannelCommand("!project", [], () => {
-  server.say(apiData.Bot.CHANNEL, "Today we're learning Golang!");
-});
-projectCommand.addAlias(["!today", `!project`]);
-
-const htbCommand = new ChannelCommand("!htb", [], () => {
-  server.say(
-    apiData.Bot.CHANNEL,
-    "We're working through HTB's starting point, tier 2 --> https://app.hackthebox.com/starting-point"
-  );
-});
-
-const imoCommand = new ChannelCommand("!imo", [], (ch, co, msg) => {
-  server.say(
-    apiData.Bot.CHANNEL,
-    `Thanks for the suggestion ${co.username}! I'm putting it in the suggestion box for TP to review later :)`
-  );
-});
-imoCommand.addAlias(["!ithink", "!youshould", "!Ithink", "!justdo"]);
-imoCommand.addManual('"!imo <your suggestion goes here>"');
-
-const emptySuggestionBox = new ChannelCommand(
-  "!suggestionbox",
-  [],
-  (ch, co, msg) => {
-    server.say(
-      apiData.Bot.CHANNEL,
-      `...Dang, where did I put those suggestions...`
-    );
-    server.say(
-      apiData.Bot.CHANNEL,
-      `They should be right here where TP keeps the fucks she gives... `
-    );
-  },
-  [apiData.Bot.STREAMER_NICK]
-);
-
-const maleCommand = new ChannelCommand("!male", [], (ch, co, msg) => {
-  server.say(apiData.Bot.CHANNEL, `male command`);
-});
-maleCommand.addAlias([
-  "!mail",
-  "!male",
-  "!Mail",
-  "!Male",
-  "!mailman",
-  "!maleman",
-]);
-maleCommand.addManual("male string manual", true);
-
-const whoamiCommand = new ChannelCommand("!about", [], (ch, co, msg) => {
-  server.say(
-    apiData.Bot.CHANNEL,
-    `Hey ${co.username}! Welcome to my trash heap! TP is a former ER nurse
-  learning coding and cybersecurity. All you really need to know is the struggle is real, everything IS
-  in fact on fire, and you're welcome to chill as long as you like :)`
-  );
-});
-whoamiCommand.addAlias(["!whoami", "!trshpuppy"]);
-
-const YTCommand = new ChannelCommand("!yt", [], (ch, co, msg) => {
-  server.say(
-    apiData.Bot.CHANNEL,
-    "Checkout my newest video on YT, all about Codewars! --> https://www.youtube.com/watch?v=wTIcR4GxQrI"
-  );
-});
-YTCommand.addAlias(["!youtube"]);
-
-const themeCommand = new ChannelCommand("!theme", [], (ch, co, msg) => {
-  server.say(
-    apiData.Bot.CHANNEL,
-    `TP is using the Vibrancy Continued Extension in VSCode.
-  You can check it out here --> https://github.com/illixion/vscode-vibrancy-continued`
-  );
-});
-
-/* .......................................... TIMED MESSAGES ..............................................*/
-// const YTMessage = new TimerCommand(
-//   "Checkout my new video about Codewars! --> https://www.youtube.com/watch?v=wTIcR4GxQrI",
-//   5000
+// const keyWordCommand = new ChannelCommand(
+//   `!${apiData.Bot.KEYWORD_PLURAL}`,
+//   [],
+//   (ch, co, msg) => {
+//     server.say(
+//       apiData.Bot.CHANNEL,
+//       `TP loves ${apiData.Bot.KEYWORD_PLURAL} so much she's devoted at least 6969{count tiddies 5}{count tiddies +1} lines of code to them!`
+//     );
+//   }
 // );
 
-// console.log(YTMessage.message);
-// setInterval(YTMessage.sendMessage, YTMessage.interval);
-// // 3600000
+// const kataCommand = new ChannelCommand(`!kata`, [], (ch, co, msg) => {
+//   server.say(
+//     apiData.Bot.CHANNEL,
+//     "This is the kata we're doing right now --> https://www.codewars.com/kata/52dc4688eca89d0f820004c6"
+//   );
+// });
+// kataCommand.addAlias([`!codewars`]);
 
-// Add commands to command arrays:
-// botCommands.push(yesCommand, noCommand, hiCommand, breakTheUniverseCommand);
-channelCommands.push(
-  manCommand,
-  quoteCommand,
-  addQuoteCommand,
-  getPrompt,
-  promptCommand,
-  clawCommand,
-  lurkCommand,
-  unlurkCommand,
-  kataCommand,
-  clanCommand,
-  momCommand,
-  hncCommand,
-  musicCommand,
-  behaveCommand,
-  projectCommand,
-  htbCommand,
-  imoCommand,
-  emptySuggestionBox,
-  maleCommand,
-  whoamiCommand,
-  YTCommand,
-  themeCommand
-);
+// const clanCommand = new ChannelCommand(`!clan`, [], (ch, co, msg) => {
+//   server.say(
+//     apiData.Bot.CHANNEL,
+//     "Join our Codewars clan! Go to: Codewars --> Account Settings --> Clan --> then type in 'TrshPuppies'."
+//   );
+// });
 
-const commandsCommand = new ChannelCommand("!commands", [], (ch, co, msg) => {
-  const commandList = channelCommands.map((x) => {
-    if (!x.authority) {
-      x = x.name.toString() + ", ";
-      return x;
-    } else {
-      return "";
-    }
-  });
+// const momCommand = new ChannelCommand(`!mom`, [], (ch, co, msg) => {
+//   server.say(
+//     apiData.Bot.CHANNEL,
+//     "TP's mom is in the chat and, from now on, you will refer to her as 'Big Dog' or risk cruel and unusual punishment!"
+//   );
+// });
+// momCommand.addAlias([`!Mom`, "!bigdog", "!BigDog", "!Bigdog"]);
+// momCommand.addManual("!mom");
 
-  let commandListString = "";
+// const hncCommand = new ChannelCommand("!hnc", [], () => {
+//   server.say(
+//     apiData.Bot.CHANNEL,
+//     "Check out my spooky podcast which I co-host with my cousin! --> https://www.twitch.tv/hauntzncreepz --> https://open.spotify.com/show/7hcpFnIoWhveRQeNRTNpbM"
+//   );
+// });
 
-  for (let c of commandList) {
-    commandListString += `${c}`;
-  }
-  server.say(
-    apiData.Bot.CHANNEL,
-    `Here is a list of the commands, you can type '!man <command>'
-  for more details on each: \n${commandListString}`
-  );
-});
+// const musicCommand = new ChannelCommand("!music", [], () => {
+//   server.say(
+//     apiData.Bot.CHANNEL,
+//     "We're listening to the delicious synthwave of White Bat Audio --> https://whitebataudio.com/"
+//   );
+// });
+// musicCommand.addAlias(["!song", "!playlist"]);
 
-channelCommands.push(commandsCommand);
+// const behaveCommand = new ChannelCommand(
+//   "!behave",
+//   [],
+//   (ch, co, msg) => {
+//     server.say(
+//       apiData.Bot.CHANNEL,
+//       `${msg[1]} BAD DOG! Don't make TP get the spray bottle!`
+//     );
+//     server.say(apiData.Bot.CHANNEL, `/timeout ${msg[1]} 1`);
+//   },
+//   [apiData.Bot.MODLIST, apiData.Bot.STREAMER_NICK]
+// );
 
-// Functions:
-const newPromptSuccess = () =>
-  server.say(apiData.Bot.CHANNEL, "Your prompt is in the queue!");
+// const projectCommand = new ChannelCommand("!project", [], () => {
+//   server.say(apiData.Bot.CHANNEL, "Today we're learning Golang!");
+// });
+// projectCommand.addAlias(["!today", `!project`]);
+
+// const htbCommand = new ChannelCommand("!htb", [], () => {
+//   server.say(
+//     apiData.Bot.CHANNEL,
+//     "We're working through HTB's starting point, tier 2 --> https://app.hackthebox.com/starting-point"
+//   );
+// });
+
+// const imoCommand = new ChannelCommand("!imo", [], (ch, co, msg) => {
+//   server.say(
+//     apiData.Bot.CHANNEL,
+//     `Thanks for the suggestion ${co.username}! I'm putting it in the suggestion box for TP to review later :)`
+//   );
+// });
+// imoCommand.addAlias(["!ithink", "!youshould", "!Ithink", "!justdo"]);
+// imoCommand.addManual('"!imo <your suggestion goes here>"');
+
+// const emptySuggestionBox = new ChannelCommand(
+//   "!suggestionbox",
+//   [],
+//   (ch, co, msg) => {
+//     server.say(
+//       apiData.Bot.CHANNEL,
+//       `...Dang, where did I put those suggestions...`
+//     );
+//     server.say(
+//       apiData.Bot.CHANNEL,
+//       `They should be right here where TP keeps the fucks she gives... `
+//     );
+//   },
+//   [apiData.Bot.STREAMER_NICK]
+// );
+
+// const maleCommand = new ChannelCommand("!male", [], (ch, co, msg) => {
+//   server.say(apiData.Bot.CHANNEL, `male command`);
+// });
+// maleCommand.addAlias([
+//   "!mail",
+//   "!male",
+//   "!Mail",
+//   "!Male",
+//   "!mailman",
+//   "!maleman",
+// ]);
+// maleCommand.addManual("male string manual", true);
+
+// const whoamiCommand = new ChannelCommand("!about", [], (ch, co, msg) => {
+//   server.say(
+//     apiData.Bot.CHANNEL,
+//     `Hey ${co.username}! Welcome to my trash heap! TP is a former ER nurse
+//   learning coding and cybersecurity. All you really need to know is the struggle is real, everything IS
+//   in fact on fire, and you're welcome to chill as long as you like :)`
+//   );
+// });
+// whoamiCommand.addAlias(["!whoami", "!trshpuppy"]);
+
+// const YTCommand = new ChannelCommand("!yt", [], (ch, co, msg) => {
+//   server.say(
+//     apiData.Bot.CHANNEL,
+//     "Checkout my newest video on YT, all about Codewars! --> https://www.youtube.com/watch?v=wTIcR4GxQrI"
+//   );
+// });
+// YTCommand.addAlias(["!youtube"]);
+
+// const themeCommand = new ChannelCommand("!theme", [], (ch, co, msg) => {
+//   server.say(
+//     apiData.Bot.CHANNEL,
+//     `TP is using the Vibrancy Continued Extension in VSCode.
+//   You can check it out here --> https://github.com/illixion/vscode-vibrancy-continued`
+//   );
+// });
+
+// /* .......................................... TIMED MESSAGES ..............................................*/
+// // const YTMessage = new TimerCommand(
+// //   "Checkout my new video about Codewars! --> https://www.youtube.com/watch?v=wTIcR4GxQrI",
+// //   5000
+// // );
+
+// // console.log(YTMessage.message);
+// // setInterval(YTMessage.sendMessage, YTMessage.interval);
+// // // 3600000
+
+// // Add commands to command arrays:
+// // botCommands.push(yesCommand, noCommand, hiCommand, breakTheUniverseCommand);
+// channelCommands.push(
+//   manCommand,
+//   quoteCommand,
+//   addQuoteCommand,
+//   getPrompt,
+//   promptCommand,
+//   clawCommand,
+//   lurkCommand,
+//   unlurkCommand,
+//   kataCommand,
+//   clanCommand,
+//   momCommand,
+//   hncCommand,
+//   musicCommand,
+//   behaveCommand,
+//   projectCommand,
+//   htbCommand,
+//   imoCommand,
+//   emptySuggestionBox,
+//   maleCommand,
+//   whoamiCommand,
+//   YTCommand,
+//   themeCommand
+// );
+
+// const commandsCommand = new ChannelCommand("!commands", [], (ch, co, msg) => {
+//   const commandList = channelCommands.map((x) => {
+//     if (!x.authority) {
+//       x = x.name.toString() + ", ";
+//       return x;
+//     } else {
+//       return "";
+//     }
+//   });
+
+//   let commandListString = "";
+
+//   for (let c of commandList) {
+//     commandListString += `${c}`;
+//   }
+//   server.say(
+//     apiData.Bot.CHANNEL,
+//     `Here is a list of the commands, you can type '!man <command>'
+//   for more details on each: \n${commandListString}`
+//   );
+// });
+
+// channelCommands.push(commandsCommand);
+
+// // Functions:
+// const newPromptSuccess = () =>
+//   server.say(apiData.Bot.CHANNEL, "Your prompt is in the queue!");
 
 // const newQuoteSuccess = () =>
 //   server.say(
@@ -284,8 +285,29 @@ const newPromptSuccess = () =>
 //   );
 
 //handleChannelCommand
-export function ifThisDoesntWorkItsStevesFault(channel, context, message) {
-  const allCommandsToTry = CommandLibrary.getAllCommandsOfType("all");
+// export function ifThisDoesntWorkItsStevesFault(channel, context, message) {
+//   const allCommandsToTry = CommandLibrary.getAllCommandsOfType("all");
+
+//   for (const command of allCommandsToTry) {
+//     if (command.tryHandleMessage(channel, context, message.split(" "))) {
+//       break;
+//     }
+//   }
+// }
+
+//testCommand command:
+// function handleTestCommand() {
+//   console.log("hi!");
+// }
+
+// const testCommand = new Command("!tiddies", [], () => {
+//   console.log("hi 2");
+// });
+
+// CommandLibrary.addCommand(testCommand, "channel");
+
+export function handleChannelCommand(channel, context, message) {
+  const allCommandsToTry = CommandLibrary.getAllCommandsOfType("channel");
 
   for (const command of allCommandsToTry) {
     if (command.tryHandleMessage(channel, context, message.split(" "))) {

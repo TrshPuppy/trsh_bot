@@ -32,6 +32,7 @@ export default class CommandLibrary {
   }
 
   static addCommand(command, type) {
+    console.log("Add command = " + command);
     switch (type) {
       case "bot":
         CommandLibrary.allBotCommands.push(command);

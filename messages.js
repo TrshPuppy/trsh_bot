@@ -7,10 +7,11 @@
 import { server } from "./server.js";
 import nlp from "compromise";
 import { handleBotSummons } from "./commands/BotCommands.js";
-import {
-  // handleBotSummons,
-  ifThisDoesntWorkItsStevesFault,
-} from "./commands/commands.js";
+import { handleChannelCommand } from "./commands/commands.js";
+// import {
+//   // handleBotSummons,
+//   ifThisDoesntWorkItsStevesFault,
+// } from "./commands/commands.js";
 import apiData from "./data/api.json" assert { type: "json" };
 
 // Module globals:
@@ -60,7 +61,8 @@ export default function delegateMessage(channel, context, message) {
   // command:
   if (message[0] === "!") {
     // Calls a function from commands.js
-    ifThisDoesntWorkItsStevesFault(channel, context, message);
+    handleChannelCommand(channel, context, message);
+    //ifThisDoesntWorkItsStevesFault(channel, context, message);
     return;
   }
 

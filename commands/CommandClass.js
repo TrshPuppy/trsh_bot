@@ -1,3 +1,5 @@
+import CommandLibrary from "./CommandLibrary.js";
+
 /*
  *   Definition of a command:
  *       - Must come from chat
@@ -63,3 +65,12 @@ export default class Command {
     }
   }
 }
+
+//testCommand command:
+function handleTestCommand() {
+  console.log("hi!");
+}
+
+const testCommand = new Command("!tiddies", [], handleTestCommand);
+
+CommandLibrary.addCommand(testCommand, "channel");
