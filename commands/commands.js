@@ -28,7 +28,7 @@ export const prompt = {
   completed: undefined,
 };
 
-const botCommands = [];
+// const botCommands = [];
 const channelCommands = [];
 
 // Create commmands:
@@ -73,14 +73,14 @@ getPrompt.addManual(
 );
 getPrompt.addAlias(["!getprompt"]);
 
-const hiCommand = new BotCommand(
-  "hi",
-  ["hey", "hi", "hello", "Hi", "Hey", "Hello"],
-  handleHiCommand
-);
-hiCommand.addManual(
-  `@${apiData.Bot.BOT_USERNAME} ['hey', 'hi', 'hello', 'Hi', 'Hey', 'Hello']`
-);
+// const hiCommand = new BotCommand(
+//   "hi",
+//   ["hey", "hi", "hello", "Hi", "Hey", "Hello"],
+//   handleHiCommand
+// );
+// hiCommand.addManual(
+//   `@${apiData.Bot.BOT_USERNAME} ['hey', 'hi', 'hello', 'Hi', 'Hey', 'Hello']`
+// );
 
 /* .......................................... MIGRATE STREAMLABS ..............................................*/
 const clawCommand = new ChannelCommand("!claw", [], () => {
@@ -511,15 +511,15 @@ function handlePromptCommand(channel, context, message) {
   // HARASS RANDOM VIEWER
 }
 
-function handleHiCommand(channel, context, message) {
-  const hiIndx = hiCommand.args.findIndex((arg) => arg == message[1]);
+// function handleHiCommand(channel, context, message) {
+//   const hiIndx = hiCommand.args.findIndex((arg) => arg == message[1]);
 
-  server.say(
-    apiData.Bot.CHANNEL,
-    `${hiCommand.args[hiIndx]} @${context.username}!`
-  );
-  return;
-}
+//   server.say(
+//     apiData.Bot.CHANNEL,
+//     `${hiCommand.args[hiIndx]} @${context.username}!`
+//   );
+//   return;
+// }
 
 const overwriteSelectedJSON = (target, JSONObj, cb) => {
   const JSONStringData = JSON.stringify(JSONObj);
