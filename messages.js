@@ -6,8 +6,9 @@
 // Imports:
 import { server } from "./server.js";
 import nlp from "compromise";
+import { handleBotSummons } from "./commands/BotCommands.js";
 import {
-  handleBotSummons,
+  // handleBotSummons,
   ifThisDoesntWorkItsStevesFault,
 } from "./commands/commands.js";
 import apiData from "./data/api.json" assert { type: "json" };
