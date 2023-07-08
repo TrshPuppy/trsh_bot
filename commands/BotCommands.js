@@ -1,5 +1,6 @@
 import { server } from "../server.js";
 import apiData from "../data/api.json" assert { type: "json" };
+import CommandLibrary from "./CommandLibrary.js";
 
 export default class BotCommand {
   constructor(name, args, callBack, authority) {
