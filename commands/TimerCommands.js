@@ -1,4 +1,4 @@
-import ChannelCommand from "./ChannelCommands";
+import ChannelCommand from "./ChannelCommands.js";
 
 export default class TimerCommand extends ChannelCommand {
   constructor(message, interval) {
