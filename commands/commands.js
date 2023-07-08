@@ -3,6 +3,7 @@
 // Imports:
 import { server } from "../server.js";
 import apiData from "../data/api.json" assert { type: "json" };
+import BotCommand from "./BotCommands.js";
 import addPrompt, {
   markPromptIncomplete,
   getPromptFromDB,
@@ -11,57 +12,57 @@ import * as fs from "fs";
 import quotesDBData from "../data/quotesDB.json" assert { type: "json" };
 
 // This class constructs commands directed at the bot ex: "@trsh_bot":
-class BotCommand {
-  constructor(name, args, callBack, authority) {
-    this.name = name;
-    this.args = args;
-    this.thatShitFunctionToExecute = callBack;
-    this.authority = authority;
-  }
+// class BotCommand {
+//   constructor(name, args, callBack, authority) {
+//     this.name = name;
+//     this.args = args;
+//     this.thatShitFunctionToExecute = callBack;
+//     this.authority = authority;
+//   }
 
-  aliases = [];
+//   aliases = [];
 
-  addArg(arg) {
-    this.args.push(arg);
-  }
+//   addArg(arg) {
+//     this.args.push(arg);
+//   }
 
-  tryHandleMessage(channel, context, [arg0, arg1, arg2, ...rest]) {
-    if (this.args.findIndex((x) => x == arg1) !== -1) {
-      this.thatShitFunctionToExecute(channel, context, [
-        arg0,
-        arg1,
-        arg2,
-        ...rest,
-      ]);
-      return true;
-    }
-    return false;
-  }
+//   tryHandleMessage(channel, context, [arg0, arg1, arg2, ...rest]) {
+//     if (this.args.findIndex((x) => x == arg1) !== -1) {
+//       this.thatShitFunctionToExecute(channel, context, [
+//         arg0,
+//         arg1,
+//         arg2,
+//         ...rest,
+//       ]);
+//       return true;
+//     }
+//     return false;
+//   }
 
-  addManual(string, altString) {
-    if (altString) {
-      this.altManual = true;
-    }
-    this.manual = string;
-  }
+//   addManual(string, altString) {
+//     if (altString) {
+//       this.altManual = true;
+//     }
+//     this.manual = string;
+//   }
 
-  getManual() {
-    if (this.altManual) {
-      return this.manual;
-    }
-    return `Command syntax: ${
-      this.manual
-    }. You can also use these aliases: ${this.aliases.map(
-      (a) => (a = ` ${a}`)
-    )}`;
-  }
+//   getManual() {
+//     if (this.altManual) {
+//       return this.manual;
+//     }
+//     return `Command syntax: ${
+//       this.manual
+//     }. You can also use these aliases: ${this.aliases.map(
+//       (a) => (a = ` ${a}`)
+//     )}`;
+//   }
 
-  addAlias(aliasArr) {
-    for (let a of aliasArr) {
-      this.aliases.push(a);
-    }
-  }
-}
+//   addAlias(aliasArr) {
+//     for (let a of aliasArr) {
+//       this.aliases.push(a);
+//     }
+//   }
+// }
 
 //This class constructs commands which start with the "!" prefix:
 class ChannelCommand extends BotCommand {
