@@ -12,7 +12,8 @@ import addPrompt, {
   getPromptFromDB,
 } from "../promptQueue.js";
 import * as fs from "fs";
-import quotesDBData from "../data/quotesDB.json" assert { type: "json" };
+import CommandLibrary from "./CommandLibrary.js";
+// import quotesDBData from "../data/quotesDB.json" assert { type: "json" };
 
 // Globals:
 const quote = {
@@ -28,36 +29,13 @@ export const prompt = {
   completed: undefined,
 };
 
-// const botCommands = [];
 const channelCommands = [];
 
-// Create commmands:
-// const yesCommand = new BotCommand("yes", ["yes", "Yes", "Y", "y", "YES"], () =>
-//   server.say(apiData.Bot.CHANNEL, ":)")
-// );
-// yesCommand.addArg("yes");
-// yesCommand.addManual(`@${apiData.Bot.BOT_USERNAME} yes`);
+// const quoteCommand = new QuoteCommand("!quote", [], handleQuoteCommand);
+// quoteCommand.addManual("!quote <author> (author is optional)");
 
-// const noCommand = new BotCommand("no", ["no", "No", "N", "n", "NO"], () =>
-//   server.say(apiData.Bot.CHANNEL, ":(")
-// );
-// noCommand.addArg("no");
-// noCommand.addManual(`@${apiData.Bot.BOT_USERNAME} no`);
-
-// const breakTheUniverseCommand = new BotCommand(
-//   "/0",
-//   ["divide by 0", "divide by zero", "/zero", "/0"],
-//   () => server.say(apiData.Bot.CHANNEL, "8008135")
-// );
-// breakTheUniverseCommand.addManual(
-//   `@${apiData.Bot.BOT_USERNAME}  ['/0', 'divide by zero', '/zero', 'divide by 0']`
-// );
-
-const quoteCommand = new QuoteCommand("!quote", [], handleQuoteCommand);
-quoteCommand.addManual("!quote <author> (author is optional)");
-
-const addQuoteCommand = new QuoteCommand("!addquote", [], handleAddQuote);
-addQuoteCommand.addManual("!addquote @<author> <quote>");
+// const addQuoteCommand = new QuoteCommand("!addquote", [], handleAddQuote);
+// addQuoteCommand.addManual("!addquote @<author> <quote>");
 
 const manCommand = new ChannelCommand("!man", [], handleManCommand);
 manCommand.addManual("!man <command>");
@@ -72,15 +50,6 @@ getPrompt.addManual(
   `!getprompt (${apiData.Bot.BOT_USERNAME} will respond w/ the next prompt in queue).`
 );
 getPrompt.addAlias(["!getprompt"]);
-
-// const hiCommand = new BotCommand(
-//   "hi",
-//   ["hey", "hi", "hello", "Hi", "Hey", "Hello"],
-//   handleHiCommand
-// );
-// hiCommand.addManual(
-//   `@${apiData.Bot.BOT_USERNAME} ['hey', 'hi', 'hello', 'Hi', 'Hey', 'Hello']`
-// );
 
 /* .......................................... MIGRATE STREAMLABS ..............................................*/
 const clawCommand = new ChannelCommand("!claw", [], () => {
@@ -308,125 +277,119 @@ channelCommands.push(commandsCommand);
 const newPromptSuccess = () =>
   server.say(apiData.Bot.CHANNEL, "Your prompt is in the queue!");
 
-const newQuoteSuccess = () =>
-  server.say(
-    apiData.Bot.CHANNEL,
-    "Your quote was added to the database! Congrats on being so ICONIC!"
-  );
-
-// export function handleBotSummons(channel, context, message) {
-//   for (const command of botCommands) {
-//     if (command.tryHandleMessage(channel, context, message.split(" "))) {
-//       return;
-//     }
-//   }
-// }
+// const newQuoteSuccess = () =>
+//   server.say(
+//     apiData.Bot.CHANNEL,
+//     "Your quote was added to the database! Congrats on being so ICONIC!"
+//   );
 
 //handleChannelCommand
 export function ifThisDoesntWorkItsStevesFault(channel, context, message) {
-  for (const command of channelCommands) {
+  const allCommandsToTry = CommandLibrary.getAllCommandsOfType("all");
+
+  for (const command of allCommandsToTry) {
     if (command.tryHandleMessage(channel, context, message.split(" "))) {
       break;
     }
   }
 }
 
-function handleQuoteCommand(channel, context, message) {
-  let randomQuote;
-  let currentAuthor;
-  let indxIntoQuotesDB;
-  let fixedAuthorName;
+// function handleQuoteCommand(channel, context, message) {
+//   let randomQuote;
+//   let currentAuthor;
+//   let indxIntoQuotesDB;
+//   let fixedAuthorName;
 
-  if (message[1] === undefined) {
-    indxIntoQuotesDB = Math.floor(Math.random() * quotesDBData.length);
-  } else {
-    const authorArr = message[1].split("");
+//   if (message[1] === undefined) {
+//     indxIntoQuotesDB = Math.floor(Math.random() * quotesDBData.length);
+//   } else {
+//     const authorArr = message[1].split("");
 
-    if (authorArr[0] === "@") {
-      fixedAuthorName = authorArr.slice(1).join("");
-    } else {
-      fixedAuthorName = authorArr.join("");
-    }
+//     if (authorArr[0] === "@") {
+//       fixedAuthorName = authorArr.slice(1).join("");
+//     } else {
+//       fixedAuthorName = authorArr.join("");
+//     }
 
-    indxIntoQuotesDB = quotesDBData.findIndex(
-      (x) => x.author.toLowerCase() == fixedAuthorName.toLowerCase()
-    );
-  }
+//     indxIntoQuotesDB = quotesDBData.findIndex(
+//       (x) => x.author.toLowerCase() == fixedAuthorName.toLowerCase()
+//     );
+//   }
 
-  if (indxIntoQuotesDB === -1) {
-    server.say(
-      apiData.Bot.CHANNEL,
-      `I guess @${fixedAuthorName} isn't ICONIC enough to be in my database :(`
-    );
-    return;
-  }
+//   if (indxIntoQuotesDB === -1) {
+//     server.say(
+//       apiData.Bot.CHANNEL,
+//       `I guess @${fixedAuthorName} isn't ICONIC enough to be in my database :(`
+//     );
+//     return;
+//   }
 
-  const quotesArrLength = quotesDBData[indxIntoQuotesDB].quotes.length;
-  currentAuthor = quotesDBData[indxIntoQuotesDB].author;
-  const randomIndx = Math.floor(Math.random() * quotesArrLength);
-  randomQuote = quotesDBData[indxIntoQuotesDB].quotes[randomIndx].quote;
+//   const quotesArrLength = quotesDBData[indxIntoQuotesDB].quotes.length;
+//   currentAuthor = quotesDBData[indxIntoQuotesDB].author;
+//   const randomIndx = Math.floor(Math.random() * quotesArrLength);
+//   randomQuote = quotesDBData[indxIntoQuotesDB].quotes[randomIndx].quote;
 
-  const feat =
-    quotesDBData[indxIntoQuotesDB].quotes[randomIndx].feat === 1
-      ? `@${apiData.Bot.CHANNEL}`
-      : undefined;
+//   const feat =
+//     quotesDBData[indxIntoQuotesDB].quotes[randomIndx].feat === 1
+//       ? `@${apiData.Bot.CHANNEL}`
+//       : undefined;
 
-  if (feat) {
-    server.say(
-      apiData.Bot.CHANNEL,
-      `${randomQuote} - @${currentAuthor} ft. @${apiData.Bot.BOT_USERNAME}`
-    );
-  } else {
-    server.say(apiData.Bot.CHANNEL, `${randomQuote} - @${currentAuthor}`);
-  }
-  // taladeganights, office spaces
-  // Remember, the field mouse is fast, but the owl sees at night...
-  // Leaderboard for most iconic chatters
-  // chatter quotes featuring TB
-  // !TZ=Europe/Copenhagen date <- command request
-  // feature request, command: !/bin/bash response: she-bang
-}
+//   if (feat) {
+//     server.say(
+//       apiData.Bot.CHANNEL,
+//       `${randomQuote} - @${currentAuthor} ft. @${apiData.Bot.BOT_USERNAME}`
+//     );
+//   } else {
+//     server.say(apiData.Bot.CHANNEL, `${randomQuote} - @${currentAuthor}`);
+//   }
+//   // taladeganights, office spaces
+//   // Remember, the field mouse is fast, but the owl sees at night...
+//   // Leaderboard for most iconic chatters
+//   // chatter quotes featuring TB
+//   // !TZ=Europe/Copenhagen date <- command request
+//   // feature request, command: !/bin/bash response: she-bang
+// }
 
-function handleAddQuote(channel, context, message) {
-  const quoteString = message.slice(2).join(" ");
+// function handleAddQuote(channel, context, message) {
+//   const quoteString = message.slice(2).join(" ");
 
-  if (!isThisInputClean(quoteString, context)) {
-    return;
-  }
+//   if (!isThisInputClean(quoteString, context)) {
+//     return;
+//   }
 
-  const quoteToAdd = Object.create(quote);
-  let authorSanitized;
+//   const quoteToAdd = Object.create(quote);
+//   let authorSanitized;
 
-  quoteToAdd.quote = quoteString;
-  quoteToAdd.date = new Date();
-  quoteToAdd.feat = 0;
+//   quoteToAdd.quote = quoteString;
+//   quoteToAdd.date = new Date();
+//   quoteToAdd.feat = 0;
 
-  if (message[1].startsWith("@")) {
-    authorSanitized = message[1].slice(1);
-  } else {
-    server.say(
-      apiData.Bot.CHANNEL,
-      `${context.username}, please indicate the author by adding '@' before their username, ya scrub.`
-    );
-    return;
-  }
+//   if (message[1].startsWith("@")) {
+//     authorSanitized = message[1].slice(1);
+//   } else {
+//     server.say(
+//       apiData.Bot.CHANNEL,
+//       `${context.username}, please indicate the author by adding '@' before their username, ya scrub.`
+//     );
+//     return;
+//   }
 
-  if (
-    quotesDBData.find(
-      (x) => x.author.toLowerCase() == authorSanitized.toLowerCase()
-    ) !== undefined
-  ) {
-    const authorIndx = quotesDBData.findIndex(
-      (y) => y.author.toLowerCase() == authorSanitized.toLowerCase()
-    );
-    quotesDBData[authorIndx].quotes.push(quoteToAdd);
-  } else {
-    const authorObj = { author: authorSanitized, quotes: [quoteToAdd] };
-    quotesDBData.push(authorObj);
-  }
+//   if (
+//     quotesDBData.find(
+//       (x) => x.author.toLowerCase() == authorSanitized.toLowerCase()
+//     ) !== undefined
+//   ) {
+//     const authorIndx = quotesDBData.findIndex(
+//       (y) => y.author.toLowerCase() == authorSanitized.toLowerCase()
+//     );
+//     quotesDBData[authorIndx].quotes.push(quoteToAdd);
+//   } else {
+//     const authorObj = { author: authorSanitized, quotes: [quoteToAdd] };
+//     quotesDBData.push(authorObj);
+//   }
 
-  overwriteQuotesJson(newQuoteSuccess);
-}
+//   overwriteQuotesJson(newQuoteSuccess);
+// }
 
 function handleManCommand(channel, context, message) {
   if (message[1] === undefined) {
@@ -510,16 +473,6 @@ function handlePromptCommand(channel, context, message) {
 
   // HARASS RANDOM VIEWER
 }
-
-// function handleHiCommand(channel, context, message) {
-//   const hiIndx = hiCommand.args.findIndex((arg) => arg == message[1]);
-
-//   server.say(
-//     apiData.Bot.CHANNEL,
-//     `${hiCommand.args[hiIndx]} @${context.username}!`
-//   );
-//   return;
-// }
 
 const overwriteSelectedJSON = (target, JSONObj, cb) => {
   const JSONStringData = JSON.stringify(JSONObj);
