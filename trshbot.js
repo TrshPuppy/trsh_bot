@@ -31,6 +31,7 @@ try {
   throw err;
 }
 
+// Create the TMI.js server with an event listener for messages in chat
 createServer();
 
 // While trsh_bot is running, make sure the OAuth token hasn't expired & refresh it if it has
