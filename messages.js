@@ -52,7 +52,7 @@ export default function delegateMessage(channel, context, message) {
   const botSummons = `@${apiData.Bot.BOT_USERNAME}`;
   const messageArr = message.split(" ");
   if (messageArr[0].toLowerCase() === botSummons.toLowerCase()) {
-    // Calls a function from commands.js
+    // Calls a function from /commands/BotCommands.js
     handleBotSummons(channel, context, message);
     return;
   }
