@@ -5,6 +5,7 @@ import { server } from "../server.js";
 import apiData from "../data/api.json" assert { type: "json" };
 import BotCommand from "./BotCommands.js";
 import ChannelCommand from "./ChannelCommands.js";
+import QuoteCommand from "./QuoteCommands.js";
 import addPrompt, {
   markPromptIncomplete,
   getPromptFromDB,
@@ -91,32 +92,32 @@ import quotesDBData from "../data/quotesDB.json" assert { type: "json" };
 //   }
 // }
 
-class QuoteCommand extends ChannelCommand {
-  tryHandleMessage(channel, context, [arg0, arg1, arg2, ...rest]) {
-    if (this.name === arg0) {
-      this.thatShitFunctionToExecute(channel, context, [
-        arg0,
-        arg1,
-        arg2,
-        ...rest,
-      ]);
-      return true;
-    }
-    return false;
-  }
-}
+// class QuoteCommand extends ChannelCommand {
+//   tryHandleMessage(channel, context, [arg0, arg1, arg2, ...rest]) {
+//     if (this.name === arg0) {
+//       this.thatShitFunctionToExecute(channel, context, [
+//         arg0,
+//         arg1,
+//         arg2,
+//         ...rest,
+//       ]);
+//       return true;
+//     }
+//     return false;
+//   }
+// }
 
-class TimerCommand {
-  constructor(message, interval) {
-    this.message = message;
-    this.interval = interval;
-  }
+// class TimerCommand {
+//   constructor(message, interval) {
+//     this.message = message;
+//     this.interval = interval;
+//   }
 
-  sendMessage() {
-    console.log(this.message);
-    server.say(apiData.Bot.CHANNEL, this.message);
-  }
-}
+//   sendMessage() {
+//     console.log(this.message);
+//     server.say(apiData.Bot.CHANNEL, this.message);
+//   }
+// }
 
 // Globals:
 const quote = {
