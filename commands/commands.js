@@ -6,6 +6,7 @@ import apiData from "../data/api.json" assert { type: "json" };
 import BotCommand from "./BotCommands.js";
 import ChannelCommand from "./ChannelCommands.js";
 import QuoteCommand from "./QuoteCommands.js";
+import TimerCommand from "./TimerCommands.js";
 import addPrompt, {
   markPromptIncomplete,
   getPromptFromDB,
