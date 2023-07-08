@@ -14,112 +14,6 @@ import addPrompt, {
 import * as fs from "fs";
 import quotesDBData from "../data/quotesDB.json" assert { type: "json" };
 
-// This class constructs commands directed at the bot ex: "@trsh_bot":
-// class BotCommand {
-//   constructor(name, args, callBack, authority) {
-//     this.name = name;
-//     this.args = args;
-//     this.thatShitFunctionToExecute = callBack;
-//     this.authority = authority;
-//   }
-
-//   aliases = [];
-
-//   addArg(arg) {
-//     this.args.push(arg);
-//   }
-
-//   tryHandleMessage(channel, context, [arg0, arg1, arg2, ...rest]) {
-//     if (this.args.findIndex((x) => x == arg1) !== -1) {
-//       this.thatShitFunctionToExecute(channel, context, [
-//         arg0,
-//         arg1,
-//         arg2,
-//         ...rest,
-//       ]);
-//       return true;
-//     }
-//     return false;
-//   }
-
-//   addManual(string, altString) {
-//     if (altString) {
-//       this.altManual = true;
-//     }
-//     this.manual = string;
-//   }
-
-//   getManual() {
-//     if (this.altManual) {
-//       return this.manual;
-//     }
-//     return `Command syntax: ${
-//       this.manual
-//     }. You can also use these aliases: ${this.aliases.map(
-//       (a) => (a = ` ${a}`)
-//     )}`;
-//   }
-
-//   addAlias(aliasArr) {
-//     for (let a of aliasArr) {
-//       this.aliases.push(a);
-//     }
-//   }
-// }
-
-// //This class constructs commands which start with the "!" prefix:
-// class ChannelCommand extends BotCommand {
-//   // constructor / setter should set the command's authority (who can use this command via badge/role)
-
-//   tryHandleMessage(channel, context, [arg0, arg1, ...rest]) {
-//     if (this.name !== arg0) {
-//       if (this.aliases.findIndex((a) => a == arg0) === -1) {
-//         return false;
-//       }
-//     }
-//     if (this.authority !== undefined) {
-//       // if (context.username.toLowerCase() !== this.authority.toLowerCase()) {
-//       //   return false;
-//       // }
-
-//       if (this.authority.find((x) => (x = context.username)) === -1) {
-//         return false;
-//       }
-//     }
-
-//     this.thatShitFunctionToExecute(channel, context, [arg0, arg1, ...rest]);
-
-//     return true;
-//   }
-// }
-
-// class QuoteCommand extends ChannelCommand {
-//   tryHandleMessage(channel, context, [arg0, arg1, arg2, ...rest]) {
-//     if (this.name === arg0) {
-//       this.thatShitFunctionToExecute(channel, context, [
-//         arg0,
-//         arg1,
-//         arg2,
-//         ...rest,
-//       ]);
-//       return true;
-//     }
-//     return false;
-//   }
-// }
-
-// class TimerCommand {
-//   constructor(message, interval) {
-//     this.message = message;
-//     this.interval = interval;
-//   }
-
-//   sendMessage() {
-//     console.log(this.message);
-//     server.say(apiData.Bot.CHANNEL, this.message);
-//   }
-// }
-
 // Globals:
 const quote = {
   quote: "",
@@ -134,34 +28,30 @@ export const prompt = {
   completed: undefined,
 };
 
-// const timer = (cb, ms) => {
-//   setInterval(cb, ms);
-// };
-
 const botCommands = [];
 const channelCommands = [];
 
 // Create commmands:
-const yesCommand = new BotCommand("yes", ["yes", "Yes", "Y", "y", "YES"], () =>
-  server.say(apiData.Bot.CHANNEL, ":)")
-);
-yesCommand.addArg("yes");
-yesCommand.addManual(`@${apiData.Bot.BOT_USERNAME} yes`);
+// const yesCommand = new BotCommand("yes", ["yes", "Yes", "Y", "y", "YES"], () =>
+//   server.say(apiData.Bot.CHANNEL, ":)")
+// );
+// yesCommand.addArg("yes");
+// yesCommand.addManual(`@${apiData.Bot.BOT_USERNAME} yes`);
 
-const noCommand = new BotCommand("no", ["no", "No", "N", "n", "NO"], () =>
-  server.say(apiData.Bot.CHANNEL, ":(")
-);
-noCommand.addArg("no");
-noCommand.addManual(`@${apiData.Bot.BOT_USERNAME} no`);
+// const noCommand = new BotCommand("no", ["no", "No", "N", "n", "NO"], () =>
+//   server.say(apiData.Bot.CHANNEL, ":(")
+// );
+// noCommand.addArg("no");
+// noCommand.addManual(`@${apiData.Bot.BOT_USERNAME} no`);
 
-const breakTheUniverseCommand = new BotCommand(
-  "/0",
-  ["divide by 0", "divide by zero", "/zero", "/0"],
-  () => server.say(apiData.Bot.CHANNEL, "8008135")
-);
-breakTheUniverseCommand.addManual(
-  `@${apiData.Bot.BOT_USERNAME}  ['/0', 'divide by zero', '/zero', 'divide by 0']`
-);
+// const breakTheUniverseCommand = new BotCommand(
+//   "/0",
+//   ["divide by 0", "divide by zero", "/zero", "/0"],
+//   () => server.say(apiData.Bot.CHANNEL, "8008135")
+// );
+// breakTheUniverseCommand.addManual(
+//   `@${apiData.Bot.BOT_USERNAME}  ['/0', 'divide by zero', '/zero', 'divide by 0']`
+// );
 
 const quoteCommand = new QuoteCommand("!quote", [], handleQuoteCommand);
 quoteCommand.addManual("!quote <author> (author is optional)");
@@ -364,7 +254,7 @@ const themeCommand = new ChannelCommand("!theme", [], (ch, co, msg) => {
 // // 3600000
 
 // Add commands to command arrays:
-botCommands.push(yesCommand, noCommand, hiCommand, breakTheUniverseCommand);
+// botCommands.push(yesCommand, noCommand, hiCommand, breakTheUniverseCommand);
 channelCommands.push(
   manCommand,
   quoteCommand,
@@ -424,13 +314,13 @@ const newQuoteSuccess = () =>
     "Your quote was added to the database! Congrats on being so ICONIC!"
   );
 
-export function handleBotSummons(channel, context, message) {
-  for (const command of botCommands) {
-    if (command.tryHandleMessage(channel, context, message.split(" "))) {
-      return;
-    }
-  }
-}
+// export function handleBotSummons(channel, context, message) {
+//   for (const command of botCommands) {
+//     if (command.tryHandleMessage(channel, context, message.split(" "))) {
+//       return;
+//     }
+//   }
+// }
 
 //handleChannelCommand
 export function ifThisDoesntWorkItsStevesFault(channel, context, message) {
