@@ -9,7 +9,6 @@ import addPrompt, {
 } from "./promptQueue.js";
 import * as fs from "fs";
 import quotesDBData from "./data/quotesDB.json" assert { type: "json" };
-import { ServerResponse } from "http";
 
 // This class constructs commands directed at the bot ex: "@trsh_bot":
 class BotCommand {
@@ -39,11 +38,17 @@ class BotCommand {
     return false;
   }
 
-  addManual(string) {
+  addManual(string, altString) {
+    if (altString) {
+      this.altManual = true;
+    }
     this.manual = string;
   }
 
   getManual() {
+    if (this.altManual) {
+      return this.manual;
+    }
     return `Command syntax: ${
       this.manual
     }. You can also use these aliases: ${this.aliases.map(
@@ -250,7 +255,7 @@ const hncCommand = new ChannelCommand("!hnc", [], () => {
 const musicCommand = new ChannelCommand("!music", [], () => {
   server.say(
     apiData.Bot.CHANNEL,
-    "We're listening to some tasty Chilljop --> https://chillhop.com/"
+    "We're listening to the delicious synthwave of White Bat Audio --> https://whitebataudio.com/"
   );
 });
 musicCommand.addAlias(["!song", "!playlist"]);
@@ -316,10 +321,33 @@ maleCommand.addAlias([
   "!mailman",
   "!maleman",
 ]);
-maleCommand.getManual = (x) => {
-  console.log("UTTER CHAOS" + " " + x);
-};
-maleCommand.addManual("male string manual");
+maleCommand.addManual("male string manual", true);
+
+const whoamiCommand = new ChannelCommand("!about", [], (ch, co, msg) => {
+  server.say(
+    apiData.Bot.CHANNEL,
+    `Hey ${co.username}! Welcome to my trash heap! TP is a former ER nurse
+  learning coding and cybersecurity. All you really need to know is the struggle is real, everything IS
+  in fact on fire, and you're welcome to chill as long as you like :)`
+  );
+});
+whoamiCommand.addAlias(["!whoami", "!trshpuppy"]);
+
+const YTCommand = new ChannelCommand("!yt", [], (ch, co, msg) => {
+  server.say(
+    apiData.Bot.CHANNEL,
+    "Checkout my newest video on YT, all about Codewars! --> https://www.youtube.com/watch?v=wTIcR4GxQrI"
+  );
+});
+YTCommand.addAlias(["!youtube"]);
+
+const themeCommand = new ChannelCommand("!theme", [], (ch, co, msg) => {
+  server.say(
+    apiData.Bot.CHANNEL,
+    `TP is using the Vibrancy Continued Extension in VSCode.
+  You can check it out here --> https://github.com/illixion/vscode-vibrancy-continued`
+  );
+});
 
 /* .......................................... TIMED MESSAGES ..............................................*/
 // const YTMessage = new TimerCommand(
@@ -351,9 +379,36 @@ channelCommands.push(
   projectCommand,
   htbCommand,
   imoCommand,
-  emptySuggestionBox
-  //  maleCommand
+  emptySuggestionBox,
+  maleCommand,
+  whoamiCommand,
+  YTCommand,
+  themeCommand
 );
+
+const commandsCommand = new ChannelCommand("!commands", [], (ch, co, msg) => {
+  const commandList = channelCommands.map((x) => {
+    if (!x.authority) {
+      x = x.name.toString() + ", ";
+      return x;
+    } else {
+      return "";
+    }
+  });
+
+  let commandListString = "";
+
+  for (let c of commandList) {
+    commandListString += `${c}`;
+  }
+  server.say(
+    apiData.Bot.CHANNEL,
+    `Here is a list of the commands, you can type '!man <command>'
+  for more details on each: \n${commandListString}`
+  );
+});
+
+channelCommands.push(commandsCommand);
 
 // Functions:
 const newPromptSuccess = () =>
