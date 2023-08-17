@@ -1,5 +1,8 @@
 // import CommandLibrary from "./CommandLibrary.js";
 
+import { server } from "../server.js";
+import apiData from "../data/api.json" assert { type: "json" };
+
 // /*
 //  *   Definition of a command:
 //  *       - Must come from chat
@@ -67,7 +70,8 @@ export default class Command {
 }
 
 //testCommand command:
-function handleTestCommand() {
+function handleTestCommand(ch, co, ms) {
+  server.say(apiData.Bot.CHANNEL, "Hello Tiddies, it's me trshbot");
   console.log("tiddies");
 }
 
