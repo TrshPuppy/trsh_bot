@@ -68,7 +68,7 @@ export default class Command {
 
 //testCommand command:
 function handleTestCommand() {
-  console.log("hi!");
+  console.log("tiddies");
 }
 
 const testCommand = new Command("!tiddies", [], handleTestCommand);

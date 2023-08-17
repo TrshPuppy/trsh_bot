@@ -6,7 +6,7 @@
 // Imports:
 import { server } from "./server.js";
 import nlp from "compromise";
-import { handleBotSummons } from "./commands/BotCommands.js";
+// import { handleBotSummons } from "./commands/BotCommands.js";
 import { handleChannelCommand } from "./commands/commands.js";
 // import {
 //   // handleBotSummons,
