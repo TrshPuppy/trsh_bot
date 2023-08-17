@@ -1,5 +1,5 @@
-import ChannelCommand from "./ChannelCommands.js";
-import quotesDBData from "../data/quotesDB.json" assert { type: "json" };
+// import ChannelCommand from "./ChannelCommands.js";
+// import quotesDBData from "../data/quotesDB.json" assert { type: "json" };
 
 const quoteCommands = [];
 

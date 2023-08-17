@@ -22,13 +22,13 @@ let keywordLessMessages = 0;
  * Called from server.js, the parameters are given to us by the TMI.js server:
  */
 export default function delegateMessage(channel, context, message) {
-  // console.log(`@${context.username}: "${message}"`); // <------------- Log of messages to console if you want.
   message = message.trim();
 
   // Sanitize the message:
   if (message[0] === "/" || message[0] === ".") {
     return;
   }
+
   // Make sure the bot isn't responding to its own messages.
   if (context.username === server.username) {
     return;

@@ -1,10 +1,10 @@
-import CommandLibrary from "./CommandLibrary.js";
+// import CommandLibrary from "./CommandLibrary.js";
 
-/*
- *   Definition of a command:
- *       - Must come from chat
- *       - must start with the prefix set in api.json
- */
+// /*
+//  *   Definition of a command:
+//  *       - Must come from chat
+//  *       - must start with the prefix set in api.json
+//  */
 
 export default class Command {
   constructor(name, args, callBack, authority) {
@@ -72,5 +72,7 @@ function handleTestCommand() {
 }
 
 const testCommand = new Command("!tiddies", [], handleTestCommand);
+export const testLibrary = [];
+testLibrary.push(testCommand);
 
-CommandLibrary.addCommand(testCommand, "channel");
+// // CommandLibrary.addCommand(testCommand, "channel");

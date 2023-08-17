@@ -1,20 +1,32 @@
 // This module handles chat commands and delegates based on their type.
 
-// Imports:
-import { server } from "../server.js";
-import apiData from "../data/api.json" assert { type: "json" };
-import BotCommand from "./BotCommands.js";
-import ChannelCommand from "./ChannelCommands.js";
-import QuoteCommand from "./QuoteCommands.js";
-import TimerCommand from "./TimerCommands.js";
-import addPrompt, {
-  markPromptIncomplete,
-  getPromptFromDB,
-} from "../promptQueue.js";
-import * as fs from "fs";
-import CommandLibrary from "./CommandLibrary.js";
-import Command from "./CommandClass.js";
+// // Imports:
+// import { server } from "../server.js";
+// import apiData from "../data/api.json" assert { type: "json" };
+// import BotCommand from "./BotCommands.js";
+// import ChannelCommand from "./ChannelCommands.js";
+// import QuoteCommand from "./QuoteCommands.js";
+// import TimerCommand from "./TimerCommands.js";
+// import addPrompt, {
+//   markPromptIncomplete,
+//   getPromptFromDB,
+// } from "../promptQueue.js";
+// import * as fs from "fs";
+// import CommandLibrary from "./CommandLibrary.js";
+// import Command from "./CommandClass.js";
 // import quotesDBData from "../data/quotesDB.json" assert { type: "json" };
+
+import { testLibrary } from "./CommandClass.js";
+
+export function handleChannelCommand(channel, context, message) {
+  // const allCommandsToTry = CommandLibrary.getAllCommandsOfType("channel");
+
+  for (const command of testLibrary) {
+    if (command.tryHandleMessage(channel, context, message.split(" "))) {
+      break;
+    }
+  }
+}
 
 // // Globals:
 // const quote = {
@@ -306,16 +318,6 @@ import Command from "./CommandClass.js";
 
 // CommandLibrary.addCommand(testCommand, "channel");
 
-export function handleChannelCommand(channel, context, message) {
-  const allCommandsToTry = CommandLibrary.getAllCommandsOfType("channel");
-
-  for (const command of allCommandsToTry) {
-    if (command.tryHandleMessage(channel, context, message.split(" "))) {
-      break;
-    }
-  }
-}
-
 // function handleQuoteCommand(channel, context, message) {
 //   let randomQuote;
 //   let currentAuthor;
@@ -413,180 +415,180 @@ export function handleChannelCommand(channel, context, message) {
 //   overwriteQuotesJson(newQuoteSuccess);
 // }
 
-function handleManCommand(channel, context, message) {
-  if (message[1] === undefined) {
-    server.say(
-      apiData.Bot.CHANNEL,
-      `Sorry @${context.username}, @${apiData.Bot.STREAMER_NICK} already has a man :( Try again?`
-    );
-    return;
-  }
-  let requestedCommand = message[1].startsWith("!")
-    ? message[1].toLowerCase()
-    : "!" + message[1].toLowerCase();
+// function handleManCommand(channel, context, message) {
+//   if (message[1] === undefined) {
+//     server.say(
+//       apiData.Bot.CHANNEL,
+//       `Sorry @${context.username}, @${apiData.Bot.STREAMER_NICK} already has a man :( Try again?`
+//     );
+//     return;
+//   }
+//   let requestedCommand = message[1].startsWith("!")
+//     ? message[1].toLowerCase()
+//     : "!" + message[1].toLowerCase();
 
-  let manMessage;
+//   let manMessage;
 
-  // Check Bot commands for requested command:
-  let commandIndx = botCommands.findIndex(
-    (com) =>
-      com.name == requestedCommand || com.name == requestedCommand.slice(1)
-  );
+//   // Check Bot commands for requested command:
+//   let commandIndx = botCommands.findIndex(
+//     (com) =>
+//       com.name == requestedCommand || com.name == requestedCommand.slice(1)
+//   );
 
-  // Check Channel commands for request command (if not in Bot commands):
-  if (commandIndx !== -1) {
-    manMessage = botCommands[commandIndx].getManual();
-  } else {
-    commandIndx = channelCommands.findIndex(
-      (c) => c.name == requestedCommand || c.name == requestedCommand.slice(1)
-    );
-    if (commandIndx !== -1) {
-      manMessage = channelCommands[commandIndx].getManual();
-    } else {
-      manMessage = "That command doesn't exist, sorry bub.";
-    }
-  }
-  server.say(apiData.Bot.CHANNEL, manMessage);
-  return;
-}
+//   // Check Channel commands for request command (if not in Bot commands):
+//   if (commandIndx !== -1) {
+//     manMessage = botCommands[commandIndx].getManual();
+//   } else {
+//     commandIndx = channelCommands.findIndex(
+//       (c) => c.name == requestedCommand || c.name == requestedCommand.slice(1)
+//     );
+//     if (commandIndx !== -1) {
+//       manMessage = channelCommands[commandIndx].getManual();
+//     } else {
+//       manMessage = "That command doesn't exist, sorry bub.";
+//     }
+//   }
+//   server.say(apiData.Bot.CHANNEL, manMessage);
+//   return;
+// }
 
-function handlePromptCommand(channel, context, message) {
-  if (message[1] === undefined) {
-    server.say(apiData.Bot.CHANNEL, `@${context.username} RTFM!`);
-    return;
-  }
+// function handlePromptCommand(channel, context, message) {
+//   if (message[1] === undefined) {
+//     server.say(apiData.Bot.CHANNEL, `@${context.username} RTFM!`);
+//     return;
+//   }
 
-  // Prep message for promptObj:
-  message.shift();
+//   // Prep message for promptObj:
+//   message.shift();
 
-  if (!isThisInputClean(message)) {
-    server.say(
-      apiData.Bot.CHANNEL,
-      `Your prompt is invalid @${context.username}!`
-    );
-    return;
-  }
+//   if (!isThisInputClean(message)) {
+//     server.say(
+//       apiData.Bot.CHANNEL,
+//       `Your prompt is invalid @${context.username}!`
+//     );
+//     return;
+//   }
 
-  // Create promptObj to be added to DB:
-  const promptObj = Object.create(prompt);
+//   // Create promptObj to be added to DB:
+//   const promptObj = Object.create(prompt);
 
-  promptObj.time = new Date() * 1; // in milliseconds
-  promptObj.prompt = message.join(" ").trimEnd();
-  promptObj.author = context.username;
-  promptObj.completed = 0;
+//   promptObj.time = new Date() * 1; // in milliseconds
+//   promptObj.prompt = message.join(" ").trimEnd();
+//   promptObj.author = context.username;
+//   promptObj.completed = 0;
 
-  // Send promptObj to be added to DB:
-  const wasThePromptAddSuccessful = addPrompt(promptObj);
+//   // Send promptObj to be added to DB:
+//   const wasThePromptAddSuccessful = addPrompt(promptObj);
 
-  wasThePromptAddSuccessful
-    ? newPromptSuccess()
-    : server.say(
-        apiData.Bot.CHANNEL,
-        "Sorry, your prompt didn't make it into the queue :("
-      );
+//   wasThePromptAddSuccessful
+//     ? newPromptSuccess()
+//     : server.say(
+//         apiData.Bot.CHANNEL,
+//         "Sorry, your prompt didn't make it into the queue :("
+//       );
 
-  // a day where i can imitate trshbot is a good day
-  // saratonln
-  // : a day where i can imitate tiddies is a good day
-  // TommyLuco
-  // : maybe trshbot should make some miso soup
-  // Trsh_bot
-  // : a day tiddies i can imitate tiddies is a good day
+//   // a day where i can imitate trshbot is a good day
+//   // saratonln
+//   // : a day where i can imitate tiddies is a good day
+//   // TommyLuco
+//   // : maybe trshbot should make some miso soup
+//   // Trsh_bot
+//   // : a day tiddies i can imitate tiddies is a good day
 
-  // HARASS RANDOM VIEWER
-}
+//   // HARASS RANDOM VIEWER
+// }
 
-const overwriteSelectedJSON = (target, JSONObj, cb) => {
-  const JSONStringData = JSON.stringify(JSONObj);
+// const overwriteSelectedJSON = (target, JSONObj, cb) => {
+//   const JSONStringData = JSON.stringify(JSONObj);
 
-  fs.writeFile(target, JSONStringData, "utf-8", (err) => {
-    if (err) {
-      console.error(`Unable to write object to file. Error: ${err}`);
-    } else {
-      cb?.();
-      console.log(`Success writing obje to file: ${target}`);
-    }
-  });
-};
+//   fs.writeFile(target, JSONStringData, "utf-8", (err) => {
+//     if (err) {
+//       console.error(`Unable to write object to file. Error: ${err}`);
+//     } else {
+//       cb?.();
+//       console.log(`Success writing obje to file: ${target}`);
+//     }
+//   });
+// };
 
-function overwritePromptJson(cb) {
-  // overwriteSelectedJSON("./promptQueue.json", promptQueueData, cb);
-}
+// function overwritePromptJson(cb) {
+//   // overwriteSelectedJSON("./promptQueue.json", promptQueueData, cb);
+// }
 
-function overwriteQuotesJson(cb) {
-  overwriteSelectedJSON("./data/quotesDB.json", quotesDBData, cb);
-}
+// function overwriteQuotesJson(cb) {
+//   overwriteSelectedJSON("./data/quotesDB.json", quotesDBData, cb);
+// }
 
-// handleGetPrompt()
-async function handleTiddies() {
-  let currentPromptInQueue;
-  try {
-    currentPromptInQueue = await getPromptFromDB();
-    if (!currentPromptInQueue) {
-      server.say(
-        apiData.Bot.CHANNEL,
-        "There are no more prompts in the queue :("
-      );
-      return;
-    }
-  } catch (err) {
-    server.say(
-      apiData.Bot.CHANNEL,
-      "Oops! There was an error getting the next prompt"
-    );
-    console.log("Error: getting prompt from DB! " + err);
-    return;
-  }
+// // handleGetPrompt()
+// async function handleTiddies() {
+//   let currentPromptInQueue;
+//   try {
+//     currentPromptInQueue = await getPromptFromDB();
+//     if (!currentPromptInQueue) {
+//       server.say(
+//         apiData.Bot.CHANNEL,
+//         "There are no more prompts in the queue :("
+//       );
+//       return;
+//     }
+//   } catch (err) {
+//     server.say(
+//       apiData.Bot.CHANNEL,
+//       "Oops! There was an error getting the next prompt"
+//     );
+//     console.log("Error: getting prompt from DB! " + err);
+//     return;
+//   }
 
-  server.say(
-    apiData.Bot.CHANNEL,
-    `'${currentPromptInQueue.prompt}' - by ${currentPromptInQueue.author}`
-  );
+//   server.say(
+//     apiData.Bot.CHANNEL,
+//     `'${currentPromptInQueue.prompt}' - by ${currentPromptInQueue.author}`
+//   );
 
-  try {
-    await markPromptIncomplete(currentPromptInQueue.rowid);
-  } catch (err) {
-    console.log("Error: marking prompt as complete! " + err);
-    return;
-  }
-  return;
-}
+//   try {
+//     await markPromptIncomplete(currentPromptInQueue.rowid);
+//   } catch (err) {
+//     console.log("Error: marking prompt as complete! " + err);
+//     return;
+//   }
+//   return;
+// }
 
-export function isThisInputClean(message) {
-  const lastWord = message[0].split(""); //firstWord
+// export function isThisInputClean(message) {
+//   const lastWord = message[0].split(""); //firstWord
 
-  if (
-    lastWord[0] === "!" ||
-    lastWord[0] === "/" ||
-    lastWord[0] === "." ||
-    lastWord[0] === "'" ||
-    lastWord[0] === `"` ||
-    lastWord[0] === "`" ||
-    lastWord[0] === "-" ||
-    lastWord[0] === "#"
-  ) {
-    return false;
-  }
+//   if (
+//     lastWord[0] === "!" ||
+//     lastWord[0] === "/" ||
+//     lastWord[0] === "." ||
+//     lastWord[0] === "'" ||
+//     lastWord[0] === `"` ||
+//     lastWord[0] === "`" ||
+//     lastWord[0] === "-" ||
+//     lastWord[0] === "#"
+//   ) {
+//     return false;
+//   }
 
-  if (message.length > 1 || message[1] !== undefined) {
-    for (const word of message) {
-      const wordArr = word.split("");
+//   if (message.length > 1 || message[1] !== undefined) {
+//     for (const word of message) {
+//       const wordArr = word.split("");
 
-      if (wordArr.includes("#")) {
-        return false;
-      }
+//       if (wordArr.includes("#")) {
+//         return false;
+//       }
 
-      let dashIndx = wordArr.findIndex((x) => (x = "-"));
-      if (dashIndx !== -1) {
-        if (wordArr[dashIndx + 1] === "-" || wordArr[dashIndx + 1] === "-") {
-          return false;
-        }
-      }
-    }
-  }
+//       let dashIndx = wordArr.findIndex((x) => (x = "-"));
+//       if (dashIndx !== -1) {
+//         if (wordArr[dashIndx + 1] === "-" || wordArr[dashIndx + 1] === "-") {
+//           return false;
+//         }
+//       }
+//     }
+//   }
 
-  return true;
-}
+//   return true;
+// }
 
 // /*
 // Channel commands:
