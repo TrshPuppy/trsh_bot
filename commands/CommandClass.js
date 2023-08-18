@@ -76,13 +76,17 @@ function handleTestCommand(ch, co, msg) {
 }
 
 const testCommand = new Command("!tiddies", [], handleTestCommand);
+testCommand.addManual("RTFM!");
 export const commandLibrary = [];
+
 commandLibrary.push(testCommand);
 
 // Commands:
 const manCommand = new Command("!man", [], handleManCommand);
 manCommand.addManual("!man <command>");
-commandLibrary.push(Command);
+commandLibrary.push(manCommand);
+
+const maleCommand = new Command("!male", [], handleMaleCommand);
 
 function handleManCommand(ch, co, msg) {
   if (msg[1] === undefined) {
@@ -108,11 +112,11 @@ function handleManCommand(ch, co, msg) {
   if (commandIndx !== -1) {
     manMessage = commandLibrary[commandIndx].getManual();
   } else {
-    commandIndx = channelCommands.findIndex(
+    commandIndx = commandLibrary.findIndex(
       (c) => c.name == requestedCommand || c.name == requestedCommand.slice(1)
     );
     if (commandIndx !== -1) {
-      manMessage = channelCommands[commandIndx].getManual();
+      manMessage = commandLibrary[commandIndx].getManual();
     } else {
       manMessage = "That command doesn't exist, sorry bub.";
     }
@@ -120,3 +124,5 @@ function handleManCommand(ch, co, msg) {
   server.say(apiData.Bot.CHANNEL, manMessage);
   return;
 }
+
+function handleMaleCommand(ch, co, msg) {}
