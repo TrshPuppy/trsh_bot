@@ -70,13 +70,53 @@ export default class Command {
 }
 
 //testCommand command:
-function handleTestCommand(ch, co, ms) {
+function handleTestCommand(ch, co, msg) {
   server.say(apiData.Bot.CHANNEL, "Hello Tiddies, it's me trshbot");
   console.log("tiddies");
 }
 
 const testCommand = new Command("!tiddies", [], handleTestCommand);
-export const testLibrary = [];
-testLibrary.push(testCommand);
+export const commandLibrary = [];
+commandLibrary.push(testCommand);
 
-// // CommandLibrary.addCommand(testCommand, "channel");
+// Commands:
+const manCommand = new Command("!man", [], handleManCommand);
+manCommand.addManual("!man <command>");
+commandLibrary.push(Command);
+
+function handleManCommand(ch, co, msg) {
+  if (msg[1] === undefined) {
+    server.say(
+      apiData.Bot.CHANNEL,
+      `Sorry @${co.username}, @${apiData.Bot.STREAMER_NICK} already has a man :( Try again?`
+    );
+    return;
+  }
+  let requestedCommand = msg[1].startsWith("!")
+    ? msg[1].toLowerCase()
+    : "!" + msg[1].toLowerCase();
+
+  let manMessage;
+
+  // Check Bot commands for requested command:
+  let commandIndx = commandLibrary.findIndex(
+    (com) =>
+      com.name == requestedCommand || com.name == requestedCommand.slice(1)
+  );
+
+  // Check Channel commands for request command (if not in Bot commands):
+  if (commandIndx !== -1) {
+    manMessage = commandLibrary[commandIndx].getManual();
+  } else {
+    commandIndx = channelCommands.findIndex(
+      (c) => c.name == requestedCommand || c.name == requestedCommand.slice(1)
+    );
+    if (commandIndx !== -1) {
+      manMessage = channelCommands[commandIndx].getManual();
+    } else {
+      manMessage = "That command doesn't exist, sorry bub.";
+    }
+  }
+  server.say(apiData.Bot.CHANNEL, manMessage);
+  return;
+}
