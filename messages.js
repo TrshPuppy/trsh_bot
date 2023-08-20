@@ -17,7 +17,7 @@ export default function delegateMessage(channel, tags, message, self) {
   let command = args.shift();
   command = command.split("");
   command.shift();
-  command = command.join("");
+  command = command.join("").toLowerCase();
 
   let context = {
     channel,
@@ -31,7 +31,17 @@ export default function delegateMessage(channel, tags, message, self) {
   try {
     commands[command].exe(context);
   } catch (e) {
-    console.log("this is an error: " + e);
+    for (let com in commands) {
+      const foundIndx = com["aliases"]
+        ? com["aliases"].findIndex((x) => {
+            x === command.toString();
+          })
+        : -1;
+      if (foundIndx !== -1) {
+        com.exe(context);
+        break;
+      }
+    }
   }
 }
 
@@ -43,7 +53,7 @@ const commands = {
         server.say(
           apiData.Bot.CHANNEL,
           `Sorry @${contextObj.tags["display-name"]}, @${apiData.Bot.STREAMER_NICK} already has a man
-          :( Try again?)`
+          :( Try again?`
         );
       }
       server.say(
@@ -52,8 +62,168 @@ const commands = {
       );
     },
     manual: () => {
-      return "syntax: !man <command>";
+      return "Get the manual on any command. Syntax: !man <command>";
     },
+  },
+  male: {
+    exe: (contextObj) => {
+      server.say(apiData.Bot.CHANNEL, "BORK! BORK! BORK!");
+    },
+    manual: () => {
+      return "Syntax: BORK BORK BORK!!";
+    },
+  },
+  mail: {
+    exe: (contextObj) => commands.male.exe(contextObj),
+    manual: () => commands.male.manual(),
+  },
+  claw: {
+    exe: (context) => {
+      server.say(
+        apiData.Bot.CHANNEL,
+        " If you think you like the Trash Heap, you're gonna love the Claw! --> https://www.theclaw.team <-- We code, we build stuff, we love tech!"
+      );
+    },
+    manual: () => {
+      return "Find out about the Claw stream team!";
+    },
+  },
+  lurk: {
+    exe: (context) => {
+      server.say(
+        apiData.Bot.CHANNEL,
+        `Puppies are such a handful... @${context.tags["display-name"]} has gone to eat some flooring! At least it'll tire them out.`
+      );
+    },
+    manual: () => {
+      return "Syntax: !lurk";
+    },
+  },
+  unlurk: {
+    exe: (context) => {
+      server.say(
+        apiData.Bot.CHANNEL,
+        `@${context.tags["display-name"]} has returned from chewing up the floor. Hope you're feeling happy and full @${context.tags["display-name"]}!`
+      );
+    },
+    manual: () => {
+      return "Syntax: !unlurk";
+    },
+  },
+  kata: {
+    exe: (con) => {
+      server.say(
+        apiData.Bot.CHANNEL,
+        "This is the kata we're doing right now --> https://www.codewars.com/kata/5648b12ce68d9daa6b000099/train/go"
+      );
+    },
+    manual: () => {
+      return "Get the current Codewars kata. Syntax: !kata";
+    },
+  },
+  codewars: {
+    exe: (c) => commands.kata.exe(c),
+    manual: () => commands.kata.manual(),
+  },
+  clan: {
+    exe: (c) => {
+      server.say(
+        apiData.Bot.CHANNEL,
+        "Join our Codewars clan! Go to: Codewars --> Account Settings --> Clan --> then type in 'TrshPuppies'."
+      );
+    },
+    manual: () => {
+      return "Get instructions to join the TrashPuppies Codewars clan. Syntax: !clan";
+    },
+  },
+  mom: {
+    exe: (c) => {
+      server.say(
+        apiData.Bot.CHANNEL,
+        "Check out my spooky podcast which I co-host with my cousin! --> https://www.twitch.tv/hauntzncreepz --> https://open.spotify.com/show/7hcpFnIoWhveRQeNRTNpbM"
+      );
+    },
+    manual: () => {
+      return "Find out about my podcast. Syntax: !hnc";
+    },
+  },
+  music: {
+    exe: (c) => {
+      server.say(
+        apiData.Bot.CHANNEL,
+        "We're listening to some tasty lofi from Chillhop --> https://chillhop.com"
+      );
+    },
+    manual: () => {
+      return "Want to know what we're listening to? Syntax: !music";
+    },
+  },
+  song: {
+    exe: (c) => commands.music.exe(c),
+    manual: () => commands.music.manual(),
+  },
+  playlist: {
+    exe: (c) => commands.music.exe(c),
+    manual: () => commands.music.manual(),
+  },
+  project: {
+    exe: (c) => {
+      server.say(
+        apiData.Bot.CHANNEL,
+        "Today we're working on @trsh_bot --> https://github.com/trshpuppy/trsh_bot"
+      );
+    },
+    manual: () => {
+      return "Find out what we're working on today. Syntax: !project";
+    },
+  },
+  today: {
+    exe: (c) => commands.project.exe(c),
+    manual: () => commands.project.manual(),
+  },
+  about: {
+    exe: (c) => {
+      server.say(
+        apiData.Bot.CHANNEL,
+        `Hey ${c.tags["display-name"]}! Welcome to my trash heap! TP is a former ER nurse
+      learning coding and cybersecurity. All you really need to know is the struggle is real, everything IS
+      in fact on fire, and you're welcome to chill as long as you like :)`
+      );
+    },
+    manual: () => {
+      return "Find out about TP. Syntax: !about";
+    },
+  },
+  whoami: {
+    exe: (c) => commands.about.exe(c),
+    manual: () => commands.about.manual(),
+  },
+  theme: {
+    exe: (c) => {
+      server.say(
+        apiData.Bot.CHANNEL,
+        `TP is using the Vibrancy Continued Extension in VSCode.
+      You can check it out here --> https://github.com/illixion/vscode-vibrancy-continued`
+      );
+    },
+    manual: () => {
+      return "Find out about TP's VSCode theme";
+    },
+  },
+  yt: {
+    exe: (c) => {
+      server.say(
+        apiData.Bot.CHANNEL,
+        "Checkout my newest YT video: 'My 1st Tech Interview was for a Senior Position'! --> https://www.youtube.com/watch?v=V1MkBvpD-xw"
+      );
+    },
+    manual: () => {
+      return "Find out about my latest YouTube video.";
+    },
+  },
+  youtube: {
+    exe: (c) => commands.yt.exe(c),
+    manual: () => commands.yt.manual(),
   },
 };
 
