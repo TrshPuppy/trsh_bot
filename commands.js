@@ -274,7 +274,7 @@ const behaveCommand = new ChannelCommand(
 );
 
 const projectCommand = new ChannelCommand("!project", [], () => {
-  server.say(apiData.Bot.CHANNEL, "Today we're learning Golang!");
+  server.say(apiData.Bot.CHANNEL, "Today we're hacking into a box made by @overgrowncarrot1 --> https://app.vagrantup.com/overgrowncarrot1/boxes/TrshPuppy1");
 });
 projectCommand.addAlias(["!today", `!project`]);
 
@@ -336,7 +336,7 @@ whoamiCommand.addAlias(["!whoami", "!trshpuppy"]);
 const YTCommand = new ChannelCommand("!yt", [], (ch, co, msg) => {
   server.say(
     apiData.Bot.CHANNEL,
-    "Checkout my newest video on YT, all about Codewars! --> https://www.youtube.com/watch?v=wTIcR4GxQrI"
+    "Checkout my newest video on YT, all about my first Tech Interview! --> https://www.youtube.com/watch?v=wTIcR4GxQrI"
   );
 });
 YTCommand.addAlias(["!youtube"]);
@@ -348,6 +348,14 @@ const themeCommand = new ChannelCommand("!theme", [], (ch, co, msg) => {
   You can check it out here --> https://github.com/illixion/vscode-vibrancy-continued`
   );
 });
+
+const nerdCommand = new ChannelCommand("!nerd", [], (ch, co, msg) => {
+  server.say(
+    apiData.Bot.CHANNEL,
+    `TP is such a nerd she's pushed her entire Obsidian directory of notes to GitHub so you can use and reference them! --> https://github.com/TrshPuppy/obsidian-notes`
+  );
+});
+nerdCommand.addAlias(["!notes", "!obsidian", "!obsidiannotes"])
 
 /* .......................................... TIMED MESSAGES ..............................................*/
 // const YTMessage = new TimerCommand(
@@ -383,7 +391,8 @@ channelCommands.push(
   maleCommand,
   whoamiCommand,
   YTCommand,
-  themeCommand
+  themeCommand,
+  nerdCommand
 );
 
 const commandsCommand = new ChannelCommand("!commands", [], (ch, co, msg) => {
