@@ -45,11 +45,28 @@ const commands = {
           `Sorry @${contextObj.tags["display-name"]}, @${apiData.Bot.STREAMER_NICK} already has a man
           :( Try again?`
         );
+        return;
+      } else {
+        const commandManualed = contextObj.args[0];
+        try {
+          server.say(
+            apiData.Bot.CHANNEL,
+            `${commands[commandManualed].manual()}`
+          );
+        } catch (e) {
+          console.log(`ERROR in commands.man.exe: ${e}`);
+          const alias = findCommandByAlias(commandManualed);
+          if (alias) {
+            server.say(apiData.Bot.CHANNEL, `${commands[alias].manual()}`);
+          } else {
+            server.say(
+              apiData.Bot.CHANNEL,
+              `Sorry @${contextObj.tags["display-name"]}, there's no manual for that ocmmand because it doesn't exist :/`
+            );
+          }
+        }
       }
-      server.say(
-        apiData.Bot.CHANNEL,
-        `${commands[contextObj.args[0]].manual()}`
-      );
+      return;
     },
     manual: () => {
       return "Get the manual on any command. Syntax: !man <command>";
@@ -85,7 +102,7 @@ const commands = {
       );
     },
     manual: () => {
-      return "Syntax: !lurk";
+      return "Let everyone know you're hungry for some flooring & will be back to chat in a bit. Syntax: !lurk";
     },
     aliases: () => [],
   },
@@ -218,23 +235,36 @@ function handleChannelCommand(channel, tags, message, self) {
   };
 
   console.log("command= " + command + "command type = " + typeof command);
-
-  try {
-    commands[command].exe(context);
-  } catch (e) {
-    for (const [ky, val] of Object.entries(commands)) {
-      const als = val["aliases"]();
-      let found = als.findIndex((x) => x == command);
-      if (found !== -1) {
-        commands[ky].exe(context);
-        return;
+  if (command)
+    try {
+      commands[command].exe(context);
+    } catch (e) {
+      console.log(`errror = ${e}`);
+      for (const [ky, val] of Object.entries(commands)) {
+        const als = val["aliases"]();
+        let found = als.findIndex((x) => x == command);
+        if (found !== -1) {
+          commands[ky].exe(context);
+          return;
+        }
       }
+      server.say(
+        apiData.Bot.CHANNEL,
+        `Sorry @${tags["display-name"]}, that command doesn't exist :(`
+      );
     }
-    server.say(
-      apiData.Bot.CHANNEL,
-      `Sorry @${tags["display-name"]}, that command doesn't exist :(`
-    );
+}
+
+// Return a command from the commands object by finding it, or finding its alias:
+function findCommandByAlias(command) {
+  for (const [ky, val] of Object.entries(commands)) {
+    const als = val["aliases"]();
+    let found = als.findIndex((x) => x == command);
+    if (found !== -1) {
+      return ky;
+    }
   }
+  return 0;
 }
 
 // Module globals:
