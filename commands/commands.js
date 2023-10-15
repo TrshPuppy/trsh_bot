@@ -16,17 +16,17 @@
 // import Command from "./CommandClass.js";
 // import quotesDBData from "../data/quotesDB.json" assert { type: "json" };
 
-import { commandLibrary } from "./CommandClass.js";
+// import { commandLibrary } from "./CommandClass.js";
 
-export function handleChannelCommand(channel, context, message) {
-  // const allCommandsToTry = CommandLibrary.getAllCommandsOfType("channel");
+// export function handleChannelCommand(channel, context, message) {
+//   // const allCommandsToTry = CommandLibrary.getAllCommandsOfType("channel");
 
-  for (const command of commandLibrary) {
-    if (command.tryHandleMessage(channel, context, message.split(" "))) {
-      break;
-    }
-  }
-}
+//   for (const command of commandLibrary) {
+//     if (command.tryHandleMessage(channel, context, message.split(" "))) {
+//       break;
+//     }
+//   }
+// }
 
 // // Globals:
 // const quote = {

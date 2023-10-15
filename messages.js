@@ -6,43 +6,33 @@
 // Imports:
 import { server } from "./server.js";
 import nlp from "compromise";
-import { handleChannelCommand } from "./commands/commands.js";
+// import { handleChannelCommand } from "./commands/commands.js";
 import apiData from "./data/api.json" assert { type: "json" };
 
 export default function delegateMessage(channel, tags, message, self) {
-  if (!message.startsWith("!")) return;
-
-  // get the name of the command to access it in the commands obj:
-  let args = message.split(" ");
-  let command = args.shift();
-  command = command.split("");
-  command.shift();
-  command = command.join("").toLowerCase();
-
-  let context = {
-    channel,
-    tags,
-    args,
-    self,
-  };
-
-  console.log("command= " + command);
-
-  try {
-    commands[command].exe(context);
-  } catch (e) {
-    for (let com in commands) {
-      const foundIndx = com["aliases"]
-        ? com["aliases"].findIndex((x) => {
-            x === command.toString();
-          })
-        : -1;
-      if (foundIndx !== -1) {
-        com.exe(context);
-        break;
-      }
-    }
+  if (self == true) {
+    return;
   }
+
+  console.log(`message starts with ${message[0]}`);
+
+  switch (message[0]) {
+    case "/":
+      return;
+    case ".":
+      return;
+    case ";":
+      return;
+    case "!":
+      handleChannelCommand(channel, tags, message, self);
+      break;
+    case "@":
+      return;
+    default:
+      checkForKeyWordMessage(channel, tags, message, self);
+      break;
+  }
+  return;
 }
 
 // commmands['man'].exe(contextObj)
@@ -64,6 +54,7 @@ const commands = {
     manual: () => {
       return "Get the manual on any command. Syntax: !man <command>";
     },
+    aliases: [],
   },
   male: {
     exe: (contextObj) => {
@@ -72,11 +63,13 @@ const commands = {
     manual: () => {
       return "Syntax: BORK BORK BORK!!";
     },
+    aliases: ["mail"],
   },
-  mail: {
-    exe: (contextObj) => commands.male.exe(contextObj),
-    manual: () => commands.male.manual(),
-  },
+  // mail: {
+  //   exe: (contextObj) => commands.male.exe(contextObj),
+  //   manual: () => commands.male.manual(),
+  //   aliases:[]
+  // },
   claw: {
     exe: (context) => {
       server.say(
@@ -87,6 +80,7 @@ const commands = {
     manual: () => {
       return "Find out about the Claw stream team!";
     },
+    aliases: [],
   },
   lurk: {
     exe: (context) => {
@@ -98,6 +92,7 @@ const commands = {
     manual: () => {
       return "Syntax: !lurk";
     },
+    aliases: [],
   },
   unlurk: {
     exe: (context) => {
@@ -109,6 +104,7 @@ const commands = {
     manual: () => {
       return "Syntax: !unlurk";
     },
+    aliases: [],
   },
   kata: {
     exe: (con) => {
@@ -120,11 +116,12 @@ const commands = {
     manual: () => {
       return "Get the current Codewars kata. Syntax: !kata";
     },
+    aliases: [],
   },
-  codewars: {
-    exe: (c) => commands.kata.exe(c),
-    manual: () => commands.kata.manual(),
-  },
+  // codewars: {
+  //   exe: (c) => commands.kata.exe(c),
+  //   manual: () => commands.kata.manual(),
+  // },
   clan: {
     exe: (c) => {
       server.say(
@@ -135,6 +132,7 @@ const commands = {
     manual: () => {
       return "Get instructions to join the TrashPuppies Codewars clan. Syntax: !clan";
     },
+    aliases: [],
   },
   mom: {
     exe: (c) => {
@@ -146,6 +144,7 @@ const commands = {
     manual: () => {
       return "Find out about my podcast. Syntax: !hnc";
     },
+    aliases: ["bigdog"],
   },
   music: {
     exe: (c) => {
@@ -157,15 +156,16 @@ const commands = {
     manual: () => {
       return "Want to know what we're listening to? Syntax: !music";
     },
+    aliases: ["song", "playlist"],
   },
-  song: {
-    exe: (c) => commands.music.exe(c),
-    manual: () => commands.music.manual(),
-  },
-  playlist: {
-    exe: (c) => commands.music.exe(c),
-    manual: () => commands.music.manual(),
-  },
+  // song: {
+  //   exe: (c) => commands.music.exe(c),
+  //   manual: () => commands.music.manual(),
+  // },
+  // playlist: {
+  //   exe: (c) => commands.music.exe(c),
+  //   manual: () => commands.music.manual(),
+  // },
   project: {
     exe: (c) => {
       server.say(
@@ -176,11 +176,12 @@ const commands = {
     manual: () => {
       return "Find out what we're working on today. Syntax: !project";
     },
+    aliases: ["today"],
   },
-  today: {
-    exe: (c) => commands.project.exe(c),
-    manual: () => commands.project.manual(),
-  },
+  // today: {
+  //   exe: (c) => commands.project.exe(c),
+  //   manual: () => commands.project.manual(),
+  // },
   about: {
     exe: (c) => {
       server.say(
@@ -193,11 +194,12 @@ const commands = {
     manual: () => {
       return "Find out about TP. Syntax: !about";
     },
+    aliases: ["whoami"],
   },
-  whoami: {
-    exe: (c) => commands.about.exe(c),
-    manual: () => commands.about.manual(),
-  },
+  // whoami: {
+  //   exe: (c) => commands.about.exe(c),
+  //   manual: () => commands.about.manual(),
+  // },
   theme: {
     exe: (c) => {
       server.say(
@@ -209,6 +211,7 @@ const commands = {
     manual: () => {
       return "Find out about TP's VSCode theme";
     },
+    aliases: [],
   },
   yt: {
     exe: (c) => {
@@ -220,14 +223,54 @@ const commands = {
     manual: () => {
       return "Find out about my latest YouTube video.";
     },
+    aliases: ["youtube"],
   },
-  youtube: {
-    exe: (c) => commands.yt.exe(c),
-    manual: () => commands.yt.manual(),
-  },
+  // youtube: {
+  //   exe: (c) => commands.yt.exe(c),
+  //   manual: () => commands.yt.manual(),
+  // },
 };
 
-// // Module globals:
+function handleChannelCommand(channel, tags, message, self) {
+  // get the name of the command to access it in the commands obj:
+  let args = message.split(" ");
+  let command = args.shift();
+  command = command.split("");
+  command.shift();
+  command = command.join("").toLowerCase();
+
+  let context = {
+    channel,
+    tags,
+    args,
+    self,
+  };
+
+  console.log("command= " + command);
+
+  try {
+    commands[command].exe(context);
+  } catch (e) {
+    let coms = Object.keys(commands);
+
+    coms.forEach((com) => {
+      console.log(commands[com].aliases);
+      const foundIndx = commands[com].aliases.find((x) => {
+        console.log(`x = ${typeof x}, command = ${typeof command}`);
+        x == command;
+      });
+      console.log(`found index ${foundIndx}`);
+
+      if (foundIndx !== undefined) {
+        console.log("FOUND!!!!!!!!!!!!!!!!!!!!!!");
+        commands[com].exe(context);
+      }
+      return;
+    });
+  }
+}
+
+// Module globals:
 // let Fred = new Date(0); // lastKeywordTime
 // let keywordLessMessages = 0;
 
@@ -357,39 +400,38 @@ const commands = {
 //   return true;
 // }
 
-/*
- * Here is an example of what TMI.js gives us when its "message" event handler fires off:
- * See the delegateMessage() function at the top of this module, but simply:
- * this is an array containing the ["channel", context{}, "messge"].
- * The context object is the most useful as you can use the info in it to
- * navigate how the bot responds to the message.
- *
- * [
- *  '#trshpuppy',
- *  {
- *    'badge-info': { subscriber: '4' },
- *    badges: { broadcaster: '1', subscriber: '3000' },
- *    'client-nonce': 'x',
- *    color: '#8A2BE2',
- *    'display-name': 'TrshPuppy',
- *    emotes: null,
- *    'first-msg': false,
- *    flags: null,
- *    id: 'x-x-x',
- *   mod: false,
- *  'returning-chatter': false,
- *    'room-id': 'x',
- *    subscriber: true,
- *    'tmi-sent-ts': 'x',
- *    turbo: false,
- *    'user-id': 'x',
- *    'user-type': null,
- *    'emotes-raw': null,
- *    'badge-info-raw': 'subscriber/4',
- *    'badges-raw': 'broadcaster/1,subscriber/3000',
- *    username: 'trshpuppy',
- *    'message-type': 'chat'
- *  },
- *  'tiddies'
- * ]
- */
+// /*
+//  * Here is an example of what TMI.js gives us when its "message" event handler fires off:
+//  * See the delegateMessage() function at the top of this module, but simply:
+//  * this is an array containing the ["channel", context{}, "messge"].
+//  * The context object is the most useful as you can use the info in it to
+//  * navigate how the bot responds to the message.
+//  *
+//  * [
+//  *  '#trshpuppy',
+//  *  {
+//  *    'badge-info': { subscriber: '4' },
+//  *    badges: { broadcaster: '1', subscriber: '3000' },
+//  *    'client-nonce': 'x',
+//  *    color: '#8A2BE2',
+//  *    'display-name': 'TrshPuppy',
+//  *    emotes: null,
+//  *    'first-msg': false,
+//  *    flags: null,
+//  *    id: 'x-x-x',
+//  *   mod: false,
+//  *  'returning-chatter': false,
+//  *    'room-id': 'x',
+//  *    subscriber: true,
+//  *    'tmi-sent-ts': 'x',
+//  *    turbo: false,
+//  *    'user-id': 'x',
+//  *    'user-type': null,
+//  *    'emotes-raw': null,
+//  *    'badge-info-raw': 'subscriber/4',
+//  *    'badges-raw': 'broadcaster/1,subscriber/3000',
+//  *    username: 'trshpuppy',
+//  *    'message-type': 'chat'
+//  *  },
+//  *  'tiddies'
+//  *
