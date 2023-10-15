@@ -54,7 +54,7 @@ const commands = {
     manual: () => {
       return "Get the manual on any command. Syntax: !man <command>";
     },
-    aliases: [],
+    aliases: () => [],
   },
   male: {
     exe: (contextObj) => {
@@ -63,13 +63,8 @@ const commands = {
     manual: () => {
       return "Syntax: BORK BORK BORK!!";
     },
-    aliases: ["mail"],
+    aliases: () => ["mail"],
   },
-  // mail: {
-  //   exe: (contextObj) => commands.male.exe(contextObj),
-  //   manual: () => commands.male.manual(),
-  //   aliases:[]
-  // },
   claw: {
     exe: (context) => {
       server.say(
@@ -80,7 +75,7 @@ const commands = {
     manual: () => {
       return "Find out about the Claw stream team!";
     },
-    aliases: [],
+    aliases: () => [],
   },
   lurk: {
     exe: (context) => {
@@ -92,7 +87,7 @@ const commands = {
     manual: () => {
       return "Syntax: !lurk";
     },
-    aliases: [],
+    aliases: () => [],
   },
   unlurk: {
     exe: (context) => {
@@ -104,7 +99,7 @@ const commands = {
     manual: () => {
       return "Syntax: !unlurk";
     },
-    aliases: [],
+    aliases: () => [],
   },
   kata: {
     exe: (con) => {
@@ -116,12 +111,8 @@ const commands = {
     manual: () => {
       return "Get the current Codewars kata. Syntax: !kata";
     },
-    aliases: [],
+    aliases: () => [],
   },
-  // codewars: {
-  //   exe: (c) => commands.kata.exe(c),
-  //   manual: () => commands.kata.manual(),
-  // },
   clan: {
     exe: (c) => {
       server.say(
@@ -132,7 +123,7 @@ const commands = {
     manual: () => {
       return "Get instructions to join the TrashPuppies Codewars clan. Syntax: !clan";
     },
-    aliases: [],
+    aliases: () => [],
   },
   mom: {
     exe: (c) => {
@@ -144,7 +135,7 @@ const commands = {
     manual: () => {
       return "Find out about my podcast. Syntax: !hnc";
     },
-    aliases: ["bigdog"],
+    aliases: () => ["bigdog"],
   },
   music: {
     exe: (c) => {
@@ -156,16 +147,8 @@ const commands = {
     manual: () => {
       return "Want to know what we're listening to? Syntax: !music";
     },
-    aliases: ["song", "playlist"],
+    aliases: () => ["song", "playlist"],
   },
-  // song: {
-  //   exe: (c) => commands.music.exe(c),
-  //   manual: () => commands.music.manual(),
-  // },
-  // playlist: {
-  //   exe: (c) => commands.music.exe(c),
-  //   manual: () => commands.music.manual(),
-  // },
   project: {
     exe: (c) => {
       server.say(
@@ -176,12 +159,8 @@ const commands = {
     manual: () => {
       return "Find out what we're working on today. Syntax: !project";
     },
-    aliases: ["today"],
+    aliases: () => ["today"],
   },
-  // today: {
-  //   exe: (c) => commands.project.exe(c),
-  //   manual: () => commands.project.manual(),
-  // },
   about: {
     exe: (c) => {
       server.say(
@@ -194,12 +173,8 @@ const commands = {
     manual: () => {
       return "Find out about TP. Syntax: !about";
     },
-    aliases: ["whoami"],
+    aliases: () => ["whoami"],
   },
-  // whoami: {
-  //   exe: (c) => commands.about.exe(c),
-  //   manual: () => commands.about.manual(),
-  // },
   theme: {
     exe: (c) => {
       server.say(
@@ -211,7 +186,7 @@ const commands = {
     manual: () => {
       return "Find out about TP's VSCode theme";
     },
-    aliases: [],
+    aliases: () => [],
   },
   yt: {
     exe: (c) => {
@@ -223,12 +198,8 @@ const commands = {
     manual: () => {
       return "Find out about my latest YouTube video.";
     },
-    aliases: ["youtube"],
+    aliases: () => ["youtube"],
   },
-  // youtube: {
-  //   exe: (c) => commands.yt.exe(c),
-  //   manual: () => commands.yt.manual(),
-  // },
 };
 
 function handleChannelCommand(channel, tags, message, self) {
@@ -246,27 +217,23 @@ function handleChannelCommand(channel, tags, message, self) {
     self,
   };
 
-  console.log("command= " + command);
+  console.log("command= " + command + "command type = " + typeof command);
 
   try {
     commands[command].exe(context);
   } catch (e) {
-    let coms = Object.keys(commands);
-
-    coms.forEach((com) => {
-      console.log(commands[com].aliases);
-      const foundIndx = commands[com].aliases.find((x) => {
-        console.log(`x = ${typeof x}, command = ${typeof command}`);
-        x == command;
-      });
-      console.log(`found index ${foundIndx}`);
-
-      if (foundIndx !== undefined) {
-        console.log("FOUND!!!!!!!!!!!!!!!!!!!!!!");
-        commands[com].exe(context);
+    for (const [ky, val] of Object.entries(commands)) {
+      const als = val["aliases"]();
+      let found = als.findIndex((x) => x == command);
+      if (found !== -1) {
+        commands[ky].exe(context);
+        return;
       }
-      return;
-    });
+    }
+    server.say(
+      apiData.Bot.CHANNEL,
+      `Sorry @${tags["display-name"]}, that command doesn't exist :(`
+    );
   }
 }
 
