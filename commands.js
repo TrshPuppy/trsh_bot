@@ -255,7 +255,7 @@ const hncCommand = new ChannelCommand("!hnc", [], () => {
 const musicCommand = new ChannelCommand("!music", [], () => {
   server.say(
     apiData.Bot.CHANNEL,
-    "We're listening to the delicious synthwave of White Bat Audio --> https://whitebataudio.com/"
+    "We're listening to the some Friday the 13th lofi! --> https://www.youtube.com/watch?v=_fVRA6XnvYc"
   );
 });
 musicCommand.addAlias(["!song", "!playlist"]);
@@ -274,9 +274,12 @@ const behaveCommand = new ChannelCommand(
 );
 
 const projectCommand = new ChannelCommand("!project", [], () => {
-  server.say(apiData.Bot.CHANNEL, "Today we're hacking into a box made by @overgrowncarrot1 --> https://app.vagrantup.com/overgrowncarrot1/boxes/TrshPuppy1");
+  server.say(
+    apiData.Bot.CHANNEL,
+    "Today we're hacking HTB Vaccine! --> https://app.hackthebox.com/starting-point"
+  );
 });
-projectCommand.addAlias(["!today", `!project`]);
+projectCommand.addAlias(["!today", `!project`, "!htb"]);
 
 const htbCommand = new ChannelCommand("!htb", [], () => {
   server.say(
@@ -355,7 +358,7 @@ const nerdCommand = new ChannelCommand("!nerd", [], (ch, co, msg) => {
     `TP is such a nerd she's pushed her entire Obsidian directory of notes to GitHub so you can use and reference them! --> https://github.com/TrshPuppy/obsidian-notes`
   );
 });
-nerdCommand.addAlias(["!notes", "!obsidian", "!obsidiannotes"])
+nerdCommand.addAlias(["!notes", "!obsidian", "!obsidiannotes"]);
 
 /* .......................................... TIMED MESSAGES ..............................................*/
 // const YTMessage = new TimerCommand(
@@ -372,7 +375,7 @@ botCommands.push(yesCommand, noCommand, hiCommand, breakTheUniverseCommand);
 channelCommands.push(
   manCommand,
   quoteCommand,
-  addQuoteCommand,
+  //addQuoteCommand,
   getPrompt,
   promptCommand,
   clawCommand,
@@ -385,7 +388,7 @@ channelCommands.push(
   musicCommand,
   behaveCommand,
   projectCommand,
-  htbCommand,
+  //htbCommand,
   imoCommand,
   emptySuggestionBox,
   maleCommand,
@@ -503,6 +506,11 @@ function handleQuoteCommand(channel, context, message) {
 }
 
 function handleAddQuote(channel, context, message) {
+  console.log("MESSAGE is " + message);
+  if (message.length < 3) {
+    return;
+  }
+
   const quoteString = message.slice(2).join(" ");
 
   if (!isThisInputClean(quoteString, context)) {
