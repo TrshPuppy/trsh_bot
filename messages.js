@@ -14,8 +14,6 @@ export default function delegateMessage(channel, tags, message, self) {
     return;
   }
 
-  console.log(`message starts with ${message[0]}`);
-
   switch (message[0]) {
     case "/":
       return;
@@ -80,7 +78,7 @@ const commands = {
     manual: () => {
       return "Syntax: BORK BORK BORK!!";
     },
-    aliases: () => ["mail"],
+    aliases: () => ["mail", "bork"],
   },
   claw: {
     exe: (context) => {
@@ -114,7 +112,7 @@ const commands = {
       );
     },
     manual: () => {
-      return "Syntax: !unlurk";
+      return "Let chat know you're returned and are ready to chat again! Syntax: !unlurk";
     },
     aliases: () => [],
   },
@@ -138,7 +136,7 @@ const commands = {
       );
     },
     manual: () => {
-      return "Get instructions to join the TrashPuppies Codewars clan. Syntax: !clan";
+      return "Get instructions to join the TrshPuppies Codewars clan. Syntax: !clan";
     },
     aliases: () => [],
   },
@@ -146,13 +144,25 @@ const commands = {
     exe: (c) => {
       server.say(
         apiData.Bot.CHANNEL,
+        "TP's mom is in the chat and, from now on, you will refer to her as 'Big Dog' or risk cruel and unusual punishment!"
+      );
+    },
+    manual: () => {
+      return "Big Dog in the House WHAT WHAT!??!";
+    },
+    aliases: () => ["bigdog"],
+  },
+  hnc: {
+    exe: (c) => {
+      server.say(
+        apiData.Bot.CHANNEL,
         "Check out my spooky podcast which I co-host with my cousin! --> https://www.twitch.tv/hauntzncreepz --> https://open.spotify.com/show/7hcpFnIoWhveRQeNRTNpbM"
       );
     },
     manual: () => {
-      return "Find out about my podcast. Syntax: !hnc";
+      return "Find out about my spooky podcast. Syntax: !hnc";
     },
-    aliases: () => ["bigdog"],
+    aliases: () => ["hauntzncreepz", "hauntzandcreepz"],
   },
   music: {
     exe: (c) => {
@@ -201,7 +211,7 @@ const commands = {
       );
     },
     manual: () => {
-      return "Find out about TP's VSCode theme";
+      return "Find out about TP's VSCode theme. Syntax: !theme";
     },
     aliases: () => [],
   },
@@ -213,7 +223,7 @@ const commands = {
       );
     },
     manual: () => {
-      return "Find out about my latest YouTube video.";
+      return "Find out about my latest YouTube video. Syntax: !yt";
     },
     aliases: () => ["youtube"],
   },
@@ -235,31 +245,30 @@ function handleChannelCommand(channel, tags, message, self) {
   };
 
   console.log("command= " + command + "command type = " + typeof command);
-  if (command)
-    try {
-      commands[command].exe(context);
-    } catch (e) {
-      console.log(`errror = ${e}`);
-      for (const [ky, val] of Object.entries(commands)) {
-        const als = val["aliases"]();
-        let found = als.findIndex((x) => x == command);
-        if (found !== -1) {
-          commands[ky].exe(context);
-          return;
-        }
-      }
+
+  try {
+    commands[command].exe(context);
+  } catch (e) {
+    console.log(`ERROR in handleChannelCommand try-catch: ${e}`);
+    const alias = findCommandByAlias(command);
+
+    if (alias) {
+      commands[alias].exe(context);
+    } else {
       server.say(
         apiData.Bot.CHANNEL,
         `Sorry @${tags["display-name"]}, that command doesn't exist :(`
       );
     }
+    return;
+  }
 }
 
 // Return a command from the commands object by finding it, or finding its alias:
 function findCommandByAlias(command) {
   for (const [ky, val] of Object.entries(commands)) {
     const als = val["aliases"]();
-    let found = als.findIndex((x) => x == command);
+    let found = als.findIndex((x) => x == command.toString().toLowerCase());
     if (found !== -1) {
       return ky;
     }
