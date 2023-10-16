@@ -14,6 +14,8 @@ export default function delegateMessage(channel, tags, message, self) {
     return;
   }
 
+  console.log(`message starts with ${message}`);
+
   switch (message[0]) {
     case "/":
       return;
@@ -25,6 +27,27 @@ export default function delegateMessage(channel, tags, message, self) {
       handleChannelCommand(channel, tags, message, self);
       break;
     case "@":
+      if (
+        message.split(" ")[0].toLowerCase() ==
+        `@${apiData.Bot.BOT_USERNAME.toLowerCase()}`
+      ) {
+        const command = message.split(" ")[1].toLowerCase();
+        if (commands[command]) {
+          commands[command].exe({ channel, tags, message, self });
+          return;
+        } else {
+          const alias = findCommandByAlias(command);
+          if (alias) {
+            commands[alias].exe({ channel, tags, message, self });
+          } else {
+            server.say(
+              apiData.Bot.CHANNEL,
+              `sorry, that command doesn't exist :()`
+            );
+          }
+          return;
+        }
+      }
       return;
     default:
       checkForKeyWordMessage(channel, tags, message, self);
@@ -69,7 +92,45 @@ const commands = {
     manual: () => {
       return "Get the manual on any command. Syntax: !man <command>";
     },
-    aliases: () => [],
+    aliases: () => ["man"],
+  },
+  hi: {
+    exe: (context) => {
+      const responses = [
+        `@${context.tags["display-name"]}, how's it hangin bub?`,
+        `@${context.tags["display-name"]}, you're lookin fly today my guy!`,
+        `How's the weather over there @${context.tags["display-name"]}?`,
+        `... Who are you again?`,
+        `T.G.I.<insert current day here>. amiright @${context.tags["display-name"]}?`,
+        `Talk to me when I've had my coffee @${context.tags["display-name"]} -_-`,
+        `Hey @${context.tags["display-name"]}, good to see u! <3`,
+      ];
+      const rand = Math.floor(Math.random() * responses.length);
+      server.say(apiData.Bot.CHANNEL, responses[rand]);
+      return;
+    },
+    manual: () => {
+      return `Say hello to '${apiData.Bot.BOT_USERNAME}. Syntax: '@${apiData.Bot.BOT_USERNAME} hey`;
+    },
+    aliases: () => ["hi", "hello", "hey", "goodmorning", "yo", "gm", "whatup"],
+  },
+  yes: {
+    exe: () => {
+      server.say(apiData.Bot.CHANNEL, `:)`);
+    },
+    manual: () => {
+      return `Syntax: '@${apiData.Bot.BOT_USERNAME} yes`;
+    },
+    aliases: () => ["yes", "ya", "yeah", "yas", "y"],
+  },
+  no: {
+    exe: () => {
+      server.say(apiData.Bot.CHANNEL, ":(");
+    },
+    manual: () => {
+      return `Syntax: '@${apiData.Bot.BOT_USERNAME} no`;
+    },
+    aliases: () => ["no", "nah", "nope", "n"],
   },
   male: {
     exe: (contextObj) => {
@@ -78,7 +139,7 @@ const commands = {
     manual: () => {
       return "Syntax: BORK BORK BORK!!";
     },
-    aliases: () => ["mail", "bork"],
+    aliases: () => ["male", "mail", "bork"],
   },
   claw: {
     exe: (context) => {
@@ -90,7 +151,7 @@ const commands = {
     manual: () => {
       return "Find out about the Claw stream team!";
     },
-    aliases: () => [],
+    aliases: () => ["claw"],
   },
   lurk: {
     exe: (context) => {
@@ -102,7 +163,7 @@ const commands = {
     manual: () => {
       return "Let everyone know you're hungry for some flooring & will be back to chat in a bit. Syntax: !lurk";
     },
-    aliases: () => [],
+    aliases: () => ["lurk"],
   },
   unlurk: {
     exe: (context) => {
@@ -114,7 +175,7 @@ const commands = {
     manual: () => {
       return "Let chat know you're returned and are ready to chat again! Syntax: !unlurk";
     },
-    aliases: () => [],
+    aliases: () => ["unlurk"],
   },
   kata: {
     exe: (con) => {
@@ -126,7 +187,7 @@ const commands = {
     manual: () => {
       return "Get the current Codewars kata. Syntax: !kata";
     },
-    aliases: () => [],
+    aliases: () => ["kata"],
   },
   clan: {
     exe: (c) => {
@@ -138,7 +199,7 @@ const commands = {
     manual: () => {
       return "Get instructions to join the TrshPuppies Codewars clan. Syntax: !clan";
     },
-    aliases: () => [],
+    aliases: () => ["clan"],
   },
   mom: {
     exe: (c) => {
@@ -150,7 +211,7 @@ const commands = {
     manual: () => {
       return "Big Dog in the House WHAT WHAT!??!";
     },
-    aliases: () => ["bigdog"],
+    aliases: () => ["mom", "bigdog"],
   },
   hnc: {
     exe: (c) => {
@@ -162,7 +223,7 @@ const commands = {
     manual: () => {
       return "Find out about my spooky podcast. Syntax: !hnc";
     },
-    aliases: () => ["hauntzncreepz", "hauntzandcreepz"],
+    aliases: () => ["hnc", "hauntzncreepz", "hauntzandcreepz"],
   },
   music: {
     exe: (c) => {
@@ -174,7 +235,7 @@ const commands = {
     manual: () => {
       return "Want to know what we're listening to? Syntax: !music";
     },
-    aliases: () => ["song", "playlist"],
+    aliases: () => ["music", "song", "playlist"],
   },
   project: {
     exe: (c) => {
@@ -186,7 +247,7 @@ const commands = {
     manual: () => {
       return "Find out what we're working on today. Syntax: !project";
     },
-    aliases: () => ["today"],
+    aliases: () => ["project", "today"],
   },
   about: {
     exe: (c) => {
@@ -200,7 +261,7 @@ const commands = {
     manual: () => {
       return "Find out about TP. Syntax: !about";
     },
-    aliases: () => ["whoami"],
+    aliases: () => ["about", "whoami"],
   },
   theme: {
     exe: (c) => {
@@ -213,7 +274,7 @@ const commands = {
     manual: () => {
       return "Find out about TP's VSCode theme. Syntax: !theme";
     },
-    aliases: () => [],
+    aliases: () => ["theme"],
   },
   yt: {
     exe: (c) => {
@@ -225,7 +286,7 @@ const commands = {
     manual: () => {
       return "Find out about my latest YouTube video. Syntax: !yt";
     },
-    aliases: () => ["youtube"],
+    aliases: () => ["yt", "youtube"],
   },
 };
 
