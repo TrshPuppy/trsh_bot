@@ -233,13 +233,128 @@ const commands = {
     aliases: () => ["yt", "youtube"],
   },
   prompt: {
-    exe: (context) => {},
+    exe: (context) => {
+      handleAddPrompt(context);
+      return;
+    },
     manual: () => {},
     aliases: () => ["pr", "addprompt"],
   },
 };
-
 export default commands;
+
+function handleAddPrompt(context) {
+  console.log(context.args);
+  const promptText = context.args;
+
+  // Make sure there is a prompt after the command:
+  if (promptText.length <= 0) {
+    server.say(apiData.Bot.CHANNEL, `@${context.tags["display-name"]} RTFM!`);
+    return;
+  }
+
+  // Make sure the prompt text is clean (no punctuation/ numbers);
+  const filteredPromptArr = [];
+  for (let word of promptText) {
+    const filtered = word.split("").filter((c) => {
+      return (
+        (c.charCodeAt(0) >= 65 && c.charCodeAt(0) <= 90) ||
+        (c.charCodeAt(0) >= 97 && c.charCodeAt(0) <= 122)
+      );
+    });
+
+    if (filtered.length > 0) {
+      filteredPromptArr.push(filtered.join(""));
+    }
+  }
+
+  const sparklyCleanPromptText = filteredPromptArr.join(" ");
+
+  // Create promptObj to be added to DB:
+  const promptObj = Object.create();
+
+  promptObj.time = new Date() * 1; // in milliseconds
+  promptObj.prompt = sparklyCleanPromptText;
+  promptObj.author = context.tags["display-name"];
+  promptObj.completed = 0;
+
+  // Send promptObj to be added to DB:
+  const wasThePromptAddSuccessful = addPrompt(promptObj);
+}
+
+export function isThisInputClean(message) {
+  // Filter out non-alphabetic characters
+
+  // const firstWord = message[0].split(""); //firstWord
+
+  // if (
+  //   firstWord[0] === "!" ||
+  //   firstWord[0] === "/" ||
+  //   firstWord[0] === "." ||
+  //   firstWord[0] === "'" ||
+  //   firstWord[0] === `"` ||
+  //   firstWord[0] === "`" ||
+  //   firstWord[0] === "-" ||
+  //   firstWord[0] === "#"
+  // ) {
+  //   return false;
+  // }
+
+  // if (message.length > 1 || message[1] !== undefined) {
+  //   for (const word of message) {
+  //     const wordArr = word.split("");
+
+  //     if (wordArr.includes("#")) {
+  //       return false;
+  //     }
+
+  //     let dashIndx = wordArr.findIndex((x) => (x = "-"));
+  //     if (dashIndx !== -1) {
+  //       if (wordArr[dashIndx + 1] === "-" || wordArr[dashIndx + 1] === "-") {
+  //         return false;
+  //       }
+  //     }
+  //   }
+  //}
+
+  return true;
+}
+
+// function handlePromptCommand(channel, context, message) {
+//   if (message[1] === undefined) {
+//     server.say(apiData.Bot.CHANNEL, `@${context.username} RTFM!`);
+//     return;
+//   }
+
+//   // Prep message for promptObj:
+//   message.shift();
+
+//   if (!isThisInputClean(message)) {
+//     server.say(
+//       apiData.Bot.CHANNEL,
+//       `Your prompt is invalid @${context.username}!`
+//     );
+//     return;
+//   }
+
+//   // Create promptObj to be added to DB:
+//   const promptObj = Object.create(prompt);
+
+//   promptObj.time = new Date() * 1; // in milliseconds
+//   promptObj.prompt = message.join(" ").trimEnd();
+//   promptObj.author = context.username;
+//   promptObj.completed = 0;
+
+//   // Send promptObj to be added to DB:
+//   const wasThePromptAddSuccessful = addPrompt(promptObj);
+
+//   wasThePromptAddSuccessful
+//     ? newPromptSuccess()
+//     : server.say(
+//         apiData.Bot.CHANNEL,
+//         "Sorry, your prompt didn't make it into the queue :("
+//       );
+// }
 
 // This module handles chat commands and delegates based on their type.
 

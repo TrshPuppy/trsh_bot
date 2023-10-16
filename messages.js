@@ -313,7 +313,7 @@ function handleChannelCommand(channel, tags, message, self) {
     self,
   };
 
-  console.log("command= " + command + "command type = " + typeof command);
+  // console.log("command= " + command + "command type = " + typeof command);
 
   try {
     commands[command].exe(context);
