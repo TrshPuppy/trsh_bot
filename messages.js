@@ -6,8 +6,9 @@
 // Imports:
 import { server } from "./server.js";
 import nlp from "compromise";
-// import { handleChannelCommand } from "./commands/commands.js";
+import addPrompt from "./promptQueue.js";
 import apiData from "./data/api.json" assert { type: "json" };
+import commands from "./commands.js";
 
 export default function delegateMessage(channel, tags, message, self) {
   if (self == true) {
@@ -57,238 +58,245 @@ export default function delegateMessage(channel, tags, message, self) {
 }
 
 // commmands['man'].exe(contextObj)
-const commands = {
-  man: {
-    exe: (contextObj) => {
-      if (contextObj.args.length === 0) {
-        server.say(
-          apiData.Bot.CHANNEL,
-          `Sorry @${contextObj.tags["display-name"]}, @${apiData.Bot.STREAMER_NICK} already has a man
-          :( Try again?`
-        );
-        return;
-      } else {
-        const commandManualed = contextObj.args[0];
-        try {
-          server.say(
-            apiData.Bot.CHANNEL,
-            `${commands[commandManualed].manual()}`
-          );
-        } catch (e) {
-          console.log(`ERROR in commands.man.exe: ${e}`);
-          const alias = findCommandByAlias(commandManualed);
-          if (alias) {
-            server.say(apiData.Bot.CHANNEL, `${commands[alias].manual()}`);
-          } else {
-            server.say(
-              apiData.Bot.CHANNEL,
-              `Sorry @${contextObj.tags["display-name"]}, there's no manual for that ocmmand because it doesn't exist :/`
-            );
-          }
-        }
-      }
-      return;
-    },
-    manual: () => {
-      return "Get the manual on any command. Syntax: !man <command>";
-    },
-    aliases: () => ["man"],
-  },
-  hi: {
-    exe: (context) => {
-      const responses = [
-        `@${context.tags["display-name"]}, how's it hangin bub?`,
-        `@${context.tags["display-name"]}, you're lookin fly today my guy!`,
-        `How's the weather over there @${context.tags["display-name"]}?`,
-        `... Who are you again?`,
-        `T.G.I.<insert current day here>. amiright @${context.tags["display-name"]}?`,
-        `Talk to me when I've had my coffee @${context.tags["display-name"]} -_-`,
-        `Hey @${context.tags["display-name"]}, good to see u! <3`,
-      ];
-      const rand = Math.floor(Math.random() * responses.length);
-      server.say(apiData.Bot.CHANNEL, responses[rand]);
-      return;
-    },
-    manual: () => {
-      return `Say hello to '${apiData.Bot.BOT_USERNAME}. Syntax: '@${apiData.Bot.BOT_USERNAME} hey`;
-    },
-    aliases: () => ["hi", "hello", "hey", "goodmorning", "yo", "gm", "whatup"],
-  },
-  yes: {
-    exe: () => {
-      server.say(apiData.Bot.CHANNEL, `:)`);
-    },
-    manual: () => {
-      return `Syntax: '@${apiData.Bot.BOT_USERNAME} yes`;
-    },
-    aliases: () => ["yes", "ya", "yeah", "yas", "y"],
-  },
-  no: {
-    exe: () => {
-      server.say(apiData.Bot.CHANNEL, ":(");
-    },
-    manual: () => {
-      return `Syntax: '@${apiData.Bot.BOT_USERNAME} no`;
-    },
-    aliases: () => ["no", "nah", "nope", "n"],
-  },
-  male: {
-    exe: (contextObj) => {
-      server.say(apiData.Bot.CHANNEL, "BORK! BORK! BORK!");
-    },
-    manual: () => {
-      return "Syntax: BORK BORK BORK!!";
-    },
-    aliases: () => ["male", "mail", "bork"],
-  },
-  claw: {
-    exe: (context) => {
-      server.say(
-        apiData.Bot.CHANNEL,
-        " If you think you like the Trash Heap, you're gonna love the Claw! --> https://www.theclaw.team <-- We code, we build stuff, we love tech!"
-      );
-    },
-    manual: () => {
-      return "Find out about the Claw stream team!";
-    },
-    aliases: () => ["claw"],
-  },
-  lurk: {
-    exe: (context) => {
-      server.say(
-        apiData.Bot.CHANNEL,
-        `Puppies are such a handful... @${context.tags["display-name"]} has gone to eat some flooring! At least it'll tire them out.`
-      );
-    },
-    manual: () => {
-      return "Let everyone know you're hungry for some flooring & will be back to chat in a bit. Syntax: !lurk";
-    },
-    aliases: () => ["lurk"],
-  },
-  unlurk: {
-    exe: (context) => {
-      server.say(
-        apiData.Bot.CHANNEL,
-        `@${context.tags["display-name"]} has returned from chewing up the floor. Hope you're feeling happy and full @${context.tags["display-name"]}!`
-      );
-    },
-    manual: () => {
-      return "Let chat know you're returned and are ready to chat again! Syntax: !unlurk";
-    },
-    aliases: () => ["unlurk"],
-  },
-  kata: {
-    exe: (con) => {
-      server.say(
-        apiData.Bot.CHANNEL,
-        "This is the kata we're doing right now --> https://www.codewars.com/kata/5648b12ce68d9daa6b000099/train/go"
-      );
-    },
-    manual: () => {
-      return "Get the current Codewars kata. Syntax: !kata";
-    },
-    aliases: () => ["kata"],
-  },
-  clan: {
-    exe: (c) => {
-      server.say(
-        apiData.Bot.CHANNEL,
-        "Join our Codewars clan! Go to: Codewars --> Account Settings --> Clan --> then type in 'TrshPuppies'."
-      );
-    },
-    manual: () => {
-      return "Get instructions to join the TrshPuppies Codewars clan. Syntax: !clan";
-    },
-    aliases: () => ["clan"],
-  },
-  mom: {
-    exe: (c) => {
-      server.say(
-        apiData.Bot.CHANNEL,
-        "TP's mom is in the chat and, from now on, you will refer to her as 'Big Dog' or risk cruel and unusual punishment!"
-      );
-    },
-    manual: () => {
-      return "Big Dog in the House WHAT WHAT!??!";
-    },
-    aliases: () => ["mom", "bigdog"],
-  },
-  hnc: {
-    exe: (c) => {
-      server.say(
-        apiData.Bot.CHANNEL,
-        "Check out my spooky podcast which I co-host with my cousin! --> https://www.twitch.tv/hauntzncreepz --> https://open.spotify.com/show/7hcpFnIoWhveRQeNRTNpbM"
-      );
-    },
-    manual: () => {
-      return "Find out about my spooky podcast. Syntax: !hnc";
-    },
-    aliases: () => ["hnc", "hauntzncreepz", "hauntzandcreepz"],
-  },
-  music: {
-    exe: (c) => {
-      server.say(
-        apiData.Bot.CHANNEL,
-        "We're listening to some tasty lofi from Chillhop --> https://chillhop.com"
-      );
-    },
-    manual: () => {
-      return "Want to know what we're listening to? Syntax: !music";
-    },
-    aliases: () => ["music", "song", "playlist"],
-  },
-  project: {
-    exe: (c) => {
-      server.say(
-        apiData.Bot.CHANNEL,
-        "Today we're working on @trsh_bot --> https://github.com/trshpuppy/trsh_bot"
-      );
-    },
-    manual: () => {
-      return "Find out what we're working on today. Syntax: !project";
-    },
-    aliases: () => ["project", "today"],
-  },
-  about: {
-    exe: (c) => {
-      server.say(
-        apiData.Bot.CHANNEL,
-        `Hey ${c.tags["display-name"]}! Welcome to my trash heap! TP is a former ER nurse
-      learning coding and cybersecurity. All you really need to know is the struggle is real, everything IS
-      in fact on fire, and you're welcome to chill as long as you like :)`
-      );
-    },
-    manual: () => {
-      return "Find out about TP. Syntax: !about";
-    },
-    aliases: () => ["about", "whoami"],
-  },
-  theme: {
-    exe: (c) => {
-      server.say(
-        apiData.Bot.CHANNEL,
-        `TP is using the Vibrancy Continued Extension in VSCode.
-      You can check it out here --> https://github.com/illixion/vscode-vibrancy-continued`
-      );
-    },
-    manual: () => {
-      return "Find out about TP's VSCode theme. Syntax: !theme";
-    },
-    aliases: () => ["theme"],
-  },
-  yt: {
-    exe: (c) => {
-      server.say(
-        apiData.Bot.CHANNEL,
-        "Checkout my newest YT video: 'My 1st Tech Interview was for a Senior Position'! --> https://www.youtube.com/watch?v=V1MkBvpD-xw"
-      );
-    },
-    manual: () => {
-      return "Find out about my latest YouTube video. Syntax: !yt";
-    },
-    aliases: () => ["yt", "youtube"],
-  },
-};
+// const commands = {
+//   man: {
+//     exe: (contextObj) => {
+//       if (contextObj.args.length === 0) {
+//         server.say(
+//           apiData.Bot.CHANNEL,
+//           `Sorry @${contextObj.tags["display-name"]}, @${apiData.Bot.STREAMER_NICK} already has a man
+//           :( Try again?`
+//         );
+//         return;
+//       } else {
+//         const commandManualed = contextObj.args[0];
+//         try {
+//           server.say(
+//             apiData.Bot.CHANNEL,
+//             `${commands[commandManualed].manual()}`
+//           );
+//         } catch (e) {
+//           console.log(`ERROR in commands.man.exe: ${e}`);
+//           const alias = findCommandByAlias(commandManualed);
+//           if (alias) {
+//             server.say(apiData.Bot.CHANNEL, `${commands[alias].manual()}`);
+//           } else {
+//             server.say(
+//               apiData.Bot.CHANNEL,
+//               `Sorry @${contextObj.tags["display-name"]}, there's no manual for that ocmmand because it doesn't exist :/`
+//             );
+//           }
+//         }
+//       }
+//       return;
+//     },
+//     manual: () => {
+//       return "Get the manual on any command. Syntax: !man <command>";
+//     },
+//     aliases: () => ["man"],
+//   },
+//   hi: {
+//     exe: (context) => {
+//       const responses = [
+//         `@${context.tags["display-name"]}, how's it hangin bub?`,
+//         `@${context.tags["display-name"]}, you're lookin fly today my guy!`,
+//         `How's the weather over there @${context.tags["display-name"]}?`,
+//         `... Who are you again?`,
+//         `T.G.I.<insert current day here>. amiright @${context.tags["display-name"]}?`,
+//         `Talk to me when I've had my coffee @${context.tags["display-name"]} -_-`,
+//         `Hey @${context.tags["display-name"]}, good to see u! <3`,
+//       ];
+//       const rand = Math.floor(Math.random() * responses.length);
+//       server.say(apiData.Bot.CHANNEL, responses[rand]);
+//       return;
+//     },
+//     manual: () => {
+//       return `Say hello to '${apiData.Bot.BOT_USERNAME}. Syntax: '@${apiData.Bot.BOT_USERNAME} hey`;
+//     },
+//     aliases: () => ["hi", "hello", "hey", "goodmorning", "yo", "gm", "whatup"],
+//   },
+//   yes: {
+//     exe: () => {
+//       server.say(apiData.Bot.CHANNEL, `:)`);
+//     },
+//     manual: () => {
+//       return `Syntax: '@${apiData.Bot.BOT_USERNAME} yes`;
+//     },
+//     aliases: () => ["yes", "ya", "yeah", "yas", "y"],
+//   },
+//   no: {
+//     exe: () => {
+//       server.say(apiData.Bot.CHANNEL, ":(");
+//     },
+//     manual: () => {
+//       return `Syntax: '@${apiData.Bot.BOT_USERNAME} no`;
+//     },
+//     aliases: () => ["no", "nah", "nope", "n"],
+//   },
+//   male: {
+//     exe: (contextObj) => {
+//       server.say(apiData.Bot.CHANNEL, "BORK! BORK! BORK!");
+//     },
+//     manual: () => {
+//       return "Syntax: BORK BORK BORK!!";
+//     },
+//     aliases: () => ["male", "mail", "bork"],
+//   },
+//   claw: {
+//     exe: (context) => {
+//       server.say(
+//         apiData.Bot.CHANNEL,
+//         " If you think you like the Trash Heap, you're gonna love the Claw! --> https://www.theclaw.team <-- We code, we build stuff, we love tech!"
+//       );
+//     },
+//     manual: () => {
+//       return "Find out about the Claw stream team!";
+//     },
+//     aliases: () => ["claw"],
+//   },
+//   lurk: {
+//     exe: (context) => {
+//       server.say(
+//         apiData.Bot.CHANNEL,
+//         `Puppies are such a handful... @${context.tags["display-name"]} has gone to eat some flooring! At least it'll tire them out.`
+//       );
+//     },
+//     manual: () => {
+//       return "Let everyone know you're hungry for some flooring & will be back to chat in a bit. Syntax: !lurk";
+//     },
+//     aliases: () => ["lurk"],
+//   },
+//   unlurk: {
+//     exe: (context) => {
+//       server.say(
+//         apiData.Bot.CHANNEL,
+//         `@${context.tags["display-name"]} has returned from chewing up the floor. Hope you're feeling happy and full @${context.tags["display-name"]}!`
+//       );
+//     },
+//     manual: () => {
+//       return "Let chat know you're returned and are ready to chat again! Syntax: !unlurk";
+//     },
+//     aliases: () => ["unlurk"],
+//   },
+//   kata: {
+//     exe: (con) => {
+//       server.say(
+//         apiData.Bot.CHANNEL,
+//         "This is the kata we're doing right now --> https://www.codewars.com/kata/5648b12ce68d9daa6b000099/train/go"
+//       );
+//     },
+//     manual: () => {
+//       return "Get the current Codewars kata. Syntax: !kata";
+//     },
+//     aliases: () => ["kata"],
+//   },
+//   clan: {
+//     exe: (c) => {
+//       server.say(
+//         apiData.Bot.CHANNEL,
+//         "Join our Codewars clan! Go to: Codewars --> Account Settings --> Clan --> then type in 'TrshPuppies'."
+//       );
+//     },
+//     manual: () => {
+//       return "Get instructions to join the TrshPuppies Codewars clan. Syntax: !clan";
+//     },
+//     aliases: () => ["clan"],
+//   },
+//   mom: {
+//     exe: (c) => {
+//       server.say(
+//         apiData.Bot.CHANNEL,
+//         "TP's mom is in the chat and, from now on, you will refer to her as 'Big Dog' or risk cruel and unusual punishment!"
+//       );
+//     },
+//     manual: () => {
+//       return "Big Dog in the House WHAT WHAT!??!";
+//     },
+//     aliases: () => ["mom", "bigdog"],
+//   },
+//   hnc: {
+//     exe: (c) => {
+//       server.say(
+//         apiData.Bot.CHANNEL,
+//         "Check out my spooky podcast which I co-host with my cousin! --> https://www.twitch.tv/hauntzncreepz --> https://open.spotify.com/show/7hcpFnIoWhveRQeNRTNpbM"
+//       );
+//     },
+//     manual: () => {
+//       return "Find out about my spooky podcast. Syntax: !hnc";
+//     },
+//     aliases: () => ["hnc", "hauntzncreepz", "hauntzandcreepz"],
+//   },
+//   music: {
+//     exe: (c) => {
+//       server.say(
+//         apiData.Bot.CHANNEL,
+//         "We're listening to some tasty lofi from Chillhop --> https://chillhop.com"
+//       );
+//     },
+//     manual: () => {
+//       return "Want to know what we're listening to? Syntax: !music";
+//     },
+//     aliases: () => ["music", "song", "playlist"],
+//   },
+//   project: {
+//     exe: (c) => {
+//       server.say(
+//         apiData.Bot.CHANNEL,
+//         "Today we're working on @trsh_bot --> https://github.com/trshpuppy/trsh_bot"
+//       );
+//     },
+//     manual: () => {
+//       return "Find out what we're working on today. Syntax: !project";
+//     },
+//     aliases: () => ["project", "today"],
+//   },
+//   about: {
+//     exe: (c) => {
+//       server.say(
+//         apiData.Bot.CHANNEL,
+//         `Hey ${c.tags["display-name"]}! Welcome to my trash heap! TP is a former ER nurse
+//       learning coding and cybersecurity. All you really need to know is the struggle is real, everything IS
+//       in fact on fire, and you're welcome to chill as long as you like :)`
+//       );
+//     },
+//     manual: () => {
+//       return "Find out about TP. Syntax: !about";
+//     },
+//     aliases: () => ["about", "whoami"],
+//   },
+//   theme: {
+//     exe: (c) => {
+//       server.say(
+//         apiData.Bot.CHANNEL,
+//         `TP is using the Vibrancy Continued Extension in VSCode.
+//       You can check it out here --> https://github.com/illixion/vscode-vibrancy-continued`
+//       );
+//     },
+//     manual: () => {
+//       return "Find out about TP's VSCode theme. Syntax: !theme";
+//     },
+//     aliases: () => ["theme"],
+//   },
+//   yt: {
+//     exe: (c) => {
+//       server.say(
+//         apiData.Bot.CHANNEL,
+//         "Checkout my newest YT video: 'My 1st Tech Interview was for a Senior Position'! --> https://www.youtube.com/watch?v=V1MkBvpD-xw"
+//       );
+//     },
+//     manual: () => {
+//       return "Find out about my latest YouTube video. Syntax: !yt";
+//     },
+//     aliases: () => ["yt", "youtube"],
+//   },
+//   prompt: {
+//     exe: (context) => {
+
+//     },
+//     manual: () => {},
+//     aliases: () => ["pr", "addprompt"],
+//   },
+// };
 
 function handleChannelCommand(channel, tags, message, self) {
   // get the name of the command to access it in the commands obj:
