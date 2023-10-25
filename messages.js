@@ -56,8 +56,6 @@ export default function delegateMessage(channel, tags, message, self) {
   }
   return;
 }
-
-// commmands['man'].exe(contextObj)
 // const commands = {
 //   man: {
 //     exe: (contextObj) => {
