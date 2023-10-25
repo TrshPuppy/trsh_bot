@@ -299,9 +299,57 @@ const commands = {
       return;
     },
     manual: () => {
-      return `Get a random quote from chat. You can either ask for a specific author: '!quote @<author>', or let ${apiData.Bot.BOT_USERNAME} choose: '!quote'`;
+      return `Get a random quote from chat. You can either ask for a specific author: '!quote @<author>', or let @${apiData.Bot.BOT_USERNAME} choose: '!quote'`;
     },
     aliases: () => ["q"],
+  },
+  addquote: {
+    exe: (context) => {
+      // Return if no input:
+      if (context.args.length < 2) {
+        server.say(
+          apiData.Bot.CHANNEL,
+          `@${context.tags["display-name"]}, try again or RTFM: '!man addquote'.`
+        );
+        return;
+      }
+
+      // Check for author and bot feature:
+      let firstAuthor = context.args[0];
+      let secondAuthor = context.args[1];
+      const firstAuthorArr = firstAuthor.split("");
+      const secondAuthorArr = secondAuthor.split("");
+
+      if (firstAuthorArr[0] == "@") {
+        firstAuthorArr.shift();
+        firstAuthor = firstAuthorArr.join("");
+      }
+
+      if (secondAuthorArr[0] == "@") {
+        secondAuthorArr.shift();
+        secondAuthor = secondAuthorArr.join("");
+      }
+
+      // Handle second author:
+      /*
+        MAYBE MAKE THE SECOND ARGUMENT THE BOT INSTEAD OF THE FIRST ARGUMENT BECAUSE THERE COULD BE A QUOTE THAT IS A SINGLE WORD?
+      */
+
+      console.log("first author " + firstAuthor);
+      // Check input is clean:
+      const dirtyTextString = context.args.join(" ");
+      if (isThisInputClean(dirtyTextString)) {
+        console.log("its clean");
+      } else {
+        console.log("its not clean");
+      }
+
+      return;
+    },
+    manual: () => {
+      return `Add a quote to the quote database. Syntax: '!addquote @<author's username> <quote>'. If the quote is a message @${apiData.Bot.BOT_USERNAME} changed, then the syntax is: '!addquote <${apiData.Bot.BOT_USERNAME}> @<original author's username> <quote>'.`;
+    },
+    aliases: () => ["aq"],
   },
   prompt: {
     exe: (context) => {
@@ -314,8 +362,6 @@ const commands = {
 };
 export default commands;
 
-function handleQuoteCommand(context) {}
-
 function handleAddPrompt(context) {
   console.log(context.args);
   const promptText = context.args;
@@ -327,19 +373,19 @@ function handleAddPrompt(context) {
   }
 
   // Make sure the prompt text is clean (no punctuation/ numbers);
-  const filteredPromptArr = [];
-  for (let word of promptText) {
-    const filtered = word.split("").filter((c) => {
-      return (
-        (c.charCodeAt(0) >= 65 && c.charCodeAt(0) <= 90) ||
-        (c.charCodeAt(0) >= 97 && c.charCodeAt(0) <= 122)
-      );
-    });
+  // const filteredPromptArr = [];
+  // for (let word of promptText) {
+  //   const filtered = word.split("").filter((c) => {
+  //     return (
+  //       (c.charCodeAt(0) >= 65 && c.charCodeAt(0) <= 90) ||
+  //       (c.charCodeAt(0) >= 97 && c.charCodeAt(0) <= 122)
+  //     );
+  //   });
 
-    if (filtered.length > 0) {
-      filteredPromptArr.push(filtered.join(""));
-    }
-  }
+  //   if (filtered.length > 0) {
+  //     filteredPromptArr.push(filtered.join(""));
+  //   }
+  // }
 
   const sparklyCleanPromptText = filteredPromptArr.join(" ");
 
@@ -355,40 +401,24 @@ function handleAddPrompt(context) {
   const wasThePromptAddSuccessful = addPrompt(promptObj);
 }
 
-export function isThisInputClean(message) {
+// This checks user input, 'dirtyText' should be a string provided by a chatter, and should not include commands (!command)
+// or '@username'
+function isThisInputClean(dirtyText) {
   // Filter out non-alphabetic characters
+  console.log(dirtyText);
+  const filteredPromptArr = [];
+  // for (let word of dirtyText) {
+  //   const filtered = word.split("").filter((c) => {
+  //     return (
+  //       (c.charCodeAt(0) >= 65 && c.charCodeAt(0) <= 90) ||
+  //       (c.charCodeAt(0) >= 97 && c.charCodeAt(0) <= 122)
+  //     );
+  //   });
 
-  // const firstWord = message[0].split(""); //firstWord
-
-  // if (
-  //   firstWord[0] === "!" ||
-  //   firstWord[0] === "/" ||
-  //   firstWord[0] === "." ||
-  //   firstWord[0] === "'" ||
-  //   firstWord[0] === `"` ||
-  //   firstWord[0] === "`" ||
-  //   firstWord[0] === "-" ||
-  //   firstWord[0] === "#"
-  // ) {
-  //   return false;
-  // }
-
-  // if (message.length > 1 || message[1] !== undefined) {
-  //   for (const word of message) {
-  //     const wordArr = word.split("");
-
-  //     if (wordArr.includes("#")) {
-  //       return false;
-  //     }
-
-  //     let dashIndx = wordArr.findIndex((x) => (x = "-"));
-  //     if (dashIndx !== -1) {
-  //       if (wordArr[dashIndx + 1] === "-" || wordArr[dashIndx + 1] === "-") {
-  //         return false;
-  //       }
-  //     }
+  //   if (filtered.length > 0) {
+  //     filteredPromptArr.push(filtered.join(""));
   //   }
-  //}
+  // }
 
   return true;
 }
