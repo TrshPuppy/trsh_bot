@@ -1,5 +1,6 @@
 import { server } from "./server.js";
 import apiData from "./data/api.json" assert { type: "json" };
+import quotesDBData from "./data/quotesDB.json" assert { type: "json" };
 
 const commands = {
   man: {
@@ -214,6 +215,7 @@ const commands = {
         `TP is using the Vibrancy Continued Extension in VSCode.
         You can check it out here --> https://github.com/illixion/vscode-vibrancy-continued`
       );
+      return;
     },
     manual: () => {
       return "Find out about TP's VSCode theme. Syntax: !theme";
@@ -232,6 +234,75 @@ const commands = {
     },
     aliases: () => ["yt", "youtube"],
   },
+  quote: {
+    exe: (context) => {
+      let indxIntoQuotesDB = 0;
+      let requestedAuthor = "";
+
+      const chatter = context.tags["display-name"];
+      const quoteString = context.args;
+
+      // If the requesting chatter doesn't specify an author, choose a random index into the quotes array:
+      if (quoteString[0] === undefined) {
+        indxIntoQuotesDB = Math.floor(Math.random() * quotesDBData.length);
+      } else {
+        // If requesting chatter DID specify an author, allow them to specify one w/ or w/o using `@`
+        //  in front of the author's username
+        const reqAuthorArr = quoteString[0].split("");
+
+        requestedAuthor =
+          reqAuthorArr[0] === "@"
+            ? reqAuthorArr.slice(1).join("")
+            : reqAuthorArr.join("");
+
+        // Find the index in the quotes array where requested author exists:
+        indxIntoQuotesDB = quotesDBData.findIndex((x) => {
+          x = x.author
+            .toLowerCase()
+            .localeCompare(requestedAuthor.toLowerCase());
+          return x == 0;
+        });
+
+        // Couldn't find requested author:
+        if (indxIntoQuotesDB === -1) {
+          server.say(
+            apiData.Bot.CHANNEL,
+            `I guess @${requestedAuthor} isn't ICONIC enough to be in my database :(`
+          );
+          return;
+        }
+      }
+
+      // Build the quote to return:
+      const currentAuthor = quotesDBData[indxIntoQuotesDB].author;
+      const thisAuthorsQuotes = quotesDBData[indxIntoQuotesDB].quotes;
+
+      const randIndx = Math.floor(Math.random() * thisAuthorsQuotes.length);
+      let randomQuote = quotesDBData[indxIntoQuotesDB].quotes[randIndx].quote;
+
+      // Check to see if the quote is actually a quote from the bot
+      // changing the keyword in a chatter's original message
+      const feat =
+        quotesDBData[indxIntoQuotesDB].quotes[randIndx].feat === 1
+          ? `@${apiData.Bot.CHANNEL}`
+          : undefined;
+
+      if (feat) {
+        server.say(
+          apiData.Bot.CHANNEL,
+          `"${randomQuote}" - @${currentAuthor} ft. @${apiData.Bot.BOT_USERNAME}`
+        );
+      } else {
+        server.say(apiData.Bot.CHANNEL, `"${randomQuote}" - @${currentAuthor}`);
+      }
+
+      return;
+    },
+    manual: () => {
+      return `Get a random quote from chat. You can either ask for a specific author: '!quote @<author>', or let ${apiData.Bot.BOT_USERNAME} choose: '!quote'`;
+    },
+    aliases: () => ["q"],
+  },
   prompt: {
     exe: (context) => {
       handleAddPrompt(context);
@@ -242,6 +313,8 @@ const commands = {
   },
 };
 export default commands;
+
+function handleQuoteCommand(context) {}
 
 function handleAddPrompt(context) {
   console.log(context.args);
