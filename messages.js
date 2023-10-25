@@ -43,7 +43,7 @@ export default function delegateMessage(channel, tags, message, self) {
           } else {
             server.say(
               apiData.Bot.CHANNEL,
-              `sorry, that command doesn't exist :()`
+              `sorry, that command doesn't exist :(`
             );
           }
           return;
