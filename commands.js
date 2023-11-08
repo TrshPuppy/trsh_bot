@@ -2,6 +2,7 @@ import { server } from "./server.js";
 import apiData from "./data/api.json" assert { type: "json" };
 import quotesDBData from "./data/quotesDB.json" assert { type: "json" };
 import { findCommandByAlias } from "./messages.js";
+import fs from "node:fs";
 
 const commands = {
   man: {
@@ -315,31 +316,74 @@ const commands = {
         return;
       }
 
-      // Check for author and bot feature:
-      let firstAuthor = context.args.shift();
-      // let secondAuthor = context.args[1];
-      const firstAuthorArr = firstAuthor.split("");
-      // const secondAuthorArr = secondAuthor.split("");
+      const authorRgx = /(^@[A-Za-z0-9]*)/g;
+      const authors = context.args.matchAll(authorRgx);
 
-      if (firstAuthorArr[0] == "@") {
-        firstAuthorArr.shift();
-        firstAuthor = firstAuthorArr.join("");
-      }
+      console.log(`authors = ${authors}`);
 
-      // if (secondAuthorArr[0] == "@") {
-      //   secondAuthorArr.shift();
-      //   secondAuthor = secondAuthorArr.join("");
+      // // Check for author and bot feature:
+      // let firstAuthor = context.args.shift();
+      // // let secondAuthor = context.args[1];
+      // const firstAuthorArr = firstAuthor.split("");
+      // // const secondAuthorArr = secondAuthor.split("");
+
+      // if (firstAuthorArr[0] !== "@") {
+      //   // firstAuthorArr.shift();
+      //   // firstAuthor = firstAuthorArr.join("");
+      //   server.say(
+      //     apiData.Bot.CHANNEL,
+      //     `@${context.tags["display-name"]}, please put an '@' symbol before the author's name.`
+      //   );
+      //   return;
       // }
 
-      // Handle second author:
-      /*
-        MAYBE MAKE THE SECOND ARGUMENT THE BOT INSTEAD OF THE FIRST ARGUMENT BECAUSE THERE COULD BE A QUOTE THAT IS A SINGLE WORD?
-      */
+      // if (firstAuthor.length < 3) {
+      //   return;
+      // }
 
-      console.log("first author " + firstAuthor);
-      // Check input is clean:
-      const dirtyTextString = context.args.join(" ");
-      const cleanTextString = cleanThisInput(dirtyTextString);
+      // firstAuthor = cleanThisInput(firstAuthor);
+      // console.log("cleaned author = " + firstAuthor);
+
+      // // Check input is clean:
+      // const dirtyTextString = context.args.join(" ");
+      // const cleanTextString = cleanThisInput(dirtyTextString);
+
+      // const quoteObj = new Object({
+      //   quote: cleanTextString,
+      //   date: new Date(),
+      //   feat: 0,
+      // });
+
+      // let authorFound = 0;
+      // // Find author in JSON
+      // for (const entry of quotesDBData) {
+      //   if (entry["author"].toLowerCase() === firstAuthor.toLowerCase()) {
+      //     entry["quotes"].push(quoteObj);
+      //     authorFound = 1;
+      //     break;
+      //   }
+      // }
+
+      // if (!authorFound) {
+      //   // Create new author in object
+      //   const authorObj = new Object({
+      //     author: firstAuthor,
+      //     quotes: [quoteObj],
+      //   });
+
+      //   quotesDBData.push(authorObj);
+      // }
+
+      // // Now overwrite the JSON:
+      const JSONString = JSON.stringify(quotesDBData);
+
+      fs.writeFile("./data/quotesDB.json", JSONString, "utf-8", (err) => {
+        if (err) {
+          console.error(`Unable to write object to file. Error: ${err}`);
+        } else {
+          console.log(`Success writing obje to file: quotesdb.json`);
+        }
+      });
 
       return;
     },
@@ -360,7 +404,6 @@ const commands = {
 export default commands;
 
 function handleAddPrompt(context) {
-  console.log(context.args);
   const promptText = context.args;
 
   // Make sure there is a prompt after the command:
@@ -402,7 +445,6 @@ function handleAddPrompt(context) {
 // or '@username'
 function cleanThisInput(dirtyText) {
   // Filter out non-alphabetic characters
-  console.log(dirtyText);
   const filteredPromptArr = [];
   for (let word of dirtyText.split(" ")) {
     const filtered = word.split("").filter((c) => {
@@ -833,47 +875,6 @@ function cleanThisInput(dirtyText) {
 //   // feature request, command: !/bin/bash response: she-bang
 // }
 
-// function handleAddQuote(channel, context, message) {
-//   const quoteString = message.slice(2).join(" ");
-
-//   if (!isThisInputClean(quoteString, context)) {
-//     return;
-//   }
-
-//   const quoteToAdd = Object.create(quote);
-//   let authorSanitized;
-
-//   quoteToAdd.quote = quoteString;
-//   quoteToAdd.date = new Date();
-//   quoteToAdd.feat = 0;
-
-//   if (message[1].startsWith("@")) {
-//     authorSanitized = message[1].slice(1);
-//   } else {
-//     server.say(
-//       apiData.Bot.CHANNEL,
-//       `${context.username}, please indicate the author by adding '@' before their username, ya scrub.`
-//     );
-//     return;
-//   }
-
-//   if (
-//     quotesDBData.find(
-//       (x) => x.author.toLowerCase() == authorSanitized.toLowerCase()
-//     ) !== undefined
-//   ) {
-//     const authorIndx = quotesDBData.findIndex(
-//       (y) => y.author.toLowerCase() == authorSanitized.toLowerCase()
-//     );
-//     quotesDBData[authorIndx].quotes.push(quoteToAdd);
-//   } else {
-//     const authorObj = { author: authorSanitized, quotes: [quoteToAdd] };
-//     quotesDBData.push(authorObj);
-//   }
-
-//   overwriteQuotesJson(newQuoteSuccess);
-// }
-
 // function handleManCommand(channel, context, message) {
 //   if (message[1] === undefined) {
 //     server.say(
@@ -957,18 +958,18 @@ function handlePromptCommand(channel, context, message) {
   // HARASS RANDOM VIEWER
 }
 
-const overwriteSelectedJSON = (target, JSONObj, cb) => {
-  const JSONStringData = JSON.stringify(JSONObj);
+// const overwriteSelectedJSON = (target, JSONObj, cb) => {
+//   const JSONStringData = JSON.stringify(JSONObj);
 
-  fs.writeFile(target, JSONStringData, "utf-8", (err) => {
-    if (err) {
-      console.error(`Unable to write object to file. Error: ${err}`);
-    } else {
-      cb?.();
-      console.log(`Success writing obje to file: ${target}`);
-    }
-  });
-};
+//   fs.writeFile(target, JSONStringData, "utf-8", (err) => {
+//     if (err) {
+//       console.error(`Unable to write object to file. Error: ${err}`);
+//     } else {
+//       cb?.();
+//       console.log(`Success writing obje to file: ${target}`);
+//     }
+//   });
+// };
 
 // function overwritePromptJson(cb) {
 //   // overwriteSelectedJSON("./promptQueue.json", promptQueueData, cb);
