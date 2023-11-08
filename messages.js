@@ -86,7 +86,7 @@ function keywordQ300(channel, tags, message, self) {
   const secondsFromLastKeyword = (new Date() - timeSinceLastKeywordMsg) / 1000;
 
   // If it's been 20 messages && 5 minutes, call the function which changes the message & reset the timer & message count:
-  if (secondsFromLastKeyword >= 5 && keywordLessMessages >= 2) {
+  if (secondsFromLastKeyword >= 300 && keywordLessMessages >= 20) {
     // Make sure we're not re-posting a super long chat message, or a super short one:
     const wordCount = message.split(" ").length;
     if (wordCount === 1 || wordCount >= 20) {
