@@ -1,6 +1,7 @@
 import { server } from "./server.js";
 import apiData from "./data/api.json" assert { type: "json" };
 import quotesDBData from "./data/quotesDB.json" assert { type: "json" };
+import { findCommandByAlias } from "./messages.js";
 
 const commands = {
   man: {
@@ -27,7 +28,7 @@ const commands = {
           } else {
             server.say(
               apiData.Bot.CHANNEL,
-              `Sorry @${contextObj.tags["display-name"]}, there's no manual for that ocmmand because it doesn't exist :/`
+              `Sorry @${contextObj.tags["display-name"]}, there's no manual for that command because it doesn't exist :/`
             );
           }
         }
@@ -174,7 +175,7 @@ const commands = {
     exe: (c) => {
       server.say(
         apiData.Bot.CHANNEL,
-        "We're listening to some tasty lofi from Chillhop --> https://chillhop.com"
+        "We're listening to synthwave from our boi White Bat Audio --> https://whitebataudio.com"
       );
     },
     manual: () => {
@@ -315,20 +316,20 @@ const commands = {
       }
 
       // Check for author and bot feature:
-      let firstAuthor = context.args[0];
-      let secondAuthor = context.args[1];
+      let firstAuthor = context.args.shift();
+      // let secondAuthor = context.args[1];
       const firstAuthorArr = firstAuthor.split("");
-      const secondAuthorArr = secondAuthor.split("");
+      // const secondAuthorArr = secondAuthor.split("");
 
       if (firstAuthorArr[0] == "@") {
         firstAuthorArr.shift();
         firstAuthor = firstAuthorArr.join("");
       }
 
-      if (secondAuthorArr[0] == "@") {
-        secondAuthorArr.shift();
-        secondAuthor = secondAuthorArr.join("");
-      }
+      // if (secondAuthorArr[0] == "@") {
+      //   secondAuthorArr.shift();
+      //   secondAuthor = secondAuthorArr.join("");
+      // }
 
       // Handle second author:
       /*
@@ -338,11 +339,7 @@ const commands = {
       console.log("first author " + firstAuthor);
       // Check input is clean:
       const dirtyTextString = context.args.join(" ");
-      if (isThisInputClean(dirtyTextString)) {
-        console.log("its clean");
-      } else {
-        console.log("its not clean");
-      }
+      const cleanTextString = cleanThisInput(dirtyTextString);
 
       return;
     },
@@ -403,24 +400,25 @@ function handleAddPrompt(context) {
 
 // This checks user input, 'dirtyText' should be a string provided by a chatter, and should not include commands (!command)
 // or '@username'
-function isThisInputClean(dirtyText) {
+function cleanThisInput(dirtyText) {
   // Filter out non-alphabetic characters
   console.log(dirtyText);
   const filteredPromptArr = [];
-  // for (let word of dirtyText) {
-  //   const filtered = word.split("").filter((c) => {
-  //     return (
-  //       (c.charCodeAt(0) >= 65 && c.charCodeAt(0) <= 90) ||
-  //       (c.charCodeAt(0) >= 97 && c.charCodeAt(0) <= 122)
-  //     );
-  //   });
+  for (let word of dirtyText.split(" ")) {
+    const filtered = word.split("").filter((c) => {
+      // if the character is not ascii alphabetical, it doesn't make it into the filtered array:
+      return (
+        (c.charCodeAt(0) >= 65 && c.charCodeAt(0) <= 90) ||
+        (c.charCodeAt(0) >= 97 && c.charCodeAt(0) <= 122)
+      );
+    });
 
-  //   if (filtered.length > 0) {
-  //     filteredPromptArr.push(filtered.join(""));
-  //   }
-  // }
+    if (filtered.length > 0) {
+      filteredPromptArr.push(filtered.join(""));
+    }
+  }
 
-  return true;
+  return filteredPromptArr.join(" ");
 }
 
 // function handlePromptCommand(channel, context, message) {

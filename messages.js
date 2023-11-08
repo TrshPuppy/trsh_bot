@@ -200,11 +200,11 @@ function handleChannelCommand(channel, tags, message, self) {
 }
 
 // Return a command from the commands object by finding it, or finding its alias:
-function findCommandByAlias(command) {
+export function findCommandByAlias(command) {
   for (const [ky, val] of Object.entries(commands)) {
     const als = val["aliases"]();
-    let found = als.findIndex((x) => x == command.toString().toLowerCase());
-    if (found !== -1) {
+    let found = als.filter((x) => x == command.toString().toLowerCase());
+    if (found.length == 1) {
       return ky;
     }
   }
