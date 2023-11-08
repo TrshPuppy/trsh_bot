@@ -15,8 +15,6 @@ export default function delegateMessage(channel, tags, message, self) {
     return;
   }
 
-  console.log(`message starts with ${message}`);
-
   switch (message[0]) {
     case "/":
       return;
@@ -178,8 +176,6 @@ function handleChannelCommand(channel, tags, message, self) {
     args,
     self,
   };
-
-  // console.log("command= " + command + "command type = " + typeof command);
 
   try {
     commands[command].exe(context);

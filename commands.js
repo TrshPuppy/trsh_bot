@@ -351,7 +351,7 @@ const commands = {
         a = a.split("");
         a.shift("");
         a = a.join("");
-        console.log(`a = ${a}`);
+
         return a;
       });
 
