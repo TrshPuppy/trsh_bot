@@ -316,79 +316,100 @@ const commands = {
         return;
       }
 
-      const authorRgx = /(^@[A-Za-z0-9]*)/g;
-      const authors = context.args.matchAll(authorRgx);
+      // Use Regex to find authors, there can be a max of two (an OG and a feat)
+      // The first author will be treated as the OG (the chatter who said the chat originally)
+      // the second author is the feat (such as a quote saved where the bot changed a word to the keyword)
+      const authorRgx = /(@[A-Za-z0-9]{3,20})/g;
+      const authors = context.args.join(" ").matchAll(authorRgx);
+      let authorsArr = [];
 
-      console.log(`authors = ${authors}`);
+      for (const match of authors) {
+        authorsArr.push(match[0]);
+      }
 
-      // // Check for author and bot feature:
-      // let firstAuthor = context.args.shift();
-      // // let secondAuthor = context.args[1];
-      // const firstAuthorArr = firstAuthor.split("");
-      // // const secondAuthorArr = secondAuthor.split("");
+      // If there are more than 2 authors, throw an error in the chat:
+      if (authorsArr.length > 2 || authorsArr.length < 1) {
+        server.say(
+          apiData.Bot.CHANNEL,
+          `@${context.tags["display-name"]}, if you're trying to add a quote use this syntax: '!addquote @<author> @<featuring (optional)> <quote string>'`
+        );
+        return;
+      }
 
-      // if (firstAuthorArr[0] !== "@") {
-      //   // firstAuthorArr.shift();
-      //   // firstAuthor = firstAuthorArr.join("");
-      //   server.say(
-      //     apiData.Bot.CHANNEL,
-      //     `@${context.tags["display-name"]}, please put an '@' symbol before the author's name.`
-      //   );
-      //   return;
+      // for (let a of authorsArr) {
+      //   console.log(`a = ${a}`);
+      //   a = a.split("");
+      //   a.shift("");
+      //   a = a.join("");
+      //   console.log(`a = ${a}`);
       // }
+      authorsArr = authorsArr.map((a) => {
+        a = a.split("");
+        a.shift("");
+        a = a.join("");
+        console.log(`a = ${a}`);
+        return a;
+      });
 
-      // if (firstAuthor.length < 3) {
-      //   return;
-      // }
+      const OG = authorsArr[0];
+      const feat = authorsArr[1] !== undefined ? authorsArr[1] : undefined;
 
-      // firstAuthor = cleanThisInput(firstAuthor);
-      // console.log("cleaned author = " + firstAuthor);
+      console.log(`OG = ${OG}, feat = ${feat}`);
 
-      // // Check input is clean:
-      // const dirtyTextString = context.args.join(" ");
-      // const cleanTextString = cleanThisInput(dirtyTextString);
+      // Get the quote string with authors filtered out:
+      const dirtyQuoteString = context.args
+        .join(" ")
+        .replaceAll(authorRgx, "")
+        .trim();
 
-      // const quoteObj = new Object({
-      //   quote: cleanTextString,
-      //   date: new Date(),
-      //   feat: 0,
-      // });
+      // Clean the string:
+      let theNasties = /([@`)(}{[\]#~]*([-]{2})*)(';)*/g;
+      const cleanQuoteString = dirtyQuoteString
+        .replaceAll(theNasties, "")
+        .trim();
 
-      // let authorFound = 0;
-      // // Find author in JSON
-      // for (const entry of quotesDBData) {
-      //   if (entry["author"].toLowerCase() === firstAuthor.toLowerCase()) {
-      //     entry["quotes"].push(quoteObj);
-      //     authorFound = 1;
-      //     break;
-      //   }
-      // }
+      // Build the quote object to go into the json:
+      const quoteObj = new Object({
+        quote: cleanQuoteString,
+        date: new Date(),
+        feat: feat,
+      });
 
-      // if (!authorFound) {
-      //   // Create new author in object
-      //   const authorObj = new Object({
-      //     author: firstAuthor,
-      //     quotes: [quoteObj],
-      //   });
+      let authorFound = 0;
+      // Find author in JSON:
+      for (const entry of quotesDBData) {
+        if (entry["author"].toLowerCase() === OG.toLowerCase()) {
+          entry["quotes"].push(quoteObj);
+          authorFound = 1;
+          break;
+        }
+      }
 
-      //   quotesDBData.push(authorObj);
-      // }
+      // Create new author object:
+      if (!authorFound) {
+        const authorObj = new Object({
+          author: OG,
+          quotes: [quoteObj],
+        });
+
+        quotesDBData.push(authorObj);
+      }
 
       // // Now overwrite the JSON:
       const JSONString = JSON.stringify(quotesDBData);
 
       fs.writeFile("./data/quotesDB.json", JSONString, "utf-8", (err) => {
         if (err) {
-          console.error(`Unable to write object to file. Error: ${err}`);
+          console.error(`ERROR: Unable to write object to file. Error: ${err}`);
         } else {
-          console.log(`Success writing obje to file: quotesdb.json`);
+          console.log(`Success adding new quote to JSON file!`);
         }
       });
 
       return;
     },
     manual: () => {
-      return `Add a quote to the quote database. Syntax: '!addquote @<author's username> <quote>'. If the quote is a message @${apiData.Bot.BOT_USERNAME} changed, then the syntax is: '!addquote <${apiData.Bot.BOT_USERNAME}> @<original author's username> <quote>'.`;
+      return `Add a quote to the quote database. Syntax: '!addquote @<author's username> @<featured author (optional)> <quote>'. If the quote is a message @${apiData.Bot.BOT_USERNAME} changed, then the syntax is: '!addquote <${apiData.Bot.BOT_USERNAME}> @<original author's username> <quote>'.`;
     },
     aliases: () => ["aq"],
   },
