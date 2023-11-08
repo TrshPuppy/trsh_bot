@@ -450,28 +450,6 @@ function handleAddPrompt(context) {
   const wasThePromptAddSuccessful = addPrompt(promptObj);
 }
 
-// This checks user input, 'dirtyText' should be a string provided by a chatter, and should not include commands (!command)
-// or '@username'
-function cleanThisInput(dirtyText) {
-  // Filter out non-alphabetic characters
-  const filteredPromptArr = [];
-  for (let word of dirtyText.split(" ")) {
-    const filtered = word.split("").filter((c) => {
-      // if the character is not ascii alphabetical, it doesn't make it into the filtered array:
-      return (
-        (c.charCodeAt(0) >= 65 && c.charCodeAt(0) <= 90) ||
-        (c.charCodeAt(0) >= 97 && c.charCodeAt(0) <= 122)
-      );
-    });
-
-    if (filtered.length > 0) {
-      filteredPromptArr.push(filtered.join(""));
-    }
-  }
-
-  return filteredPromptArr.join(" ");
-}
-
 // function handlePromptCommand(channel, context, message) {
 //   if (message[1] === undefined) {
 //     server.say(apiData.Bot.CHANNEL, `@${context.username} RTFM!`);
@@ -967,27 +945,6 @@ function handlePromptCommand(channel, context, message) {
   // HARASS RANDOM VIEWER
 }
 
-// const overwriteSelectedJSON = (target, JSONObj, cb) => {
-//   const JSONStringData = JSON.stringify(JSONObj);
-
-//   fs.writeFile(target, JSONStringData, "utf-8", (err) => {
-//     if (err) {
-//       console.error(`Unable to write object to file. Error: ${err}`);
-//     } else {
-//       cb?.();
-//       console.log(`Success writing obje to file: ${target}`);
-//     }
-//   });
-// };
-
-// function overwritePromptJson(cb) {
-//   // overwriteSelectedJSON("./promptQueue.json", promptQueueData, cb);
-// }
-
-// function overwriteQuotesJson(cb) {
-//   overwriteSelectedJSON("./data/quotesDB.json", quotesDBData, cb);
-// }
-
 // // handleGetPrompt()
 // async function handleTiddies() {
 //   let currentPromptInQueue;
@@ -1021,42 +978,6 @@ function handlePromptCommand(channel, context, message) {
 //     return;
 //   }
 //   return;
-// }
-
-// export function isThisInputClean(message) {
-//   const lastWord = message[0].split(""); //firstWord
-
-//   if (
-//     lastWord[0] === "!" ||
-//     lastWord[0] === "/" ||
-//     lastWord[0] === "." ||
-//     lastWord[0] === "'" ||
-//     lastWord[0] === `"` ||
-//     lastWord[0] === "`" ||
-//     lastWord[0] === "-" ||
-//     lastWord[0] === "#"
-//   ) {
-//     return false;
-//   }
-
-//   if (message.length > 1 || message[1] !== undefined) {
-//     for (const word of message) {
-//       const wordArr = word.split("");
-
-//       if (wordArr.includes("#")) {
-//         return false;
-//       }
-
-//       let dashIndx = wordArr.findIndex((x) => (x = "-"));
-//       if (dashIndx !== -1) {
-//         if (wordArr[dashIndx + 1] === "-" || wordArr[dashIndx + 1] === "-") {
-//           return false;
-//         }
-//       }
-//     }
-//   }
-
-//   return true;
 // }
 
 // /*
