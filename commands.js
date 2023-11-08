@@ -409,6 +409,26 @@ const commands = {
     manual: () => {},
     aliases: () => ["pr", "addprompt"],
   },
+  commands: {
+    exe: (contextObj) => {
+      const list = Object.getOwnPropertyNames(commands);
+
+      const returnArr = list.map((com) => {
+        return `${apiData.Bot.PREFIX}${com}`;
+      });
+
+      server.say(
+        apiData.Bot.CHANNEL,
+        `@${
+          contextObj.tags["display-name"]
+        }, here is a list of all the commands: ${returnArr.join(" ")}.`
+      );
+    },
+    manual: () => {
+      return "Get a full list of the commands. Syntax: !commands";
+    },
+    aliases: () => [],
+  },
 };
 export default commands;
 
