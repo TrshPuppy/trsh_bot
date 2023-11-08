@@ -284,10 +284,7 @@ const commands = {
 
       // Check to see if the quote is actually a quote from the bot
       // changing the keyword in a chatter's original message
-      const feat =
-        quotesDBData[indxIntoQuotesDB].quotes[randIndx].feat === 1
-          ? `@${apiData.Bot.CHANNEL}`
-          : undefined;
+      const feat = quotesDBData[indxIntoQuotesDB].quotes[randIndx].feat;
 
       if (feat) {
         server.say(
@@ -336,13 +333,6 @@ const commands = {
         return;
       }
 
-      // for (let a of authorsArr) {
-      //   console.log(`a = ${a}`);
-      //   a = a.split("");
-      //   a.shift("");
-      //   a = a.join("");
-      //   console.log(`a = ${a}`);
-      // }
       authorsArr = authorsArr.map((a) => {
         a = a.split("");
         a.shift("");
@@ -352,9 +342,7 @@ const commands = {
       });
 
       const OG = authorsArr[0];
-      const feat = authorsArr[1] !== undefined ? authorsArr[1] : undefined;
-
-      console.log(`OG = ${OG}, feat = ${feat}`);
+      const feat = authorsArr[1] !== undefined ? authorsArr[1] : 0;
 
       // Get the quote string with authors filtered out:
       const dirtyQuoteString = context.args
