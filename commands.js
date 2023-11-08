@@ -64,6 +64,7 @@ const commands = {
   yes: {
     exe: () => {
       server.say(apiData.Bot.CHANNEL, `:)`);
+      return;
     },
     manual: () => {
       return `Syntax: '@${apiData.Bot.BOT_USERNAME} yes`;
@@ -73,6 +74,7 @@ const commands = {
   no: {
     exe: () => {
       server.say(apiData.Bot.CHANNEL, ":(");
+      return;
     },
     manual: () => {
       return `Syntax: '@${apiData.Bot.BOT_USERNAME} no`;
@@ -82,6 +84,7 @@ const commands = {
   male: {
     exe: (contextObj) => {
       server.say(apiData.Bot.CHANNEL, "BORK! BORK! BORK!");
+      return;
     },
     manual: () => {
       return "Syntax: BORK BORK BORK!!";
@@ -94,6 +97,7 @@ const commands = {
         apiData.Bot.CHANNEL,
         " If you think you like the Trash Heap, you're gonna love the Claw! --> https://www.theclaw.team <-- We code, we build stuff, we love tech!"
       );
+      return;
     },
     manual: () => {
       return "Find out about the Claw stream team!";
@@ -106,6 +110,7 @@ const commands = {
         apiData.Bot.CHANNEL,
         `Puppies are such a handful... @${context.tags["display-name"]} has gone to eat some flooring! At least it'll tire them out.`
       );
+      return;
     },
     manual: () => {
       return "Let everyone know you're hungry for some flooring & will be back to chat in a bit. Syntax: !lurk";
@@ -118,6 +123,7 @@ const commands = {
         apiData.Bot.CHANNEL,
         `@${context.tags["display-name"]} has returned from chewing up the floor. Hope you're feeling happy and full @${context.tags["display-name"]}!`
       );
+      return;
     },
     manual: () => {
       return "Let chat know you're returned and are ready to chat again! Syntax: !unlurk";
@@ -130,6 +136,7 @@ const commands = {
         apiData.Bot.CHANNEL,
         "This is the kata we're doing right now --> https://www.codewars.com/kata/5648b12ce68d9daa6b000099/train/go"
       );
+      return;
     },
     manual: () => {
       return "Get the current Codewars kata. Syntax: !kata";
@@ -142,6 +149,7 @@ const commands = {
         apiData.Bot.CHANNEL,
         "Join our Codewars clan! Go to: Codewars --> Account Settings --> Clan --> then type in 'TrshPuppies'."
       );
+      return;
     },
     manual: () => {
       return "Get instructions to join the TrshPuppies Codewars clan. Syntax: !clan";
@@ -154,6 +162,7 @@ const commands = {
         apiData.Bot.CHANNEL,
         "TP's mom is in the chat and, from now on, you will refer to her as 'Big Dog' or risk cruel and unusual punishment!"
       );
+      return;
     },
     manual: () => {
       return "Big Dog in the House WHAT WHAT!??!";
@@ -166,6 +175,7 @@ const commands = {
         apiData.Bot.CHANNEL,
         "Check out my spooky podcast which I co-host with my cousin! --> https://www.twitch.tv/hauntzncreepz --> https://open.spotify.com/show/7hcpFnIoWhveRQeNRTNpbM"
       );
+      return;
     },
     manual: () => {
       return "Find out about my spooky podcast. Syntax: !hnc";
@@ -178,6 +188,7 @@ const commands = {
         apiData.Bot.CHANNEL,
         "We're listening to synthwave from our boi White Bat Audio --> https://whitebataudio.com"
       );
+      return;
     },
     manual: () => {
       return "Want to know what we're listening to? Syntax: !music";
@@ -190,11 +201,12 @@ const commands = {
         apiData.Bot.CHANNEL,
         "Today we're working on @trsh_bot --> https://github.com/trshpuppy/trsh_bot"
       );
+      return;
     },
     manual: () => {
       return "Find out what we're working on today. Syntax: !project";
     },
-    aliases: () => ["project", "today"],
+    aliases: () => ["project", "today", "htb"],
   },
   about: {
     exe: (c) => {
@@ -204,6 +216,7 @@ const commands = {
         learning coding and cybersecurity. All you really need to know is the struggle is real, everything IS
         in fact on fire, and you're welcome to chill as long as you like :)`
       );
+      return;
     },
     manual: () => {
       return "Find out about TP. Syntax: !about";
@@ -230,6 +243,7 @@ const commands = {
         apiData.Bot.CHANNEL,
         "Checkout my newest YT video: 'My 1st Tech Interview was for a Senior Position'! --> https://www.youtube.com/watch?v=V1MkBvpD-xw"
       );
+      return;
     },
     manual: () => {
       return "Find out about my latest YouTube video. Syntax: !yt";
@@ -423,6 +437,7 @@ const commands = {
           contextObj.tags["display-name"]
         }, here is a list of all the commands: ${returnArr.join(" ")}.`
       );
+      return;
     },
     manual: () => {
       return "Get a full list of the commands. Syntax: !commands";
