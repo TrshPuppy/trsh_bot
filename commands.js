@@ -59,7 +59,16 @@ const commands = {
     manual: () => {
       return `Say hello to '${apiData.Bot.BOT_USERNAME}. Syntax: '@${apiData.Bot.BOT_USERNAME} hey`;
     },
-    aliases: () => ["hi", "hello", "hey", "goodmorning", "yo", "gm", "whatup"],
+    aliases: () => [
+      "hi",
+      "hello",
+      "hey",
+      "goodmorning",
+      "yo",
+      "gm",
+      "whatup",
+      "hihi",
+    ],
   },
   yes: {
     exe: () => {
@@ -186,7 +195,7 @@ const commands = {
     exe: (c) => {
       server.say(
         apiData.Bot.CHANNEL,
-        "We're listening to synthwave from our boi White Bat Audio --> https://whitebataudio.com"
+        "We're listening to Eurobeat in honor of Initial D -->https://open.spotify.com/playlist/12NSP6DiKBqsLTybzOSn2D?si=496033c0c2374fd1"
       );
       return;
     },
@@ -199,7 +208,7 @@ const commands = {
     exe: (c) => {
       server.say(
         apiData.Bot.CHANNEL,
-        "Today we're working on @trsh_bot --> https://github.com/trshpuppy/trsh_bot"
+        "Today we're hacking HTB Tier 2: MARKUP --> https://app.hackthebox.com/starting-point"
       );
       return;
     },
@@ -330,7 +339,7 @@ const commands = {
       // Use Regex to find authors, there can be a max of two (an OG and a feat)
       // The first author will be treated as the OG (the chatter who said the chat originally)
       // the second author is the feat (such as a quote saved where the bot changed a word to the keyword)
-      const authorRgx = /(@[A-Za-z0-9]{3,20})/g;
+      const authorRgx = /@[\da-zA-Z]\w{3,24}/g; // @[\da-zA-Z]\w{3,24}
       const authors = context.args.join(" ").matchAll(authorRgx);
       let authorsArr = [];
 
@@ -443,6 +452,71 @@ const commands = {
       return "Get a full list of the commands. Syntax: !commands";
     },
     aliases: () => [],
+  },
+  website: {
+    exe: (contextObj) => {
+      server.say(
+        apiData.Bot.CHANNEL,
+        `Checkout TP's website! The front end is jank but the content is FIRE! --> https://trshpuppy.github.io/`
+      );
+      return;
+    },
+    manual: () => {
+      return "Get the URL for TP's website";
+    },
+    aliases: () => ["io", "web"],
+  },
+  dare: {
+    exe: (contextObj) => {
+      server.say(
+        apiData.Bot.CHANNEL,
+        `Hey pleb, I dare you to click this --> https://media.giphy.com/media/riwUvx9DmD1bSTw05Z/giphy.mp4`
+      );
+      return;
+    },
+    manual: () => {
+      return "Get the URL for TP's website";
+    },
+    aliases: () => ["gif"],
+  },
+  bitty: {
+    exe: (c) => {
+      server.say(
+        apiData.Bot.CHANNEL,
+        `Go check out Lil_Bitty_Diver! She's my lovely cousin --> https://twitch.tv/lil_bitty_diver`
+      );
+      return;
+    },
+    manual: () => {
+      return "Find out about my cousin, who is way cooler than me. Syntax: !bitty";
+    },
+    aliases: () => [],
+  },
+  welcome: {
+    exe: (c) => {
+      server.say(
+        apiData.Bot.CHANNEL,
+        "WELCOME TO THE TRASH HEAP: https://clips.twitch.tv/SuspiciousHungryAnteaterWholeWheat-GmC-jLVZaVJzZwJU"
+      );
+      return;
+    },
+    manual: () => {
+      return "See the Official Welcome Clip for the Trash Heap! Syntax: !welcome";
+    },
+    aliases: () => [],
+  },
+  nerd: {
+    exe: (c) => {
+      server.say(
+        apiData.Bot.CHANNEL,
+        "TP is such a nerd, that she's taken notes on coding, cybersecurity, computers, and hacking and made them available for others on GitHub --> https://github.com/trshpuppy/obsidian-notes"
+      );
+      return;
+    },
+    manual: () => {
+      return "See the Official Welcome Clip for the Trash Heap! Syntax: !welcome";
+    },
+    aliases: () => ["obsidian", "notes"],
   },
 };
 export default commands;
