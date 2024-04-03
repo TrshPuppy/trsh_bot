@@ -3,7 +3,11 @@ import apiData from "./data/api.json" assert { type: "json" };
 import quotesDBData from "./data/quotesDB.json" assert { type: "json" };
 import { findCommandByAlias } from "./messages.js";
 import fs from "node:fs";
-import addPrompt from "./promptQueue.js";
+import addPrompt, {
+    getPromptFromDB,
+    markPromptIncomplete,
+} from "./promptQueue.js";
+import { get } from "node:http";
 
 const commands = {
     man: {
@@ -212,7 +216,7 @@ const commands = {
         exe: (c) => {
             server.say(
                 apiData.Bot.CHANNEL,
-                "Today we're working through PortSwigger's Web Security Academy --> https://portswigger.net/web-security"
+                "Today we're coding NetPuppy; a CLI tool for establishing a TCP connection b/w 2 peers w/ the option for starting a reverse shell on one! --> github.com/trshpuppy/netpuppy"
             );
             return;
         },
@@ -462,7 +466,52 @@ const commands = {
         },
         aliases: () => ["pr", "addprompt"],
     },
-    commands: {
+    getprompt: {
+        exe: async (c) => {
+            // Caller should be a mod:
+            if (c.tags["mod"] === false) {
+                return;
+            }
+
+            // If they're a mod, let em cook:
+            try {
+                const nextPromptInQueue = await getPromptFromDB(); // returns an object including .prompt and .author keys
+                console.log("gotprompt:  " + gotprompt);
+                if (!nextPromptInQueue) {
+                    server.say(
+                        apiData.Bot.CHANNEL,
+                        "There are no more prompts in the queue :("
+                    );
+                    return;
+                }
+            } catch (err) {
+                server.say(
+                    apiData.Bot.CHANNEL,
+                    "Oops! There was an error getting the next prompt"
+                );
+                console.log("Error: getting prompt from DB! " + err);
+                return;
+            }
+
+            server.say(
+                apiData.Bot.CHANNEL,
+                `'${nextPromptInQueue.prompt}' - by @${nextPromptInQueue.author}`
+            );
+
+            try {
+                await markPromptIncomplete(nextPromptInQueue.rowid);
+            } catch (err) {
+                console.log("Error: marking prompt as complete! " + err);
+                return;
+            }
+            return;
+        },
+        manual: () => {
+            return `Get the next prompt in the queue. Syntax: !getprompt`;
+        },
+        aliases: () => ["gt", "g"],
+    },
+    cmds: {
         exe: (contextObj) => {
             const list = Object.getOwnPropertyNames(commands);
 
@@ -481,7 +530,7 @@ const commands = {
         manual: () => {
             return "Get a full list of the commands. Syntax: !commands";
         },
-        aliases: () => [],
+        aliases: () => ["commands"],
     },
     website: {
         exe: (contextObj) => {
@@ -657,19 +706,6 @@ const commands = {
             return "Get the current challenge from stderr. Syntax: !stderr";
         },
         aliases: () => ["challenge"],
-    },
-    voucher: {
-        exe: (c) => {
-            server.say(
-                apiData.Bot.CHANNEL,
-                "We're doing a giveaway for a 12 month VIP+ subscription to Hack the Box! Join this Sat, Jan 27th at noon EST to enter your name in the drawing!"
-            );
-            return;
-        },
-        manual: () => {
-            return "Get the info for the HTB giveaway. Syntax: !voucher";
-        },
-        aliases: () => ["giveaway"],
     },
 };
 export default commands;

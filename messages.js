@@ -48,10 +48,10 @@ export default function delegateMessage(channel, tags, message, self) {
                     if (alias) {
                         commands[alias].exe({ channel, tags, message, self });
                     } else {
-                        server.say(
-                            apiData.Bot.CHANNEL,
-                            `sorry, that command doesn't exist :(`
-                        );
+                        // server.say(
+                        //     apiData.Bot.CHANNEL,
+                        //     `sorry, that command doesn't exist :(`
+                        // );
                     }
                     return;
                 }
@@ -67,6 +67,7 @@ export default function delegateMessage(channel, tags, message, self) {
 
 let timeSinceLastKeywordMsg = new Date();
 let keywordLessMessages = 0;
+let timeSinceYTMessage = new Date();
 
 function keywordQ300(channel, tags, message, self) {
     /*
@@ -134,6 +135,14 @@ function keywordQ300(channel, tags, message, self) {
         timeSinceLastKeywordMsg = new Date();
         keywordLessMessages = 0;
 
+        if (timeSinceYTMessage >= 900) {
+            server.say(
+                apiData.Bot.CHANNEL,
+                `Have you checked out the NetPuppy Dev Log series?! TP just uploaded a new vid all about concurrenvy! --> youtu.be/ADlIelOEb5E`
+            );
+            timeSinceYTMessage = new Date();
+        }
+
         return true;
     }
     return false;
@@ -163,10 +172,10 @@ function handleChannelCommand(channel, tags, message, self) {
         if (alias) {
             commands[alias].exe(context);
         } else {
-            server.say(
-                apiData.Bot.CHANNEL,
-                `Sorry @${tags["display-name"]}, that command doesn't exist :(`
-            );
+            // server.say(
+            //     apiData.Bot.CHANNEL,
+            //     `Sorry @${tags["display-name"]}, that command doesn't exist :(`
+            // );
         }
         return;
     }
