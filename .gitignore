@@ -12,3 +12,4 @@ data/quotesDB.json
 quotesDB.json
 run_tb.sh
 data/prompts.sqlite
+xmetrix.js

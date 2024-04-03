@@ -1,9 +1,14 @@
+/*
+ * This module is for creating and exporting the TMI.js server
+ */
+
 import apiData from "./data/api.json" assert { type: "json" };
 import tmi from "tmi.js";
 import delegateMessage from "./messages.js";
 
 export let server;
 
+// Create the server using the tmi.Client & using data in data/api.json
 export default function createServer() {
   server = new tmi.Client({
     connection: {
@@ -20,10 +25,3 @@ export default function createServer() {
   // Event Handlers:
   server.on("message", delegateMessage);
 }
-
-// server.on("message", (channel, tags, message, self) => {
-//   console.log("channel = " + channel);
-//   console.log("tags = " + JSON.stringify(tags));
-//   console.log("message = " + message);
-//   console.log("self = " + self);
-// });
