@@ -1,16 +1,16 @@
-// This module handles automating the OAuth2 token and refresh token
-console.log("hi");
+/*
+ * This module handles automating the OAuth2 token and refresh token
+ */
+
 import fetch from "node-fetch";
 import apiData from "./data/api.json" assert { type: "json" };
 import * as fs from "fs/promises";
 
 export default async function checkOAuthStatus() {
+  // If Oauth is due to expire OR OAuth returns a 404, then:
   if (isOAuthExpired()) {
-    // If Oauth is due to expire OR OAuth returns a 404, then:
     const response = await refreshOAuth();
-
     const json = await response.json();
-
     await checkRefreshInJSON(json);
   }
 }
@@ -40,13 +40,6 @@ function refreshOAuth() {
       "Content-Type": `application/x-www-form-urlencoded`,
     },
   });
-  // .then(function (response) {
-  //   return response.json();
-  // })
-  // .then(checkRefreshInJSON)
-  // .catch((error) => console.log(`error during fetch = ${error}`));
-
-  // Check response for failure OR update JSON:
 }
 
 async function checkRefreshInJSON(json) {
@@ -68,16 +61,6 @@ async function updateJSON(response) {
 
   // Overwrite api.json w/ updated JSON Object:
   await fs.writeFile(targetFile, JSONObj, "utf-8");
-
-  //(error) => {
-  //     if (error) {
-  //       console.log(
-  //         "Error, failed to write new data to api.json. JSON not updated."
-  //       );
-  //       return;
-  //     }
-  //     console.log("Successfully wrote new data to api.json file!");
-  //   });
 }
 
 function getNewRefreshToken() {
@@ -86,9 +69,16 @@ function getNewRefreshToken() {
   );
 }
 
-/*
-f wherever you want to access the data you use `getApiData()`, and only in that function you use `require`, and only the first time that it gets called, then `require` will only be called later on in the program's execution, not when the files get loaded as an import
+/* f wherever you want to access the data you use `getApiData()`, 
+and only in that function you use `require`, and only the first time that it gets called, 
+then `require` will only be called later on in the program's execution, 
+not when the files get loaded as an import
 
 
-Another option is, create an api.js file. Requiring that file will return the object you store in module.exports inside of that file. Any file that requires api.js will get a reference to that same object. It doesn't matter if that object is empty at the beginning of the project. Later on, you can set values on that object (e.g. module.exports.token = blabla). And any file that required api.js will be able to access whatever data you store in that object.
+Another option is, create an api.js file. Requiring that file will return the 
+object you store in module.exports inside of that file. Any file that requires 
+api.js will get a reference to that same object. It doesn't matter if that object 
+is empty at the beginning of the project. Later on, you can set values on that object 
+(e.g. module.exports.token = blabla). And any file that required api.js will be able 
+to access whatever data you store in that object.
 */
