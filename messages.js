@@ -6,7 +6,6 @@
 // Imports:
 import { server } from "./server.js";
 import nlp from "compromise";
-import addPrompt from "./promptQueue.js";
 import apiData from "./data/api.json" assert { type: "json" };
 import commands from "./commands.js";
 
@@ -30,9 +29,6 @@ export default function delegateMessage(channel, tags, message, self) {
             return;
         case ";":
             return;
-        // case "!":
-        //     handleChannelCommand(channel, tags, message, self);
-        //     break;
         case "@":
             // If the message is meant for the bot:
             if (
@@ -58,8 +54,9 @@ export default function delegateMessage(channel, tags, message, self) {
             }
             return;
         default:
-            // If none, then it's a regular chat message & we can run our keyword function:
+            // If none, then it's a regular chat message & we can run our keyword and timer functions:
             keywordQ300(channel, tags, message, self);
+            checkMessageTimers(channel, tags, message, self);
             break;
     }
     return;
@@ -67,7 +64,31 @@ export default function delegateMessage(channel, tags, message, self) {
 
 let timeSinceLastKeywordMsg = new Date();
 let keywordLessMessages = 0;
-let timeSinceYTMessage = new Date();
+
+const timerMessages = {
+    programStart: new Date() / 1000, // Put in seconds
+    yt: {
+        msg: `Have you checked out the NetPuppy Dev Log series?! TP just uploaded a new vid all about concurrency! --> youtu.be/ADlIelOEb5E`,
+        interval: 1800, // 30 minutes
+        offset: 0,
+        lastChecked: new Date() / 1000,
+        started: false,
+    },
+    bootDev: {
+        msg: "Are you interested in taking a course on Boot.dev? There are courses on Python, Go, JS, shells & terminals, SQL, Docker, and a lot more! Use my affiliate code TRASHPUP for 25% off your first payment! --> https://boot.dev/?via=trashpuppy",
+        interval: 1800,
+        offset: 900, // 15 mins
+        lastChecked: new Date() / 1000,
+        started: false,
+    },
+    tibs:{
+        msg: "@0xtib3rius invited me to be his first guest on his new web-series! Check out the episode here! --> https://youtu.be/zSJEy91MJcY",
+        interval: 1800,
+        offset: 1200,
+        lastChecked: new Date() / 1000,
+        started: false,
+    }
+};
 
 function keywordQ300(channel, tags, message, self) {
     /*
@@ -135,17 +156,42 @@ function keywordQ300(channel, tags, message, self) {
         timeSinceLastKeywordMsg = new Date();
         keywordLessMessages = 0;
 
-        if (timeSinceYTMessage >= 900) {
-            server.say(
-                apiData.Bot.CHANNEL,
-                `Have you checked out the NetPuppy Dev Log series?! TP just uploaded a new vid all about concurrenvy! --> youtu.be/ADlIelOEb5E`
-            );
-            timeSinceYTMessage = new Date();
-        }
-
         return true;
     }
     return false;
+}
+
+function checkMessageTimers(c, t, m, s) {
+    const now = Math.floor(new Date() / 1000);
+
+    // Go through timer messages and decrement their offsets/ timers:
+    for (const [ky, val] of Object.entries(timerMessages)) {
+        if (ky == "programStart") {
+            continue;
+        }
+
+        const sinceLastChecked = Math.floor(now - val.lastChecked);
+
+        if (val.started == false) {
+            // Decrement the offset
+            val.offset -= sinceLastChecked;
+
+            // If the offset if 0 or negative, set started to true
+            if (val.offset <= 0) {
+                val.started = true;
+            }
+        } else {
+            val.interval -= sinceLastChecked;
+
+            if (val.interval <= 0) {
+                // Reset interval and send message to chat:
+                val.interval = 1800; // 30 mins
+                server.say(apiData.Bot.CHANNEL, val.msg);
+            }
+        }
+        val.lastChecked = now;
+    }
+    return;
 }
 
 function handleChannelCommand(channel, tags, message, self) {

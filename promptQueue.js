@@ -22,26 +22,16 @@ export default function addPrompt(promptObj) {
 // Return next prompt in queue to calling function from DB:
 export async function getPromptFromDB() {
     return await new Promise((resolve, reject) => {
-        const s =
+        const queryString =
             "SELECT rowid, prompt, author FROM prompts WHERE completed = 0 ORDER BY time ASC LIMIT 1";
 
-        prompts.each(
-            s,
-            (err, what_WaS_ThiS_VaRiaBLes_NAME_SuppOSeD_To_bE_1234509876) => {
-                if (err) {
-                    reject("ERROR getting prompt from DB: " + err);
-                }
-                resolve(what_WaS_ThiS_VaRiaBLes_NAME_SuppOSeD_To_bE_1234509876);
-            },
-            (err, rows) => {
-                if (err) {
-                    reject("Error getting prompt from DB: " + err);
-                }
-                if (!rows) {
-                    resolve(rows);
-                }
+        prompts.each(queryString, (err, x) => {
+            console.log("x in getPromptFromDB:   " + x);
+            if (err) {
+                reject("ERROR getting prompt from DB: " + err);
             }
-        );
+            resolve(x);
+        });
     });
 }
 

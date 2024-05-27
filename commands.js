@@ -98,6 +98,16 @@ const commands = {
         },
         aliases: () => ["no", "nah", "nope", "n"],
     },
+    dividebyzero: {
+        exe: () => {
+            server.say(apiData.Bot.CHANNEL, "Calculating...");
+            server.say(apiData.Bot.CHANNEL, "8008135");
+        },
+        manual: () => {
+            return `Syntax: '@${apiData.Bot.BOT_USERNAME} dividebyzero'`;
+        },
+        aliases: () => ["0", "divideby0"],
+    },
     male: {
         exe: (contextObj) => {
             server.say(apiData.Bot.CHANNEL, "BORK! BORK! BORK!");
@@ -216,7 +226,7 @@ const commands = {
         exe: (c) => {
             server.say(
                 apiData.Bot.CHANNEL,
-                "Today we're coding NetPuppy; a CLI tool for establishing a TCP connection b/w 2 peers w/ the option for starting a reverse shell on one! --> github.com/trshpuppy/netpuppy"
+                "Today we're coding NetPuppy: a CLI tool for spawning a reverse shell on a target. --> github.com/trshpuppy/netpuppy"
             );
             return;
         },
@@ -258,7 +268,7 @@ const commands = {
         exe: (c) => {
             server.say(
                 apiData.Bot.CHANNEL,
-                "Checkout my newest YT video: 'My 1st Tech Interview was for a Senior Position'! --> https://www.youtube.com/watch?v=V1MkBvpD-xw"
+                "Checkout my newest YT video: 'Concurrency is Hard: NetPuppy Dev Log 2.1'! --> https://www.youtube.com/watch?v=ADlIelOEb5E"
             );
             return;
         },
@@ -437,7 +447,7 @@ const commands = {
                 } else {
                     server.say(
                         apiData.Bot.CHANNEL,
-                        `Thanks @${context.tags["display-name"]}, your ICONIC quote was added to my database ;)`
+                        `Thanks @${OG}, your ICONIC quote was added to my database ;)`
                     );
                     console.log(`Success adding new quote to JSON file!`);
                 }
@@ -698,7 +708,7 @@ const commands = {
         exe: (c) => {
             server.say(
                 apiData.Bot.CHANNEL,
-                `Today's challenge from @stderr: 󵔫󳅆󳑁󳤠󶥳󲃰􁾒`
+                `Today's challenge from @stderr: /Td6WFoAAATm1rRGAgAhARwAAAAQz1jM4ACiAIxdACINhMVc+NOBSgDhDWUUq2kOo5WBKe0VHpqey/206ywXzNZ1i2hnohBhyKV+hZTh4e9S9DyLL/Tx9TYAOPYKXpM7UD16M2dNOqBzNQE7QSMDn3T+98PbI8cA1P5lXnzL+Mf59JZ3r20sKkXJFLkKm8IqDK+3AA73JXMDS82Uhv8A2T9ZMrr1RkFZnQAAAIuXjjIVxLtsAAGoAaMBAAAysmZVscRn+wIAAAAABFla`
             );
             return;
         },
@@ -706,6 +716,30 @@ const commands = {
             return "Get the current challenge from stderr. Syntax: !stderr";
         },
         aliases: () => ["challenge"],
+    },
+    bootdev: {
+        exe: (c) => {
+            server.say(
+                apiData.Bot.CHANNEL,
+                "Are you interested in taking a course on Boot.dev? There are courses on Python, Go, JS, shells & terminals, SQL, Docker, and a lot more! Use my affiliate code TRASHPUP for 25% off your first payment! --> https://boot.dev/?via=trashpuppy"
+            );
+        },
+        manual: () => {
+            return "Find out how to get a discount on Boot.dev with my affiliate link! Syntax: !bootdev";
+        },
+        aliases: () => ["boot"],
+    },
+    tibs: {
+        exe: (c) => {
+            server.say(
+                apiData.Bot.CHANNEL,
+                "@0xtib3rius invited me to be his first guest on his new web-series! Check out the episode here! --> https://youtu.be/zSJEy91MJcY"
+            );
+        },
+        manual: () => {
+            return "Find out about my recent interview w/ @0xtib3rius! Syntax: !tibs";
+        },
+        aliases: () => [],
     },
 };
 export default commands;
@@ -722,6 +756,7 @@ function handleAddPrompt(context) {
         return false;
     }
     console.log("promt text:   " + promptText);
+
     // Make sure the prompt text is clean (no punctuation/ numbers);
     const filteredPromptArr = [];
     for (let word of promptText) {
@@ -745,6 +780,7 @@ function handleAddPrompt(context) {
 
     const sparklyCleanPromptText = filteredPromptArr.join(" ");
     console.log("sparkly clean =   " + sparklyCleanPromptText);
+
     // Create promptObj to be added to DB:
     const promptObj = new Object();
 
@@ -754,7 +790,6 @@ function handleAddPrompt(context) {
     promptObj.completed = 0;
 
     // Send promptObj to be added to DB:
-    console.log("prompt obj before send:   " + promptObj);
     const wasThePromptAddSuccessful = addPrompt(promptObj);
     return wasThePromptAddSuccessful;
 }
